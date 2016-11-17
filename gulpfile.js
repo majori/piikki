@@ -6,7 +6,8 @@ const BUILD_DIR = './dist'
 
 const CONFIG = {
     typescript: {
-        target: 'ES6'
+        target: 'ES6',
+        module: 'commonjs'
     }
 }
 
