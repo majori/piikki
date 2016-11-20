@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import routes from './routes';
+import database from './database';
 
 const app = express();
 
