@@ -1,9 +1,17 @@
 let cfg = {};
 
+// ## Environment configs
+//
 cfg.env = process.env.NODE_ENV || 'development';
 cfg.isProduction = cfg.env === 'production';
 
-// Database configs
+// ### HTTP-server configs
+//
+cfg.hostname = process.env.PIIKKI_HOSTNAME || 'localhost';
+cfg.port = process.env.PIIKKI_PORT || 3000;
+
+// ### Database configs
+//
 let dbLocalConnection = {
     host: process.env.PIIKKI_DATABASE_HOSTNAME || 'localhost',
 	user: 'piikki',
@@ -13,11 +21,9 @@ let dbLocalConnection = {
 	charset: 'utf8'
 };
 
-let dbConnection = process.env.PIIKKI_DATABASE_URL || dbLocalConnection;
-
 cfg.db = {
     client: 'postgresql',
-    connection: dbConnection,
+    connection: process.env.PIIKKI_DATABASE_URL || dbLocalConnection,
 	pool: { min: 0, max: 5 },
     migrations: {
         tableName: 'knex_migrations'

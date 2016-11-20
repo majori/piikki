@@ -2,14 +2,11 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import routes from './routes';
 import database from './database';
+const cfg = require('../config');
 
 const app = express();
 
-const ENV = process.env.NODE_ENV || 'development';
-const HOSTNAME = process.env.PIIKKI_HOSTNAME || 'localhost';
-const PORT = process.env.PIIKKI_PORT || 3000;
-
-if (ENV === 'development') {
+if (!cfg.isProduction) {
     // Use dev middlewares
 }
 
@@ -19,6 +16,6 @@ app.use(bodyParser.json());
 // Config routes
 routes(app);
 
-app.listen(PORT, HOSTNAME, () => {
-    console.log(`Server listening on http://${HOSTNAME}:${PORT}`);
+app.listen(cfg.port, cfg.hostname, () => {
+    console.log(`Server listening on http://${cfg.hostname}:${cfg.port}`);
 });
