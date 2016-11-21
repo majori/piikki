@@ -24,6 +24,7 @@
     "typescript": "^2.0.10"
   },
   "dependencies": {
+    "@types/bcrypt": "0.0.30",
     "@types/bluebird": "^3.0.35",
     "@types/body-parser": "0.0.33",
     "@types/debug": "0.0.29",
@@ -33,6 +34,7 @@
     "@types/lodash": "^4.14.39",
     "@types/method-override": "0.0.29",
     "@types/node": "^6.0.48",
+    "bcrypt": "^0.8.7",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "debug": "^2.3.3",

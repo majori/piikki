@@ -4,9 +4,9 @@ exports.up = (knex, Promise) => Promise.all([
         table.uuid('id')
             .primary()
             .defaultTo(knex.raw('uuid_generate_v4()'));
-        table.string('username')
+        table.string('username', 20)
             .unique();
-        table.string('hash');
+        table.string('password');
         table.float('saldo')
             .defaultTo('0.0');
     }),
