@@ -1,21 +1,32 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as errorHandler from 'errorhandler';
+import * as methodOverride from 'method-override';
+import * as debug from 'debug';
 import routes from './routes';
+import handlers from './handlers';
 import database from './database';
+
 const cfg = require('../config');
+const log = debug('http');
 
 const app = express();
 
+// Use dev middlewares
 if (!cfg.isProduction) {
-    // Use dev middlewares
+    app.use(errorHandler());
 }
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(methodOverride());
 
-// Config routes
+// Configure routes
 routes(app);
 
+// Configure error handlers
+handlers(app);
+
 app.listen(cfg.port, cfg.hostname, () => {
-    console.log(`Server listening on http://${cfg.hostname}:${cfg.port}`);
+    log(`Server listening on http://${cfg.hostname}:${cfg.port}`);
 });
