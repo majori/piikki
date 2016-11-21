@@ -1,24 +1,23 @@
 const gulp  = require('gulp');
 const ts    = require('gulp-typescript');
 
-const SOURCE_DIR = './src';
-const BUILD_DIR = './dist'
-
 const CONFIG = {
-    typescript: {
-        target: 'ES6',
-        module: 'commonjs'
-    }
-}
+    SOURCE_DIR: './src', 
+    BUILD_DIR: './dist',
 
-gulp.task('build-typescript', () => gulp
-    .src(`${SOURCE_DIR}/**/*.ts`)
-    .pipe(ts(CONFIG.typescript))
-    .pipe(gulp.dest(BUILD_DIR))
-);
+    TS_CONFIG_FILE: 'tsconfig.json'
+};
+
+const tsProject = ts.createProject(CONFIG.TS_CONFIG_FILE);
+
+
+gulp.task('build-typescript', () => {
+    const tsResult = tsProject.src().pipe(tsProject());
+    return tsResult.js.pipe(gulp.dest(CONFIG.BUILD_DIR))
+});
 
 gulp.task('watch', () => {
-    gulp.watch(`${SOURCE_DIR}/**/*.ts`, ['build-typescript'])
+    gulp.watch(`${CONFIG.SOURCE_DIR}/**/*.ts`, ['build-typescript'])
 })
 
 gulp.task('build', ['build-typescript']);
