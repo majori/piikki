@@ -3,9 +3,9 @@ import * as bodyParser from 'body-parser';
 import * as errorHandler from 'errorhandler';
 import * as methodOverride from 'method-override';
 import * as debug from 'debug';
+import * as database from './database';
 import routes from './routes';
 import handlers from './handlers';
-import database from './database';
 
 const cfg = require('../config');
 const log = debug('http');
