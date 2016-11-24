@@ -9,10 +9,10 @@ const db = knex(cfg.db);
 
 interface User {
     username: string;
-    password: string;
+    password?: string;
 };
 
-export function saveUser(user: User): Promise<any> {
+export function createUser(user: User): Promise<any> {
     return validateUser(user)
         .then(() => db('users').where({username: user.username}))
         .then(records => _.isEmpty(records) ?
@@ -32,21 +32,46 @@ export function authorizeUser(user: User): Promise<any> {
             .where({ username: user.username })
             .first('password')
         )
-        .then(record => bcrypt.compareSync(user.password, record.password) ?
+        .then(row => bcrypt.compareSync(user.password, row.password) ?
             Promise.resolve() :
             Promise.reject('Invalid password')
         );
 };
 
+export function makeTransaction(user: User, amount: number, comment?: string): Promise<any> {
+    return validateUser(user)
+        .then(() => _.isNumber(amount) ? Promise.resolve() : Promise.reject('Amount is not a number'))
+        .then(() => userExists(user))
+        .then(() => db.transaction(trx => trx.table('users')
+            .where({username: user.username}).first('id', 'saldo')
+            .then(row => trx.table('users')
+                .where({username: user.username})
+                .update({saldo: row.saldo + amount})
+                .then(() => Promise.resolve({userId: row.id, oldSaldo: row.saldo, newSaldo: row.saldo + amount}))
+            )
+            .then(transaction => trx.table('transactions').insert(_.isString(comment) ? _.assign(transaction, { comment }) : transaction ))
+            .then(trx.commit)
+            .catch(trx.rollback)
+        ));
+};
+
+// Check if user object is valid
 function validateUser(user: User): Promise<string | void> {
     if (_.isUndefined(user.username))   return Promise.reject('No username');
     if (!_.isString(user.username))     return Promise.reject('Username was not a string');
     if (_.isEmpty(user.username))       return Promise.reject('Username was empty')
     if (user.username.length > 20)      return Promise.reject('Username was longer than 20 characters');
 
-    if (_.isUndefined(user.password))   return Promise.reject('No password');
-    if (!_.isString(user.password))     return Promise.reject('Password was not a string');
-    if (_.isEmpty(user.password))       return Promise.reject('Password was empty');
+    if (!_.isUndefined(user.password)) {
+        if (!_.isString(user.password))     return Promise.reject('Password was not a string');
+        if (_.isEmpty(user.password))       return Promise.reject('Password was empty');
+    }
 
     return Promise.resolve();
+}
+
+// Checks if user is in database
+function userExists(user: User) {
+    return db('users').where({username: user.username}).first()
+        .then(row => _.isUndefined(row) ? Promise.reject('User not found') : Promise.resolve(row));
 }
