@@ -8,7 +8,7 @@ exports.up = (knex, Promise) => Promise.all([
             .unique();
         table.string('password');
         table.float('saldo')
-            .defaultTo('0.0');
+            .defaultTo(0);
     }),
 
 
@@ -26,11 +26,14 @@ exports.up = (knex, Promise) => Promise.all([
             .references('id')
             .inTable('transactionTypes')
             .onDelete('SET NULL');
-        table.float('amount');
         table.uuid('userId')
             .references('id')
             .inTable('users')
             .onDelete('SET NULL');
+        table.timestamp('timestamp')
+            .defaultTo(knex.raw('now()'));
+        table.float('oldSaldo');
+        table.float('newSaldo');
         table.string('comment');
     })
 ]);
