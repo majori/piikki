@@ -4,12 +4,17 @@ const cfg = require('../config');
 export default (app: express.Application) => {
 
     app.use((req, res, next) => {
+        res.type('application/json');
+        next();
+    });
+
+    app.use((req, res, next) => {
         let auth = req.get('Authorization');
 
         if (auth && auth === cfg.secret) {
             next();
         } else {
-            res.status(401).send('Unauthorized');
+            res.status(401).json({ error: 'Unauthorized' });
         }
     });
 
