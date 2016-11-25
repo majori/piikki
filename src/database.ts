@@ -5,7 +5,8 @@ import * as _ from 'lodash';
 
 const cfg = require('../config.js');
 const saltRounds = 10;
-const db = knex(cfg.db);
+
+export const _knex = knex(cfg.db);
 
 interface IUser {
     username: string;
@@ -14,12 +15,12 @@ interface IUser {
 
 export function getUsers(): Promise<any> {
     return Promise.resolve()
-        .then(() => db.select('id', 'username', 'saldo').from('users').where({ deleted: false }));
+        .then(() => _knex.select('id', 'username', 'saldo').from('users').where({ deleted: false }));
 };
 
 export function getUser(username: string): Promise<any> {
     return validateUsername(username)
-        .then(() => db.select('username', 'saldo')
+        .then(() => _knex.select('username', 'saldo')
             .from('users')
             .where({ username, deleted: false })
             .first());
@@ -27,7 +28,7 @@ export function getUser(username: string): Promise<any> {
 
 export function createUser(user: IUser): Promise<any> {
     return validateUser(user)
-        .then(() => db('users').where({username: user.username}))
+        .then(() => _knex('users').where({username: user.username}))
         .then((records) => _.isEmpty(records) ?
             Promise.resolve() :
             Promise.reject(`Username ${user.username} already exists`)
@@ -35,13 +36,13 @@ export function createUser(user: IUser): Promise<any> {
         .then(() => {
             // Hash password
             let hash = bcrypt.hashSync(user.password, saltRounds);
-            return db('users').insert({username: user.username, password: hash});
+            return _knex('users').insert({username: user.username, password: hash});
         });
 };
 
 export function authenticateUser(user: IUser): Promise<any> {
     return validateUser(user)
-        .then(() => db('users')
+        .then(() => _knex('users')
             .where({ username: user.username })
             .first('password')
         )
@@ -55,7 +56,7 @@ export function makeTransaction(username: string, amount: number, comment?: stri
     return validateUsername(username)
         .then(() => _.isNumber(amount) ? Promise.resolve() : Promise.reject('Amount is not a number'))
         .then(() => userExists(username))
-        .then((fetchedUser) => db.transaction((trx) =>
+        .then((fetchedUser) => _knex.transaction((trx) =>
             trx.table('users')
             .where({username: fetchedUser.username})
             .update({saldo: fetchedUser.saldo + amount})
@@ -72,7 +73,6 @@ export function makeTransaction(username: string, amount: number, comment?: stri
         ));
 };
 
-export const _knex = db;
 
 function validateUser(user: IUser): Promise<[string | void]> {
     if (_.isObject(user) && user.username && user.password) {
@@ -111,7 +111,7 @@ function validateUserId(id: string): Promise<string | void> {
 // Checks if user is in database
 function userExists(username: string): Promise<any> {
     return Promise.resolve()
-        .then(() => db('users').where({ username }).first()
+        .then(() => _knex('users').where({ username }).first()
             .then((row) => _.isUndefined(row) ? Promise.reject('User not found') : Promise.resolve(row))
         );
 };
