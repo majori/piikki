@@ -1,5 +1,9 @@
 
 exports.up = (knex, Promise) => Promise.all([
+    
+    // This extension is required for auto-generated uuid (Postgresql)
+    knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'),
+
     knex.schema.createTable('users', table => {
         table.uuid('id')
             .primary()
