@@ -12,6 +12,15 @@ interface User {
     password?: string;
 };
 
+export function getUsers(): knex.QueryBuilder {
+    return db.select('id', 'username', 'saldo').from('users');
+}
+
+export function getUser(user: User): Promise<any> {
+    return validateUser(user)
+        .then(() => db.select('id', 'username', 'saldo').from('users').where({username: user.username}).first());
+}
+
 export function createUser(user: User): Promise<any> {
     return validateUser(user)
         .then(() => db('users').where({username: user.username}))
@@ -26,7 +35,7 @@ export function createUser(user: User): Promise<any> {
         });
 };
 
-export function authorizeUser(user: User): Promise<any> {
+export function authenticateUser(user: User): Promise<any> {
     return validateUser(user)
         .then(() => db('users')
             .where({ username: user.username })
@@ -42,24 +51,26 @@ export function makeTransaction(user: User, amount: number, comment?: string): P
     return validateUser(user)
         .then(() => _.isNumber(amount) ? Promise.resolve() : Promise.reject('Amount is not a number'))
         .then(() => userExists(user))
-        .then(() => db.transaction(trx => trx.table('users')
-            .where({username: user.username}).first('id', 'saldo')
-            .then(row => trx.table('users')
-                .where({username: user.username})
-                .update({saldo: row.saldo + amount})
-                .then(() => Promise.resolve({userId: row.id, oldSaldo: row.saldo, newSaldo: row.saldo + amount}))
-            )
-            .then(transaction => trx.table('transactions').insert(_.isString(comment) ? _.assign(transaction, { comment }) : transaction ))
+        .then((fetchedUser) => db.transaction(trx =>
+            trx.table('users')
+            .where({username: fetchedUser.username})
+            .update({saldo: fetchedUser.saldo + amount})
+            .then(() => Promise.resolve({userId: fetchedUser.id, oldSaldo: fetchedUser.saldo, newSaldo: fetchedUser.saldo + amount}))
+            .then(transaction =>
+                trx.table('transactions')
+                .insert(_.isString(comment) ? _.assign(transaction, { comment }) : transaction ))
             .then(trx.commit)
             .catch(trx.rollback)
         ));
 };
 
+export const _knex = db;
+
 // Check if user object is valid
 function validateUser(user: User): Promise<string | void> {
     if (_.isUndefined(user.username))   return Promise.reject('No username');
     if (!_.isString(user.username))     return Promise.reject('Username was not a string');
-    if (_.isEmpty(user.username))       return Promise.reject('Username was empty')
+    if (_.isEmpty(user.username))       return Promise.reject('Username was empty');
     if (user.username.length > 20)      return Promise.reject('Username was longer than 20 characters');
 
     if (!_.isUndefined(user.password)) {

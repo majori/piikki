@@ -1,15 +1,15 @@
 const gulp  = require('gulp');
 const ts    = require('gulp-typescript');
+const cfg   = require('./config');
 
 const CONFIG = {
-    SOURCE_DIR: './src', 
-    BUILD_DIR: './dist',
+    SOURCE_DIR: cfg.sourceDir, 
+    BUILD_DIR: cfg.buildDir,
 
     TS_CONFIG_FILE: 'tsconfig.json'
 };
 
 const tsProject = ts.createProject(CONFIG.TS_CONFIG_FILE);
-
 
 gulp.task('build-typescript', () => {
     const tsResult = tsProject.src().pipe(tsProject());

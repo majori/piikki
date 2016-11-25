@@ -1,9 +1,16 @@
+const _ = require('lodash');
+
 let cfg = {};
+
+cfg.buildDir = `${__dirname}/dist`;
+cfg.sourceDir = `${__dirname}/src`;
+cfg.migrationDir = `${__dirname}/migrations`;
 
 // ## Environment configs
 //
 cfg.env = process.env.NODE_ENV || 'development';
 cfg.isProduction = cfg.env === 'production';
+cfg.isTest = cfg.env === 'test';
 
 // ### HTTP-server configs
 //
@@ -20,6 +27,9 @@ let dbLocalConnection = {
 	database: 'piikkiDB',
 	charset: 'utf8'
 };
+
+// Use different database for testing
+_.assign(dbLocalConnection, { database: !cfg.isTest ? 'piikkiDB' : 'piikkiDB_test' });
 
 cfg.db = {
     client: 'postgresql',
