@@ -12,17 +12,18 @@ interface IUser {
     password?: string;
 };
 
-export function getUsers(): knex.QueryBuilder {
-    return db.select('id', 'username', 'saldo').from('users').where({deleted: false});
-}
+export function getUsers(): Promise<any> {
+    return Promise.resolve()
+        .then(() => db.select('id', 'username', 'saldo').from('users').where({ deleted: false }));
+};
 
-export function getUser(user: IUser): Promise<any> {
-    return validateUser(user)
-        .then(() => db.select('id', 'username', 'saldo')
+export function getUser(username: string): Promise<any> {
+    return validateUsername(username)
+        .then(() => db.select('username', 'saldo')
             .from('users')
-            .where({username: user.username, deleted: false})
+            .where({ username, deleted: false })
             .first());
-}
+};
 
 export function createUser(user: IUser): Promise<any> {
     return validateUser(user)
@@ -50,10 +51,10 @@ export function authenticateUser(user: IUser): Promise<any> {
         );
 };
 
-export function makeTransaction(user: IUser, amount: number, comment?: string): Promise<any> {
-    return validateUser(user)
+export function makeTransaction(username: string, amount: number, comment?: string): Promise<any> {
+    return validateUsername(username)
         .then(() => _.isNumber(amount) ? Promise.resolve() : Promise.reject('Amount is not a number'))
-        .then(() => userExists(user))
+        .then(() => userExists(username))
         .then((fetchedUser) => db.transaction((trx) =>
             trx.table('users')
             .where({username: fetchedUser.username})
@@ -73,23 +74,44 @@ export function makeTransaction(user: IUser, amount: number, comment?: string): 
 
 export const _knex = db;
 
-// Check if user object is valid
-function validateUser(user: IUser): Promise<string | void> {
-    if (_.isUndefined(user.username)) { return Promise.reject('No username'); };
-    if (!_.isString(user.username))   { return Promise.reject('Username was not a string'); };
-    if (_.isEmpty(user.username))     { return Promise.reject('Username was empty'); };
-    if (user.username.length > 20)    { return Promise.reject('Username was longer than 20 characters'); };
-
-    if (!_.isUndefined(user.password)) {
-        if (!_.isString(user.password)) { return Promise.reject('Password was not a string'); };
-        if (_.isEmpty(user.password))   { return Promise.reject('Password was empty'); };
+function validateUser(user: IUser): Promise<[string | void]> {
+    if (_.isObject(user) && user.username && user.password) {
+        return Promise.all([
+            validateUsername(user.username),
+            validatePassword(user.password),
+        ]);
+    } else {
+        return Promise.reject('Invalid user object');
     }
+};
+
+// Check if username is valid
+function validateUsername(username: string): Promise<string | void> {
+
+    if (!username)               { return Promise.reject('No username'); };
+    if (!_.isString(username))   { return Promise.reject('Username was not a string'); };
+    if (_.isEmpty(username))     { return Promise.reject('Username was empty'); };
+    if (username.length > 20)    { return Promise.reject('Username was longer than 20 characters'); };
 
     return Promise.resolve();
-}
+};
+
+function validatePassword(password: string): Promise<string | void> {
+
+    if (!_.isString(password)) { return Promise.reject('Password was not a string'); };
+    if (_.isEmpty(password)) { return Promise.reject('Password was empty'); };
+
+    return Promise.resolve();
+};
+
+function validateUserId(id: string): Promise<string | void> {
+    return _.isString(id) ? Promise.resolve() : Promise.reject('User ID was not a string');
+};
 
 // Checks if user is in database
-function userExists(user: IUser) {
-    return db('users').where({username: user.username}).first()
-        .then((row) => _.isUndefined(row) ? Promise.reject('IUser not found') : Promise.resolve(row));
-}
+function userExists(username: string): Promise<any> {
+    return Promise.resolve()
+        .then(() => db('users').where({ username }).first()
+            .then((row) => _.isUndefined(row) ? Promise.reject('User not found') : Promise.resolve(row))
+        );
+};

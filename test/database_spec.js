@@ -21,7 +21,7 @@ describe('Database', () => {
 
     it('should create a new user', () => expect(
         db.createUser(_.pick(user, ['username', 'password']))
-        .then(() => db.getUser(user))).eventually.to.containSubset(_.pick(user, ['username', 'saldo']))
+        .then(() => db.getUser(user.username))).eventually.to.containSubset(_.pick(user, ['username', 'saldo']))
     );
 
     it('should authenticate user', () => 
@@ -35,9 +35,9 @@ describe('Database', () => {
     it('should make a transaction', () => {
         let amount = 10;
         
-        return db.makeTransaction(user, amount)
-        .then(() => expect(db.getUser(user)).to.eventually.containSubset({ saldo: amount }))
-        .then(() => db.makeTransaction(user, -amount))
-        .then(() => expect(db.getUser(user)).to.eventually.containSubset({ saldo: 0 }));
+        return db.makeTransaction(user.username, amount)
+        .then(() => expect(db.getUser(user.username)).to.eventually.containSubset({ saldo: amount }))
+        .then(() => db.makeTransaction(user.username, -amount))
+        .then(() => expect(db.getUser(user.username)).to.eventually.containSubset({ saldo: 0 }));
     });
 });

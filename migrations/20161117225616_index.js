@@ -1,13 +1,9 @@
 
 exports.up = (knex, Promise) => Promise.all([
     
-    // This extension is required for auto-generated uuid (Postgresql)
-    knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'),
-
     knex.schema.createTable('users', table => {
-        table.uuid('id')
-            .primary()
-            .defaultTo(knex.raw('uuid_generate_v4()'));
+        table.increments('id')
+            .primary();
         table.string('username', 20)
             .notNullable()
             .unique();
@@ -24,11 +20,12 @@ exports.up = (knex, Promise) => Promise.all([
     knex.schema.createTable('transactions', table => {
         table.increments('id')
             .primary();
-        table.uuid('userId')
+        table.integer('userId')
+            .unsigned()
             .notNullable()
             .references('id')
             .inTable('users')
-            .onDelete('SET NULL');
+            .onDelete('RESTRICT');
         table.timestamp('timestamp')
             .defaultTo(knex.raw('now()'));
         table.float('oldSaldo')
