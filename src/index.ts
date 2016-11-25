@@ -9,7 +9,7 @@ import handlers from './handlers';
 import routes from './routes';
 
 const cfg = require('../config');
-const log = debug('http');
+const log = debug('piikki:http');
 
 const app = express();
 
@@ -22,11 +22,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 
+// Configure handlers
+handlers(app);
+
 // Configure routes
 routes(app);
-
-// Configure error handlers
-handlers(app);
 
 app.listen(cfg.port, cfg.hostname, () => {
     log(`Server listening on http://${cfg.hostname}:${cfg.port}`);

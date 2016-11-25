@@ -17,6 +17,10 @@ cfg.isTest = cfg.env === 'test';
 cfg.hostname = process.env.PIIKKI_HOSTNAME || 'localhost';
 cfg.port = process.env.PIIKKI_PORT || 3000;
 
+// The secret which will authorize client
+// All incoming requests must have "Authorization" header with this value
+cfg.secret = cfg.isProduction ? Buffer.from((process.env.PIIKKI_SECRET_TOKEN)).toString('base64') : 'opensesame';
+
 // ### Database configs
 //
 let dbLocalConnection = {
