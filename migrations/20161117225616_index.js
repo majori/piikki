@@ -16,6 +16,9 @@ exports.up = (knex, Promise) => Promise.all([
         table.float('saldo')
             .notNullable()
             .defaultTo(0);
+        table.boolean('deleted')
+            .notNullable()
+            .defaultTo(false);
     }),
 
     knex.schema.createTable('transactions', table => {

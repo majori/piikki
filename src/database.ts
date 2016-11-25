@@ -13,12 +13,15 @@ interface IUser {
 };
 
 export function getUsers(): knex.QueryBuilder {
-    return db.select('id', 'username', 'saldo').from('users');
+    return db.select('id', 'username', 'saldo').from('users').where({deleted: false});
 }
 
 export function getUser(user: IUser): Promise<any> {
     return validateUser(user)
-        .then(() => db.select('id', 'username', 'saldo').from('users').where({username: user.username}).first());
+        .then(() => db.select('id', 'username', 'saldo')
+            .from('users')
+            .where({username: user.username, deleted: false})
+            .first());
 }
 
 export function createUser(user: IUser): Promise<any> {
