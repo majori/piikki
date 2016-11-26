@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
+    "migrate": "knex migrate:latest",
     "build": "gulp build",
     "build:watch": "gulp",
     "test": "mocha test/**/*_spec.js"
