@@ -27,7 +27,7 @@ export function validateUser(user: IUser): Promise<[string | void]> {
 };
 
 // Check if username is valid
-export function validateUsername(username: string): Promise<string | void> {
+export function validateUsername(username: any): Promise<string | void> {
 
     if (!username)               { return Promise.reject(badRequestError('No username')); };
     if (!_.isString(username))   { return Promise.reject(badRequestError('Username was not a string')); };
@@ -37,7 +37,7 @@ export function validateUsername(username: string): Promise<string | void> {
     return Promise.resolve(username);
 };
 
-export function validatePassword(password: string): Promise<string | void> {
+export function validatePassword(password: any): Promise<string | void> {
 
     if (!_.isString(password)) { return Promise.reject(badRequestError('Password was not a string')); };
     if (_.isEmpty(password)) { return Promise.reject(badRequestError('Password was empty')); };
@@ -45,11 +45,11 @@ export function validatePassword(password: string): Promise<string | void> {
     return Promise.resolve();
 };
 
-export function validateUserId(id: string): Promise<string | void> {
+export function validateUserId(id: any): Promise<string | void> {
     return _.isString(id) ? Promise.resolve() : Promise.reject(badRequestError('User ID was not a string'));
 };
 
-export function validateTransactionAmount(amount: number) {
+export function validateTransactionAmount(amount: any) {
     return _.isNumber(amount) ? Promise.resolve() : Promise.reject(badRequestError('Amount was not a number'));
 }
 
