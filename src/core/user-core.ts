@@ -44,7 +44,7 @@ export function authenticateUser(user: IUser) {
 export function userExists(username: string) {
     return knex('users').where({ username }).first()
         .then((row) => _.isUndefined(row) ?
-            Promise.reject('User not found') :
+            Promise.reject(`User ${username} not found`) :
             Promise.resolve(row)
         );
 };

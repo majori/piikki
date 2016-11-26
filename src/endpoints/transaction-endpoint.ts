@@ -1,3 +1,6 @@
+import * as Promise from 'bluebird';
+import * as _ from 'lodash';
+
 import * as transCore from '../core/transaction-core';
 import {
     badRequestError,
@@ -8,12 +11,18 @@ import {
 } from './endpoint-utils';
 
 export const makeTransaction = createJsonRoute((req, res) => {
-    let username: any = req.body.username;
-    let amount: any = req.body.amount;
-    let comment: any = req.body.comment;
 
-    return  validateTransactionAmount(amount)
-        .then(() => validateUsername(username))
-        .then(() => transCore.makeTransaction(username, amount, comment))
-        .catch((err) => Promise.reject(badRequestError(err)));
+    let transactions = req.body;
+
+    if (!_.isArray(transactions) && _.isObject(transactions)) {
+        transactions = [ transactions ];
+    }
+
+    // TODO: If only one transaction fails, tell about the succeed ones
+    return Promise.map(transactions, (transaction: any) => validateTransactionAmount(transaction.amount)
+        .then(() => validateUsername(transaction.username))
+        .then(() => transCore.makeTransaction(transaction.username, transaction.amount, transaction.comment)
+            .catch((err) => badRequestError(err))
+        )
+    );
 });

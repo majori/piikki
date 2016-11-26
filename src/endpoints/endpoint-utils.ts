@@ -22,7 +22,7 @@ export function validateUser(user: IUser): Promise<[string | void]> {
             validatePassword(user.password),
         ]);
     } else {
-        return Promise.reject({message: 'Invalid user object'});
+        return Promise.reject(badRequestError('Invalid user object'));
     }
 };
 
@@ -50,7 +50,10 @@ export function validateUserId(id: any): Promise<string | void> {
 };
 
 export function validateTransactionAmount(amount: any) {
-    return _.isNumber(amount) ? Promise.resolve() : Promise.reject(badRequestError('Amount was not a number'));
+    if (_.isUndefined(amount)) { return Promise.reject(badRequestError('Amount was undefined')); }
+    if (!_.isNumber(amount)) { return Promise.reject(badRequestError('Amount was not a number')); }
+
+    return Promise.resolve();
 }
 
 export function badRequestError(msg: string) {
