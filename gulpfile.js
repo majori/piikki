@@ -1,6 +1,8 @@
 const gulp   = require('gulp');
 const ts     = require('gulp-typescript');
 const tslint = require('gulp-tslint');
+const del    = require('del');
+const rs     = require('run-sequence');
 const cfg    = require('./config');
 
 const CONFIG = {
@@ -25,10 +27,12 @@ gulp.task('build-typescript', () => {
     return tsResult.js.pipe(gulp.dest(CONFIG.BUILD_DIR))
 });
 
+gulp.task('clean', () => del('./dist'));
+
 gulp.task('watch', () => {
     gulp.watch(CONFIG.TS_FILES, ['build-typescript'])
-})
+});
 
 gulp.task('lint', ['tslint']);
 gulp.task('build', ['build-typescript']);
-gulp.task('default', ['build', 'watch']);
+gulp.task('default', (cb) => rs('clean', 'build', 'watch', cb));
