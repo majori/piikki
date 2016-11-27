@@ -1,6 +1,6 @@
 
 exports.up = (knex, Promise) => Promise.all([
-    
+
     knex.schema.createTable('users', table => {
         table.increments('id')
             .primary();
@@ -12,6 +12,8 @@ exports.up = (knex, Promise) => Promise.all([
         table.float('saldo')
             .notNullable()
             .defaultTo(0);
+        table.timestamp('timestamp')
+            .defaultTo(knex.raw('now()'));
         table.boolean('deleted')
             .notNullable()
             .defaultTo(false);
