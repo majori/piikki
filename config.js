@@ -25,15 +25,15 @@ cfg.secret = cfg.isProduction ? Buffer.from((process.env.PIIKKI_SECRET_TOKEN)).t
 //
 let dbLocalConnection = {
     host: process.env.PIIKKI_DATABASE_HOSTNAME || 'localhost',
-	user: 'piikki',
 	port: process.env.PIIKKI_DATABASE_PORT || 5433,
+	user: process.env.PIIKKI_DATABASE_USER || 'piikki',
 	password: process.env.PIIKKI_DATABASE_PASSWORD || 'piikki',
-	database: 'piikkiDB',
+	database: process.env.PIIKKI_DATABASE_NAME || 'piikkiDB',
 	charset: 'utf8'
 };
 
 // Use different database for testing
-_.assign(dbLocalConnection, { database: !cfg.isTest ? 'piikkiDB' : 'piikkiDB_test' });
+if (cfg.isTest) { _.assign(dbLocalConnection, { database: 'piikkiDB_test' }); };
 
 cfg.db = {
     client: 'postgresql',
