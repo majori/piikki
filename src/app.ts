@@ -53,7 +53,10 @@ export function createApp(cfg: any) {
 
         let message = (status < 500) ? httpMessage + ': ' + err.message : httpMessage;
 
-        let response = { message };
+        let response = {
+            ok: false,
+            message
+        };
 
         res.status(status);
         res.send(response);

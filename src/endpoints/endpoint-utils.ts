@@ -3,11 +3,13 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 import { IUser } from '../core/core-utils';
 
+// Wraps the result to json response if succesful
+// else pass error to express error handler
 export function createJsonRoute(func: Function) {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             func(req, res)
-                .then((result) => res.json(result))
+                .then((result) => res.json({ ok: true, result }))
                 .catch(next);
         } catch (err) {
             next(err);
