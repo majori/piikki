@@ -14,8 +14,8 @@ cfg.isTest = cfg.env === 'test';
 
 // ### HTTP-server configs
 //
-cfg.hostname = process.env.PIIKKI_HOSTNAME || 'localhost';
-cfg.port = process.env.PIIKKI_PORT || 3000;
+cfg.hostname = process.env.PIIKKI_HTTP_HOSTNAME || 'localhost';
+cfg.port = process.env.PIIKKI_HTTP_PORT || 4000;
 
 // The secret which will authorize client
 // All incoming requests must have "Authorization" header with this value
@@ -25,7 +25,7 @@ cfg.secret = cfg.isProduction ? Buffer.from((process.env.PIIKKI_SECRET_TOKEN)).t
 //
 let dbLocalConnection = {
     host: process.env.PIIKKI_DATABASE_HOSTNAME || 'localhost',
-	port: process.env.PIIKKI_DATABASE_PORT || 5433,
+	port: process.env.PIIKKI_DATABASE_PORT || 5432,
 	user: process.env.PIIKKI_DATABASE_USER || 'piikki',
 	password: process.env.PIIKKI_DATABASE_PASSWORD || 'piikki',
 	database: process.env.PIIKKI_DATABASE_NAME || 'piikkiDB',
