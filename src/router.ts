@@ -12,6 +12,7 @@ export function createRouter() {
     router.get('/users/:username', usersEndpoint.getUser);
     router.post('/users/create', usersEndpoint.createUser);
     router.post('/users/authenticate', usersEndpoint.authenticateUser);
+    router.delete('/users', usersEndpoint.deleteUser);
 
     // Transaction related
     router.post('/transaction', transactionEndpoint.makeTransaction);

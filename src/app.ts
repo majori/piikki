@@ -33,6 +33,7 @@ export function createApp(cfg: any) {
     const router = createRouter();
     app.use('/api', router);
 
+    // Error logger
     app.use((err: any, req, res, next) => {
         const status = err.status ? err.status : 500;
 

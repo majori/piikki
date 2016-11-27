@@ -32,6 +32,11 @@ export function createUser(user: IUser) {
         });
 };
 
+export function deleteUser(username: string) {
+    return knex('users').where({ username }).update({ deleted: true })
+        .then(() => Promise.resolve());
+}
+
 export function authenticateUser(user: IUser) {
     return userExists(user.username)
     .then((row) => bcrypt.compareSync(user.password, row.password) ?

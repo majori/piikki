@@ -17,19 +17,21 @@ export function createJsonRoute(func: Function) {
     };
 }
 
-export function validateUser(user: IUser): Promise<[string | void]> {
+// Check if username and password is valid
+export function validateUser(user: IUser): Promise<any> {
     if (_.isObject(user) && user.username && user.password) {
         return Promise.all([
             validateUsername(user.username),
             validatePassword(user.password),
-        ]);
+        ])
+        .then(() => Promise.resolve(user));
     } else {
         return Promise.reject(badRequestError('Invalid user object'));
     }
 };
 
 // Check if username is valid
-export function validateUsername(username: any): Promise<string | void> {
+export function validateUsername(username: any): Promise<string> {
 
     if (!username)               { return Promise.reject(badRequestError('No username')); };
     if (!_.isString(username))   { return Promise.reject(badRequestError('Username was not a string')); };
@@ -39,25 +41,32 @@ export function validateUsername(username: any): Promise<string | void> {
     return Promise.resolve(username);
 };
 
-export function validatePassword(password: any): Promise<string | void> {
+// Check if password is valid
+export function validatePassword(password: any): Promise<string> {
 
     if (!_.isString(password)) { return Promise.reject(badRequestError('Password was not a string')); };
-    if (_.isEmpty(password)) { return Promise.reject(badRequestError('Password was empty')); };
+    if (_.isEmpty(password))   { return Promise.reject(badRequestError('Password was empty')); };
 
-    return Promise.resolve();
+    return Promise.resolve(password);
 };
 
-export function validateUserId(id: any): Promise<string | void> {
-    return _.isString(id) ? Promise.resolve() : Promise.reject(badRequestError('User ID was not a string'));
-};
-
+// Check if transaction amount is valid
 export function validateTransactionAmount(amount: any) {
     if (_.isUndefined(amount)) { return Promise.reject(badRequestError('Amount was undefined')); }
-    if (!_.isNumber(amount)) { return Promise.reject(badRequestError('Amount was not a number')); }
+    if (!_.isNumber(amount))   { return Promise.reject(badRequestError('Amount was not a number')); }
 
     return Promise.resolve();
-}
+};
 
-export function badRequestError(msg: string) {
+export function badRequestError(msg: string): IBadRequest {
     return { status: 400, message: msg };
-}
+};
+
+interface IHttpError {
+    status: number;
+    message: string;
+};
+
+interface IBadRequest extends IHttpError {
+    status: 400;
+};
