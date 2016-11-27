@@ -1,6 +1,6 @@
 {
     "extends": [
-        "tslint:latest"
+        "tslint:recommended"
     ],
     "rules": {
         "class-name": true,
