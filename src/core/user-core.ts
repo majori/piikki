@@ -7,15 +7,20 @@ import { IUser, saltRounds } from './core-utils';
 
 export function getUsers() {
     return knex.select('username', 'saldo')
-            .from('users')
-            .where({ deleted: false });
+        .from('users')
+        .where({ deleted: false });
 };
 
 export function getUser(username: string) {
-    return knex.select('username', 'saldo')
-            .from('users')
-            .where({ username, deleted: false })
-            .first();
+    return knex
+        .select('username', 'saldo')
+        .from('users')
+        .where({ username, deleted: false })
+        .first()
+        .then((row) => !_.isEmpty(row) ?
+            Promise.resolve(row) :
+            Promise.reject('User not found')
+        );
 };
 
 export function createUser(user: IUser) {
