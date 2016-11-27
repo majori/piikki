@@ -1,4 +1,5 @@
 import * as Promise from 'bluebird';
+import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
 import * as transCore from '../core/transaction-core';
@@ -10,7 +11,7 @@ import {
     validateUsername
 } from './endpoint-utils';
 
-export const makeTransaction = createJsonRoute((req, res) => {
+export const makeTransaction = createJsonRoute((req: Request, res: Response, next: NextFunction): Promise<any> => {
 
     let transactions = req.body;
 

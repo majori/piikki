@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { IUser } from '../core/core-utils';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
-export function createJsonRoute(func: Function) {
+export function createJsonRoute(func: Function): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             func(req, res)
@@ -51,11 +51,11 @@ export function validatePassword(password: any): Promise<string> {
 };
 
 // Check if transaction amount is valid
-export function validateTransactionAmount(amount: any) {
+export function validateTransactionAmount(amount: any): Promise<string | number> {
     if (_.isUndefined(amount)) { return Promise.reject(badRequestError('Amount was undefined')); }
     if (!_.isNumber(amount))   { return Promise.reject(badRequestError('Amount was not a number')); }
 
-    return Promise.resolve();
+    return Promise.resolve(amount);
 };
 
 export function badRequestError(msg: string): IBadRequest {
