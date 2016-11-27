@@ -8,8 +8,7 @@
         "sourceMap": true
     },
     "include": [
-        "src/**/*.ts",
-        "config.js"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules"
