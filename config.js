@@ -19,7 +19,7 @@ cfg.port = process.env.PIIKKI_HTTP_PORT || 4000;
 
 // The secret which will authorize client
 // All incoming requests must have "Authorization" header with this value
-cfg.secret = cfg.isProduction ? Buffer.from((process.env.PIIKKI_SECRET_TOKEN)).toString('base64') : 'opensesame';
+cfg.secret = process.env.PIIKKI_SECRET_TOKEN || 'opensesame';
 
 // ### Database configs
 //
