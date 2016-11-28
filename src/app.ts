@@ -9,11 +9,6 @@ import { createRouter } from './router';
 export function createApp(cfg: any) {
     const app = express();
 
-    // Use dev middlewares
-    if (!cfg.isProduction) {
-        app.use(errorHandler());
-    }
-
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(methodOverride());
