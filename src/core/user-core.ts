@@ -5,24 +5,28 @@ import * as _ from 'lodash';
 import { knex } from '../database';
 import { IUser, saltRounds } from './core-utils';
 
+// Get all users in group
 export function getUsers() {
-    return knex.select('username', 'saldo')
+    return knex.select('username')
         .from('users')
-        .where({ deleted: false });
+        .where({ active: true });
 };
 
+// Get user info and saldo in each group
 export function getUser(username: string) {
     return knex
-        .select('username', 'saldo')
         .from('users')
-        .where({ username, deleted: false })
-        .first()
-        .then((row) => !_.isEmpty(row) ?
-            Promise.resolve(row) :
-            Promise.reject('User not found')
+        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
+        .join('groups', { 'groups.id': 'user_saldos.group_id' })
+        .select('users.username', 'groups.name', 'user_saldos.saldo')
+        .where({ 'users.username': username, 'users.active': true })
+        .then((results) => _.isEmpty(results) ?
+            Promise.reject('User not found') :
+            Promise.resolve(results)
         );
 };
 
+// Create new user
 export function createUser(user: IUser) {
     return knex('users').where({username: user.username})
         .then((records) => _.isEmpty(records) ?
@@ -37,11 +41,13 @@ export function createUser(user: IUser) {
         });
 };
 
+// Puts user's "active" -status to true
 export function deleteUser(username: string) {
-    return knex('users').where({ username }).update({ deleted: true })
+    return knex('users').where({ username }).update({ active: false })
         .then(() => Promise.resolve());
 }
 
+// Compare raw password with the hashed one
 export function authenticateUser(user: IUser) {
     return userExists(user.username)
     .then((row) => bcrypt.compareSync(user.password, row.password) ?
