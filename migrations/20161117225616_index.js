@@ -11,9 +11,9 @@ exports.up = (knex, Promise) => Promise.all([
             .notNullable();
         table.timestamp('timestamp')
             .defaultTo(knex.raw('now()'));
-        table.boolean('deleted')
+        table.boolean('active')
             .notNullable()
-            .defaultTo(false);
+            .defaultTo(true);
     }),
 
     knex.schema.createTable('transactions', table => {
