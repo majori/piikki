@@ -20,7 +20,7 @@ export function createApp(cfg: any) {
         if (auth && auth === cfg.secret) {
             next();
         } else {
-            res.status(401).json({ error: 'Unauthorized' });
+            res.status(401).json({ ok: false, message: 'Unauthorized' });
         }
     });
 
