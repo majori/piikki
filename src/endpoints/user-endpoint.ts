@@ -13,7 +13,7 @@ export const getUser = createJsonRoute((req: Request, res: Response, next: NextF
     return validateUsername(username)
     .then((vUsername) => userCore.getUser(vUsername))
     .catch((err) => Promise.reject(badRequestError(err)));
-});
+}); 
 
 export const createUser = createJsonRoute((req: Request, res: Response, next: NextFunction): Promise<any> => {
     let user: any = req.body;

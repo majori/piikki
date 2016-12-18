@@ -1,21 +1,24 @@
 import { Router } from 'express';
-import * as _ from 'lodash';
 
+import * as groupEndpoint from './endpoints/group-endpoint';
 import * as transactionEndpoint from './endpoints/transaction-endpoint';
-import * as usersEndpoint from './endpoints/user-endpoint';
+import * as userEndpoint from './endpoints/user-endpoint';
 
 export function createRouter() {
     const router = Router();
 
     // User related
-    router.get('/users', usersEndpoint.getUsers);
-    router.get('/users/:username', usersEndpoint.getUser);
-    router.post('/users/create', usersEndpoint.createUser);
-    router.post('/users/authenticate', usersEndpoint.authenticateUser);
-    router.delete('/users', usersEndpoint.deleteUser);
+    router.get('/users', userEndpoint.getUsers);
+    router.get('/users/:username', userEndpoint.getUser);
+    router.post('/users/create', userEndpoint.createUser);
+    router.post('/users/authenticate', userEndpoint.authenticateUser);
+    router.delete('/users', userEndpoint.deleteUser);
 
     // Transaction related
     router.post('/transaction', transactionEndpoint.makeTransaction);
+
+    // Group related
+    router.post('/groups', groupEndpoint.createGroup);
 
     return router;
 };

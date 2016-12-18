@@ -25,6 +25,12 @@ exports.up = (knex, Promise) => Promise.all([
             .references('id')
             .inTable('users')
             .onDelete('RESTRICT');
+        table.integer('group_id')
+            .unsigned()
+            .notNullable()
+            .references('id')
+            .inTable('groups')
+            .onDelete('RESTRICT');
         table.timestamp('timestamp')
             .defaultTo(knex.raw('now()'));
         table.float('old_saldo')
@@ -39,7 +45,8 @@ exports.up = (knex, Promise) => Promise.all([
         table.increments('id')
             .primary();
         table.string('name')
-            .notNullable();
+            .notNullable()
+            .unique();
     }),
 
     knex.schema.createTable('user_saldos', table => {
