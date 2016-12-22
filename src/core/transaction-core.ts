@@ -1,9 +1,7 @@
 import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 
-import { knex, IDatabaseUser, IDatabaseGroup } from '../database';
-import { groupExists } from './group-core';
-import { userExists } from './user-core';
+import { knex } from '../database';
 
 export function makeTransaction(username: String, groupName: String, amount: number, comment?: String) {
     let transaction;
@@ -31,16 +29,6 @@ export function makeTransaction(username: String, groupName: String, amount: num
             .catch(trx.rollback)
         ))
         .then(() => Promise.resolve({ username, saldo: transaction.new_saldo }));
-};
-
-export function createSaldoForUser(username: String, groupName: String) {
-    return Promise.all([
-        userExists(username),
-        groupExists(groupName)
-    ])
-    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
-        .insert({group_id: group.id, user_id: user.id})
-    );
 };
 
 export function userHaveSaldo(username: String, groupName: String) {

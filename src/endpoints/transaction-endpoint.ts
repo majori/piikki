@@ -12,9 +12,9 @@ import {
 } from './endpoint-utils';
 
 export const makeTransaction = createJsonRoute((req: Request, res: Response, next: NextFunction): Promise<any> => {
-
     let transactions = req.body;
 
+    // Allow body to have one or multiple transactions
     if (!_.isArray(transactions) && _.isObject(transactions)) {
         transactions = [ transactions ];
     }
@@ -22,8 +22,7 @@ export const makeTransaction = createJsonRoute((req: Request, res: Response, nex
     // TODO: If only one transaction fails, tell about the succeed ones
     return Promise.map(transactions, (transaction: any) => validateTransactionAmount(transaction.amount)
         .then(() => validateUsername(transaction.username))
-        .then(() => transCore.makeTransaction(transaction.username, transaction.amount, transaction.comment)
-            .catch((err) => badRequestError(err))
-        )
+        .then(() => transCore.makeTransaction(transaction.username, transaction.amount, transaction.comment))
+        .catch((err) => Promise.reject(badRequestError(err)))
     );
 });

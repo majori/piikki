@@ -37,6 +37,7 @@ export const deleteUser = createJsonRoute((req: Request, res: Response, next: Ne
 
     return validateUsername(user.username)
     .then((vUsername) => userCore.deleteUser(vUsername))
+    .catch((err) => Promise.reject(badRequestError(err)));
 });
 
 export const putUserToGroup = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
@@ -45,5 +46,7 @@ export const putUserToGroup = createJsonRoute((req: Request, res: Response, next
     return Promise.all([
         validateUsername(req.body.username),
         validateGroupName(req.body.groupName)
-    ]).spread((vUsername: String, vGroupName: String) => userCore.createSaldoForUser(vUsername, vGroupName));
+    ])
+    .spread((vUsername: String, vGroupName: String) => userCore.createSaldoForUser(vUsername, vGroupName))
+    .catch((err) => Promise.reject(badRequestError(err)));
 });

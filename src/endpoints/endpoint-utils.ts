@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { IUser } from '../core/core-utils';
+import { IUserDto } from '../core/core-utils';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
@@ -18,7 +18,7 @@ export function createJsonRoute(func: Function): RequestHandler {
 }
 
 // Check if username and password is valid
-export function validateUser(user: IUser): Promise<any> {
+export function validateUser(user: IUserDto): Promise<any> {
     if (_.isObject(user) && user.username && user.password) {
         return Promise.all([
             validateUsername(user.username),

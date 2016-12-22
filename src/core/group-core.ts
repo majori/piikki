@@ -3,8 +3,14 @@ import * as _ from 'lodash';
 
 import { knex, IDatabaseGroup } from '../database';
 
-export function createGroup(groupName: String): QueryBuilder {
-    return knex('groups').insert({ name: groupName });
+export function createGroup(groupName: String) {
+    return knex('groups')
+        .where({name: groupName})
+        .then((records) => _.isEmpty(records) ?
+            Promise.resolve() :
+            Promise.reject(`Group ${groupName} already exists`)
+        )
+        .then(() => knex('groups').insert({ name: groupName }));
 };
 
 export function groupExists(groupName: String): Promise<any> {
