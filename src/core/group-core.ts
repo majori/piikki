@@ -14,3 +14,12 @@ export function groupExists(groupName: String): Promise<any> {
             Promise.resolve(row)
         );
 };
+
+export function getUsersFromGroup(groupName: String) {
+    return knex
+        .select('users.username')
+        .from('users')
+        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
+        .join('groups', { 'groups.id': 'user_saldos.group_id' })
+        .where({ 'groups.name': groupName });
+};
