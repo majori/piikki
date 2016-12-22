@@ -58,6 +58,15 @@ export function validateTransactionAmount(amount: any): Promise<string | number>
     return Promise.resolve(amount);
 };
 
+// Check if group name is valid
+export function validateGroupName(name: any): Promise<string> {
+    if (_.isUndefined(name)) { return Promise.reject('Group name was undefined') }
+    if (!_.isString(name)) { return Promise.reject('Group name was not a string') }
+    if (name.length > 255) { return Promise.reject('Group name was longer than 255') }
+
+    return Promise.resolve(name);
+};
+
 export function badRequestError(msg: string): IBadRequest {
     return { status: 400, message: msg };
 };

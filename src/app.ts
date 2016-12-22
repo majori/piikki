@@ -33,6 +33,7 @@ export function createApp(cfg: any) {
         const status = err.status ? err.status : 500;
 
         if (status >= 400) {
+            console.error(err);
             console.error('Request headers:');
             console.error(JSON.stringify(req.headers));
             console.error('Request parameters:');

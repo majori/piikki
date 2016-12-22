@@ -54,19 +54,31 @@ describe('Database', () => {
     );
 
     it('should not authenticate user with wrong password', () => 
-        expect(userCore.authenticateUser(_.assign(user, { password: 'wrong' }))).to.eventually.be.rejectedWith('Invalid password')
+        expect(
+            userCore.authenticateUser(_.assign(user, { password: 'wrong' }))
+        ).to.eventually.be.rejectedWith('Invalid password')
     );
 
-    it('should create saldo for user', () => 
-        expect(transactionCore.createSaldoForUser(user.username, group.name)).to.eventually.be.fulfilled
+    it('should create saldo for user', () =>
+        expect(userCore.createSaldoForUser(user.username, group.name)).to.eventually.be.fulfilled
     );
 
     it('should make a transaction', () => {
         let amount = 10;
 
         return transactionCore.makeTransaction(user.username, group.name, amount)
-        .then(() => expect(userCore.getUser(user.username)).to.eventually.containSubset({ saldos: { [group.name]: amount } }))
+        .then((res) => {
+            expect(res).to.have.property('username', user.username);
+            expect(res).to.have.property('saldo', amount);
+            return expect(userCore.getUser(user.username))
+                .to.eventually.containSubset({ saldos: { [group.name]: amount } });
+        })
         .then(() => transactionCore.makeTransaction(user.username, group.name, -amount))
-        .then(() => expect(userCore.getUser(user.username)).to.eventually.containSubset({ saldos: { [group.name]: 0 } }));
+        .then((res) => {
+            expect(res).to.have.property('username', user.username);
+            expect(res).to.have.property('saldo', 0);
+            return expect(userCore.getUser(user.username))
+                .to.eventually.containSubset({ saldos: { [group.name]: 0 } });
+        });
     });
 });
