@@ -32,7 +32,7 @@ export function createApp(cfg: any) {
     app.use((err: any, req, res, next) => {
         const status = err.status ? err.status : 500;
 
-        if (status >= 400) {
+        if (status >= 401) {
             console.error(err);
             console.error('Request headers:');
             console.error(JSON.stringify(req.headers));
