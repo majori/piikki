@@ -71,7 +71,7 @@ exports.up = (knex, Promise) => Promise.all([
         table.string('token')
             .notNullable()
             .unique();
-        table.enu('role', ['basic', 'supervisor'])
+        table.enu('role', ['basic', 'supervisor', 'generic'])
             .notNullable()
             .defaultTo('basic');
         table.string('comment');

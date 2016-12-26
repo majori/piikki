@@ -84,12 +84,17 @@ describe('Database', () => {
     });
 
     it('create token', () => {
-        return tokenCore.createToken(group.name, 'basic')
+        return tokenCore.createGroupToken(group.name, 'basic')
         .then((res) => {
             expect(res).to.be.string;
             return Promise.resolve();
         })
-        .then(() => tokenCore.createToken(group.name, 'supervisor', 'Organization A'))
+        .then(() => tokenCore.createGroupToken(group.name, 'supervisor', 'Organization A'))
+        .then((res) => {
+            expect(res).to.be.string;
+            return Promise.resolve();
+        })
+        .then(() => tokenCore.createGenericToken('Generic client'))
         .then((res) => {
             expect(res).to.be.string;
             return Promise.resolve();
@@ -98,14 +103,21 @@ describe('Database', () => {
 
     it('get tokens', () => {
         return tokenCore.getTokens()
-        .then((res) => {
-            expect(res).to.be.an.array;
-            expect(res).to.have.length(2);
+        .then((tokens) => {
+            expect(tokens).to.be.an.array;
+            expect(tokens).to.have.length(3);
 
-            let token = res[0];
-            expect(token).to.have.property('token');
-            expect(token).to.have.property('role');
-            expect(token).to.have.property('name', group.name);
+            expect(tokens[0]).to.have.property('token');
+            expect(tokens[0]).to.have.property('role', 'basic');
+            expect(tokens[0]).to.have.property('group_name', group.name);
+
+            expect(tokens[1]).to.have.property('token');
+            expect(tokens[1]).to.have.property('role', 'supervisor');
+            expect(tokens[1]).to.have.property('group_name', group.name);
+
+            expect(tokens[2]).to.have.property('token');
+            expect(tokens[2]).to.have.property('role', 'generic');
+            expect(tokens[2]).to.have.property('group_name', null);
         });
     });
 });

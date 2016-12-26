@@ -92,7 +92,7 @@ export function createSaldoForUser(username: string, groupName: string) {
 // Checks if user is in database
 export function userExists(username: string) {
     return knex.from('users').where({ username }).first()
-        .then((row) => _.isUndefined(row) ?
+        .then((row: IDatabaseUser) => _.isUndefined(row) ?
             Promise.reject(`User ${username} not found`) :
             Promise.resolve(row)
         );

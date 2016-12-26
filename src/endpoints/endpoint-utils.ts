@@ -33,8 +33,8 @@ export function validateUser(user: IUserDto): Promise<any> {
 // Check if username is valid
 export function validateUsername(username: any): Promise<string> {
 
-    if (!username)               { return Promise.reject(badRequestError('No username')); };
-    if (!_.isString(username))   { return Promise.reject(badRequestError('Username was not a string')); };
+    if (_.isUndefined(username)) { return Promise.reject(badRequestError('No username defined')); };
+    if (!_.isString(username))   { return Promise.reject(badRequestError(`Username ${username} was not a string`)); };
     if (_.isEmpty(username))     { return Promise.reject(badRequestError('Username was empty')); };
     if (username.length > 20)    { return Promise.reject(badRequestError('Username was longer than 20 characters')); };
 
@@ -44,7 +44,7 @@ export function validateUsername(username: any): Promise<string> {
 // Check if password is valid
 export function validatePassword(password: any): Promise<string> {
 
-    if (!_.isString(password)) { return Promise.reject(badRequestError('Password was not a string')); };
+    if (!_.isString(password)) { return Promise.reject(badRequestError(`Password ${password} was not a string`)); };
     if (_.isEmpty(password))   { return Promise.reject(badRequestError('Password was empty')); };
 
     return Promise.resolve(password);
@@ -53,16 +53,16 @@ export function validatePassword(password: any): Promise<string> {
 // Check if transaction amount is valid
 export function validateTransactionAmount(amount: any): Promise<string | number> {
     if (_.isUndefined(amount)) { return Promise.reject(badRequestError('Amount was undefined')); }
-    if (!_.isNumber(amount))   { return Promise.reject(badRequestError('Amount was not a number')); }
+    if (!_.isNumber(amount))   { return Promise.reject(badRequestError(`Amount "${amount}" was not a number`)); }
 
     return Promise.resolve(amount);
 };
 
 // Check if group name is valid
 export function validateGroupName(name: any): Promise<string> {
-    if (_.isUndefined(name)) { return Promise.reject('Group name was undefined') }
-    if (!_.isString(name)) { return Promise.reject('Group name was not a string') }
-    if (name.length > 255) { return Promise.reject('Group name was longer than 255') }
+    if (_.isUndefined(name)) { return Promise.reject('Group name was undefined'); }
+    if (!_.isString(name))   { return Promise.reject(`Group name "${name}" was not a string`); }
+    if (name.length > 255)   { return Promise.reject('Group name was longer than 255'); }
 
     return Promise.resolve(name);
 };

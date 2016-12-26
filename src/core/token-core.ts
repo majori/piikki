@@ -1,10 +1,12 @@
 import * as Promise from 'bluebird';
 import * as crypto from 'crypto';
+import * as _ from 'lodash';
 
 import { knex, IDatabaseGroup } from '../database';
 import { groupExists } from './group-core';
 
-export function createToken(groupName: string, role: string, comment?: string) {
+export function createGroupToken(groupName: string, role: string, comment?: string) {
+    role = (_.includes(['basic', 'supervisor'], role)) ? role : 'basic';
 
     return Promise.all([
             groupExists(groupName),
@@ -25,12 +27,17 @@ export function createToken(groupName: string, role: string, comment?: string) {
         );
 };
 
+export function createGenericToken(comment?: string) {
+    return generateBase64Token()
+        .then((token) => knex.from('tokens').insert({ token, role: 'generic', comment }))
+}
+
 export function getTokens() {
     return knex
-        .select('tokens.token', 'tokens.role', 'groups.name')
+        .select('tokens.token', 'tokens.role', 'groups.name AS group_name')
         .from('tokens')
-        .join('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-        .join('groups', { 'groups.id': 'token_group_access.group_id' })
+        .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
+        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' })
 }
 
 function generateBase64Token(length = 32): Promise<any> {

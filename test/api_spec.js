@@ -12,7 +12,7 @@ const knex  = require(path.join(cfg.buildDir, 'database')).knex;
 const UNAUTHORIZED = 401;
 const USER = { username: 'test', password: 'hackme' };
 const HEADERS = { Authorization: 'opensesame' };
-const DB_TABLES = ['transactions', 'user_saldos', 'groups', 'users', 'knex_migrations'];
+const DB_TABLES = ['transactions', 'user_saldos', 'token_group_access', 'users', 'groups', 'tokens', 'knex_migrations'];
 
 const app = require(path.join(cfg.buildDir, 'app'));
 

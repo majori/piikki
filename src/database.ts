@@ -31,4 +31,10 @@ export interface IDatabaseUserSaldo {
     saldo: number;
 }
 
+export interface IDatabaseToken {
+    token: string;
+    role: 'basic' | 'supervisor' | 'generic';
+    group_name: string;
+}
+
 export const knex = _knex(cfg.db);
