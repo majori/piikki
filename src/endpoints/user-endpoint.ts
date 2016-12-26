@@ -47,6 +47,6 @@ export const putUserToGroup = createJsonRoute((req: Request, res: Response, next
         validateUsername(req.body.username),
         validateGroupName(req.body.groupName)
     ])
-    .spread((vUsername: String, vGroupName: String) => userCore.createSaldoForUser(vUsername, vGroupName))
+    .spread((vUsername: string, vGroupName: string) => userCore.createSaldoForUser(vUsername, vGroupName))
     .catch((err) => Promise.reject(badRequestError(err)));
 });

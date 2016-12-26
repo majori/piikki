@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { knex } from '../database';
 
-export function makeTransaction(username: String, groupName: String, amount: number, comment?: String) {
+export function makeTransaction(username: string, groupName: string, amount: number, comment?: string) {
     let transaction;
 
     return userHaveSaldo(username, groupName)
@@ -31,7 +31,7 @@ export function makeTransaction(username: String, groupName: String, amount: num
         .then(() => Promise.resolve({ username, saldo: transaction.new_saldo }));
 };
 
-export function userHaveSaldo(username: String, groupName: String) {
+export function userHaveSaldo(username: string, groupName: string) {
     return knex
         .from('user_saldos')
         .select('users.id AS user_id', 'groups.id AS group_id', 'user_saldos.saldo')

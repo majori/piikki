@@ -2,33 +2,33 @@ import * as _knex from 'knex';
 const cfg = require('../config');
 
 export interface IDatabaseUser {
-    id: Number;
-    username: String;
-    password: String;
-    timestamp: String;
+    id: number;
+    username: string;
+    password: string;
+    timestamp: string;
     active: boolean;
 }
 
 export interface IDatabaseTransaction {
-    id: Number;
-    user_id: Number;
-    group_id: Number;
-    timestamp: String;
-    old_saldo: Number;
-    new_saldo: Number;
-    comment: String;
+    id: number;
+    user_id: number;
+    group_id: number;
+    timestamp: string;
+    old_saldo: number;
+    new_saldo: number;
+    comment: string;
 }
 
 export interface IDatabaseGroup {
-    id: Number;
-    name: String;
+    id: number;
+    name: string;
 }
 
 export interface IDatabaseUserSaldo {
-    id: Number;
-    user_id: Number;
-    group_id: Number;
-    saldo: Number;
+    id: number;
+    user_id: number;
+    group_id: number;
+    saldo: number;
 }
 
 export const knex = _knex(cfg.db);

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { knex, IDatabaseGroup } from '../database';
 
-export function createGroup(groupName: String) {
+export function createGroup(groupName: string) {
     return knex('groups')
         .where({name: groupName})
         .then((records) => _.isEmpty(records) ?
@@ -13,7 +13,7 @@ export function createGroup(groupName: String) {
         .then(() => knex('groups').insert({ name: groupName }));
 };
 
-export function groupExists(groupName: String): Promise<any> {
+export function groupExists(groupName: string): Promise<any> {
     return knex('groups').where({ name: groupName }).first()
         .then((row: IDatabaseGroup) => _.isUndefined(row) ?
             Promise.reject(`Group ${groupName} not found`) :
@@ -21,7 +21,7 @@ export function groupExists(groupName: String): Promise<any> {
         );
 };
 
-export function getUsersFromGroup(groupName: String) {
+export function getUsersFromGroup(groupName: string) {
     return knex
         .select('users.username')
         .from('users')

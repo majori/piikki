@@ -4,13 +4,13 @@ import * as crypto from 'crypto';
 import { knex, IDatabaseGroup } from '../database';
 import { groupExists } from './group-core';
 
-export function createToken(groupName: String, role: String, comment?: String) {
+export function createToken(groupName: string, role: string, comment?: string) {
 
     return Promise.all([
             groupExists(groupName),
             generateBase64Token()
         ])
-        .spread((group: IDatabaseGroup, token: String) => Promise
+        .spread((group: IDatabaseGroup, token: string) => Promise
             .resolve()
             .then(() => knex
                 .from('tokens')

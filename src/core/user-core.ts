@@ -16,7 +16,7 @@ export function getUsers() {
 };
 
 // Get user info and saldo in each group
-export function getUser(username: String) {
+export function getUser(username: string) {
     let user = { username, saldos: {} };
 
     return userExists(username)
@@ -62,7 +62,7 @@ export function createUser(user: IUserDto) {
 };
 
 // Puts user's "active" -status to false
-export function deleteUser(username: String) {
+export function deleteUser(username: string) {
     return knex.from('users').where({ username }).update({ active: false })
         .then(() => Promise.resolve());
 }
@@ -70,7 +70,7 @@ export function deleteUser(username: String) {
 // Compare raw password with the hashed one
 export function authenticateUser(user: IUserDto) {
     return userExists(user.username)
-    .then((row) => new Promise((resolve, reject) => {
+    .then((row: IDatabaseUser) => new Promise((resolve, reject) => {
         bcrypt.compare(user.password, row.password, (err, same) => (same) ?
             resolve() :
             reject('Invalid password'),
@@ -78,7 +78,7 @@ export function authenticateUser(user: IUserDto) {
     }));
 };
 
-export function createSaldoForUser(username: String, groupName: String) {
+export function createSaldoForUser(username: string, groupName: string) {
     return Promise.all([
         userExists(username),
         groupExists(groupName)
@@ -90,7 +90,7 @@ export function createSaldoForUser(username: String, groupName: String) {
 };
 
 // Checks if user is in database
-export function userExists(username: String) {
+export function userExists(username: string) {
     return knex.from('users').where({ username }).first()
         .then((row) => _.isUndefined(row) ?
             Promise.reject(`User ${username} not found`) :
