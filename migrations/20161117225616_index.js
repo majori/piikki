@@ -63,12 +63,40 @@ exports.up = (knex, Promise) => Promise.all([
         table.float('saldo')
             .notNullable()
             .defaultTo(0);
+    }),
+
+    knex.schema.createTable('tokens', table => {
+        table.increments('id')
+            .primary();
+        table.string('token')
+            .notNullable()
+            .unique();
+        table.enu('role', ['basic', 'supervisor'])
+            .notNullable()
+            .defaultTo('basic');
+        table.string('comment');
+    }),
+
+    knex.schema.createTable('token_group_access', (table) => {
+        table.increments('id')
+            .primary();
+        table.integer('token_id')
+            .notNullable()
+            .references('id')
+            .inTable('tokens');
+        table.integer('group_id')
+            .notNullable()
+            .references('id')
+            .inTable('groups');
+
     })
 ]);
 
 exports.down = (knex, Promise) => Promise.all([
     knex.schema.dropTable('user_saldos'),
     knex.schema.dropTable('transactions'),
+    knex.schema.dropTable('token_group_access'),
     knex.schema.dropTable('users'),
-    knex.schema.dropTable('groups')
+    knex.schema.dropTable('groups'),
+    knex.schema.dropTable('tokens')
 ]);

@@ -10,8 +10,10 @@ const knex  = require(path.join(cfg.buildDir, 'database')).knex;
 const transactionCore   = require(path.join(cfg.buildDir, 'core/transaction-core'));
 const userCore          = require(path.join(cfg.buildDir, 'core/user-core'));
 const groupCore         = require(path.join(cfg.buildDir, 'core/group-core'));
+const tokenCore         = require(path.join(cfg.buildDir, 'core/token-core'));
 
-const tables = ['transactions', 'user_saldos', 'groups', 'users', 'knex_migrations'];
+
+const TABLES = ['transactions', 'user_saldos', 'token_group_access', 'users', 'groups', 'tokens', 'knex_migrations'];
 
 describe('Database', () => {
 
@@ -19,51 +21,50 @@ describe('Database', () => {
     const group = { name: 'testGroup' };
 
     // Clear tables and migrate to latest
-    before(() => Promise.each(tables, table =>
-            knex.schema.dropTableIfExists(table)
-        )
+    before(() => Promise
+        .each(TABLES, table => knex.schema.dropTableIfExists(table))
         .then(() => knex.migrate.latest({directory: cfg.migrationDir}))
     );
 
-    it('should create a new group', () =>
+    it('create a new group', () =>
         expect(
             groupCore.createGroup(group.name)
             .then(() => groupCore.groupExists(group.name))
         ).to.eventually.containSubset(group)
     );
 
-    it('should not create a group with existing name', () =>
+    it('not create a group with existing name', () =>
         expect(groupCore.createGroup(group.name)).to.eventually.be.rejected
     );
 
-    it('should create a new user', () =>
+    it('create a new user', () =>
         expect(
             userCore.createUser(_.pick(user, ['username', 'password']))
             .then(() => userCore.userExists(user.username))
         ).eventually.to.containSubset(_.pick(user, ['username']))
     );
 
-    it('should not create a user with existing name', () =>
+    it('not create a user with existing name', () =>
         expect(
             userCore.createUser(_.pick(user, ['username', 'password']))
         ).eventually.to.be.rejected
     );
 
-    it('should authenticate user', () =>
+    it('authenticate user', () =>
         expect(userCore.authenticateUser(user)).to.eventually.be.fulfilled
     );
 
-    it('should not authenticate user with wrong password', () => 
+    it('not authenticate user with wrong password', () => 
         expect(
             userCore.authenticateUser(_.assign(user, { password: 'wrong' }))
         ).to.eventually.be.rejectedWith('Invalid password')
     );
 
-    it('should create saldo for user', () =>
+    it('create saldo for user', () =>
         expect(userCore.createSaldoForUser(user.username, group.name)).to.eventually.be.fulfilled
     );
 
-    it('should make a transaction', () => {
+    it('make a transaction', () => {
         let amount = 10;
 
         return transactionCore.makeTransaction(user.username, group.name, amount)
@@ -79,6 +80,32 @@ describe('Database', () => {
             expect(res).to.have.property('saldo', 0);
             return expect(userCore.getUser(user.username))
                 .to.eventually.containSubset({ saldos: { [group.name]: 0 } });
+        });
+    });
+
+    it('create token', () => {
+        return tokenCore.createToken(group.name, 'basic')
+        .then((res) => {
+            expect(res).to.be.string;
+            return Promise.resolve();
+        })
+        .then(() => tokenCore.createToken(group.name, 'supervisor', 'Organization A'))
+        .then((res) => {
+            expect(res).to.be.string;
+            return Promise.resolve();
+        });
+    });
+
+    it('get tokens', () => {
+        return tokenCore.getTokens()
+        .then((res) => {
+            expect(res).to.be.an.array;
+            expect(res).to.have.length(2);
+
+            let token = res[0];
+            expect(token).to.have.property('token');
+            expect(token).to.have.property('role');
+            expect(token).to.have.property('name', group.name);
         });
     });
 });
