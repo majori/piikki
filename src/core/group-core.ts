@@ -1,5 +1,6 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
+import * as Promise from 'bluebird';
 
 import { knex, IDatabaseGroup } from '../database';
 
@@ -13,7 +14,7 @@ export function createGroup(groupName: string) {
         .then(() => knex('groups').insert({ name: groupName }));
 };
 
-export function groupExists(groupName: string): Promise<any> {
+export function groupExists(groupName: string) {
     return knex('groups').where({ name: groupName }).first()
         .then((row: IDatabaseGroup) => _.isUndefined(row) ?
             Promise.reject(`Group ${groupName} not found`) :
@@ -28,4 +29,9 @@ export function getUsersFromGroup(groupName: string) {
         .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
         .join('groups', { 'groups.id': 'user_saldos.group_id' })
         .where({ 'groups.name': groupName });
+};
+
+export function getGroups() {
+    return knex
+        .from('groups');
 };

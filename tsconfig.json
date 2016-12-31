@@ -2,8 +2,8 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "allowJs": true,
         "removeComments": true,
+        "useStrict": true,
         "outDir": "dist",
         "sourceMap": true
     },

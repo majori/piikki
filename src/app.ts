@@ -1,10 +1,22 @@
 import * as bodyParser from 'body-parser';
 import * as errorHandler from 'errorhandler';
 import * as express from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as http from 'http';
 import * as methodOverride from 'method-override';
 
+import { handleTokens, initTokens } from './tokenHandler';
 import { createRouter } from './router';
+
+export interface IExtendedRequest extends Request {
+    groupAccess: {
+        all: boolean;
+        group: {
+            elevated: boolean;
+            name: string;
+        };
+    };
+}
 
 export function createApp(cfg: any) {
     const app = express();
@@ -13,23 +25,17 @@ export function createApp(cfg: any) {
     app.use(bodyParser.json());
     app.use(methodOverride());
 
-    // Authorize request
-    app.use((req, res, next) => {
-        let auth = req.get('Authorization');
+    initTokens();
 
-        if (auth && auth === cfg.secret) {
-            next();
-        } else {
-            res.status(401).json({ ok: false, message: 'Unauthorized' });
-        }
-    });
+    // Authorize request
+    app.use(handleTokens);
 
     // Initialize routes
     const router = createRouter();
     app.use('/api', router);
 
     // Error logger
-    app.use((err: any, req, res, next) => {
+    app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
         const status = err.status ? err.status : 500;
 
         if (status >= 401) {
@@ -44,7 +50,7 @@ export function createApp(cfg: any) {
     });
 
     // Error responder
-    app.use((err: any, req, res, next) => {
+    app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
         const status = err.status ? err.status : 500;
         const httpMessage = http.STATUS_CODES[status];
 

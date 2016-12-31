@@ -1,14 +1,15 @@
-import { NextFunction, Request, Response } from 'express';
 import * as Promise from 'bluebird';
+import { NextFunction, Response } from 'express';
+import { IExtendedRequest } from '../app';
 
 import * as userCore from '../core/user-core';
 import { badRequestError, createJsonRoute, validateUser, validateUsername, validateGroupName} from './endpoint-utils';
 
-export const getUsers = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const getUsers = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     return userCore.getUsers();
 });
 
-export const getUser = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const getUser = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     let username: any = req.params.username;
 
     return validateUsername(username)
@@ -16,7 +17,7 @@ export const getUser = createJsonRoute((req: Request, res: Response, next: NextF
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
-export const createUser = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const createUser = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     let user: any = req.body;
 
     return validateUser(user)
@@ -24,7 +25,7 @@ export const createUser = createJsonRoute((req: Request, res: Response, next: Ne
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
-export const authenticateUser = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const authenticateUser = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     let user: any = req.body;
 
     return validateUser(user)
@@ -32,7 +33,7 @@ export const authenticateUser = createJsonRoute((req: Request, res: Response, ne
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
-export const deleteUser = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const deleteUser = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     let user: any = req.body;
 
     return validateUsername(user.username)
@@ -40,12 +41,13 @@ export const deleteUser = createJsonRoute((req: Request, res: Response, next: Ne
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
-export const putUserToGroup = createJsonRoute((req: Request, res: Response, next: NextFunction) => {
+export const putUserToGroup = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     let params: any = req.body;
+    params.groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : params.groupName;
 
     return Promise.all([
-        validateUsername(req.body.username),
-        validateGroupName(req.body.groupName)
+        validateUsername(params.username),
+        validateGroupName(params.groupName)
     ])
     .spread((vUsername: string, vGroupName: string) => userCore.createSaldoForUser(vUsername, vGroupName))
     .catch((err) => Promise.reject(badRequestError(err)));

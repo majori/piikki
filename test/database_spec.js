@@ -12,7 +12,6 @@ const userCore          = require(path.join(cfg.buildDir, 'core/user-core'));
 const groupCore         = require(path.join(cfg.buildDir, 'core/group-core'));
 const tokenCore         = require(path.join(cfg.buildDir, 'core/token-core'));
 
-
 const TABLES = ['transactions', 'user_saldos', 'token_group_access', 'users', 'groups', 'tokens', 'knex_migrations'];
 
 describe('Database', () => {

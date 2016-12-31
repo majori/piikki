@@ -1,17 +1,18 @@
 import * as Promise from 'bluebird';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
+import { IExtendedRequest } from '../app';
 
 import * as transCore from '../core/transaction-core';
 import {
     badRequestError,
     createJsonRoute,
     validateTransactionAmount,
-    validateUser,
-    validateUsername
+    validateGroupName,
+    validateUsername,
 } from './endpoint-utils';
 
-export const makeTransaction = createJsonRoute((req: Request, res: Response, next: NextFunction): Promise<any> => {
+export const makeTransaction = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction): Promise<any> => {
     let transactions = req.body;
 
     // Allow body to have one or multiple transactions
@@ -20,9 +21,17 @@ export const makeTransaction = createJsonRoute((req: Request, res: Response, nex
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    return Promise.map(transactions, (transaction: any) => validateTransactionAmount(transaction.amount)
-        .then(() => validateUsername(transaction.username))
-        .then(() => transCore.makeTransaction(transaction.username, transaction.amount, transaction.comment))
-        .catch((err) => Promise.reject(badRequestError(err)))
-    );
+    return Promise.map(transactions, (trx: any) => {
+
+        // If request comes from group specific token, use token related group name
+        trx.groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : trx.groupName;
+
+        return Promise.all([
+            validateTransactionAmount(trx.amount),
+            validateUsername(trx.username),
+            validateGroupName(trx.groupName)
+        ])
+        .then(() => transCore.makeTransaction(trx.username, trx.groupName, trx.amount, trx.comment))
+        .catch((err) => Promise.reject(badRequestError(err)));
+    });
 });
