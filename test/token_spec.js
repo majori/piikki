@@ -7,14 +7,17 @@ const helper = require('./helpers');
 
 const tokenCore = require(path.join(cfg.buildDir, 'core/token-core'));
 const groupCore = require(path.join(cfg.buildDir, 'core/group-core'));
+const userCore = require(path.join(cfg.buildDir, 'core/user-core'));
 
 describe('Tokens', () => {
 
     const GROUP = helper.group;
 
-    before(() => helper.clearDb()
-        .then(() => groupCore.createGroup(GROUP.name))
-    );
+    before((done) => {
+        helper.clearDb()
+        .then(helper.initializeUserAndGroup)
+        .then(() => done())
+    });
 
     it('create token', (done) => {
         tokenCore.createGroupToken(GROUP.name, 'basic')
@@ -54,5 +57,9 @@ describe('Tokens', () => {
 
             done();
         });
+    });
+
+    it('with group token client can access only to specific group', (done) => {
+        done();
     });
 });

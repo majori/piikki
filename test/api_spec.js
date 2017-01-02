@@ -9,10 +9,6 @@ const _         = require('lodash');
 const cfg   = require('../config');
 const helper = require('./helpers');
 
-const tokenCore = require(path.join(cfg.buildDir, 'core/token-core'));
-const groupCore = require(path.join(cfg.buildDir, 'core/group-core'));
-const userCore  = require(path.join(cfg.buildDir, 'core/user-core'));
-
 const UNAUTHORIZED = 401;
 
 const app = require(path.join(cfg.buildDir, 'app'));
@@ -25,95 +21,100 @@ describe('API', () => {
     let API;
 
     // Clear tables and migrate to latest
-    before(() => helper.clearDb()
-        .then(() => groupCore.createGroup(GROUP.name))
-        .then(() => userCore.createUser(USER))
-        .then(() => userCore.createSaldoForUser(USER.username, GROUP.name))
-        .then(() => tokenCore.createGroupToken(GROUP.name, 'basic'))
+    before((done) => {
+        helper.clearDb()
+        .then(helper.initializeUserAndGroup)
+        .then(helper.createGroupToken)
         .then((token) => {
             HEADERS = { Authorization: token };
             API = app.createApp(cfg);
-            return Promise.resolve();
+            done();
         })
-    );
-
-    it('unauthorize client without token', (done) => {
-        request(API)
-            .get('/api/users')
-            .end((err, res) => {
-                expect(err).not.to.be.null;
-                expect(err).to.have.status(UNAUTHORIZED);
-                expect(res).to.be.json;
-                expect(res.body).to.have.property('message');
-                expect(res.body).to.have.property('ok', false);
-                done();
-            });
     });
 
-    it('create new user [/users/create]', (done) => {
-        request(API)
-            .post('/api/users/create')
-            .set(HEADERS)
-            .send({ username: 'otherUser', password: 'hackme' })
-            .end((err, res) => {
-                expect(err).to.be.null;
-                expect(res).to.be.json;
-                expect(res).to.have.status(200);
-                done();
-            });
-    });
-
-    it('authenticate user [/users/authenticate]', (done) => {
-        Promise.resolve()
-
-        // With right password
-        .then(() => {
+    describe('Routes', () => {
+        it('create new user [/users/create]', (done) => {
             request(API)
-            .post('/api/users/authenticate')
-            .set(HEADERS)
-            .send(USER)
-            .end((err, res) => {
-                expect(err).to.be.null;
-                expect(res).to.be.json;
-                expect(res).to.have.status(200);
-                return Promise.resolve();
-            });
-        })
+                .post('/api/users/create')
+                .set(HEADERS)
+                .send({ username: 'otherUser', password: 'hackme' })
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.be.json;
+                    expect(res).to.have.status(200);
+                    done();
+                });
+        });
 
-        // With wrong password
-        .then(() => {
-            request(API)
-            .post('/api/users/authenticate')
-            .set(HEADERS)
-            .send(_.assign(USER, { password: 'wrong_password' }))
-            .end((err, res) => {
-                expect(err).not.to.be.null;
-                expect(res).to.be.json;
-                expect(res).to.have.status(400);
-                expect(res.body).to.have.property('ok', false);
-                expect(res.body).to.have.property('message', 'Bad Request: Invalid password');
-                done();
+        it('authenticate user [/users/authenticate]', (done) => {
+            Promise.resolve()
+
+            // With right password
+            .then(() => {
+                request(API)
+                .post('/api/users/authenticate')
+                .set(HEADERS)
+                .send(USER)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.be.json;
+                    expect(res).to.have.status(200);
+                    return Promise.resolve();
+                });
+            })
+
+            // With wrong password
+            .then(() => {
+                request(API)
+                .post('/api/users/authenticate')
+                .set(HEADERS)
+                .send(_.assign(USER, { password: 'wrong_password' }))
+                .end((err, res) => {
+                    expect(err).not.to.be.null;
+                    expect(res).to.be.json;
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.have.property('ok', false);
+                    expect(res.body).to.have.property('message', 'Bad Request: Invalid password');
+                    done();
+                });
             });
         });
     });
 
-    it('tell about bad username', (done) => {
-        Promise.each(['/api/users/authenticate'], (route) => {
-            let badUsername = 'bad_username';
+    describe('Errors', () => {
+        it('unauthorize client without token', (done) => {
+            Promise.each(helper.routes, (route) => {
+                request(API)
+                    [route.method](route.route)
+                    .end((err, res) => {
+                        expect(err).not.to.be.null;
+                        expect(err).to.have.status(UNAUTHORIZED);
+                        expect(res).to.be.json;
+                        expect(res.body).to.have.property('message');
+                        expect(res.body).to.have.property('ok', false);
+                        return Promise.resolve();
+                    });
+            })
+            .then(() => done());
+        });
 
-            request(API)
-            .post(route)
-            .set(HEADERS)
-            .send(_.assign(USER, { username: badUsername }))
-            .end((err, res) => {
-                expect(err).not.to.be.null;
-                expect(res).to.be.json;
-                expect(res).to.have.status(400);
-                expect(res.body).to.have.property('ok', false);
-                expect(res.body).to.have.property('message', `Bad Request: User ${badUsername} not found`);
-            });
-        })
-        .then(() => done());
-    })
+        it('tell about bad username', (done) => {
+            Promise.each(['/api/users/authenticate'], (route) => {
+                let badUsername = 'bad_username';
 
+                request(API)
+                .post(route)
+                .set(HEADERS)
+                .send(_.assign(USER, { username: badUsername }))
+                .end((err, res) => {
+                    expect(err).not.to.be.null;
+                    expect(res).to.be.json;
+                    expect(res).to.have.status(400);
+                    expect(res.body).to.have.property('ok', false);
+                    expect(res.body).to.have.property('message', `Bad Request: User ${badUsername} not found`);
+                });
+            })
+            .then(() => done());
+        });
+    });
 });
