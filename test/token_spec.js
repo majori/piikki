@@ -19,7 +19,7 @@ describe('Tokens', () => {
         .then(() => done())
     });
 
-    it('create token', (done) => {
+    it('create a new token (group and generic)', (done) => {
         tokenCore.createGroupToken(GROUP.name, 'basic')
         .then((res) => {
             expect(res).to.be.string;
@@ -37,7 +37,7 @@ describe('Tokens', () => {
         });
     });
 
-    it('get tokens', (done) => {
+    it('get existing tokens from database', (done) => {
         tokenCore.getTokens()
         .then((tokens) => {
             expect(tokens).to.be.an.array;
@@ -59,7 +59,7 @@ describe('Tokens', () => {
         });
     });
 
-    it('with group token client can access only to specific group', (done) => {
-        done();
-    });
+    it('with group token client can access only to specific group');
+
+    it('with generic token client can access all features');
 });

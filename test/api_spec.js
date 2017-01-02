@@ -33,6 +33,7 @@ describe('API', () => {
     });
 
     describe('Routes', () => {
+
         it('create new user [/users/create]', (done) => {
             request(API)
                 .post('/api/users/create')
@@ -79,6 +80,12 @@ describe('API', () => {
                 });
             });
         });
+
+        it('delete user (mark it as non-active)');
+
+        it('get all users (if client uses generic token)');
+
+        it('create group (if client uses generic token)');
     });
 
     describe('Errors', () => {
