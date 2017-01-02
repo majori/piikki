@@ -7,29 +7,25 @@ const Promise   = require('bluebird');
 const _         = require('lodash');
 
 const cfg   = require('../config');
-const knex  = require(path.join(cfg.buildDir, 'database')).knex;
+const helper = require('./helpers');
 
 const tokenCore = require(path.join(cfg.buildDir, 'core/token-core'));
 const groupCore = require(path.join(cfg.buildDir, 'core/group-core'));
 const userCore  = require(path.join(cfg.buildDir, 'core/user-core'));
 
 const UNAUTHORIZED = 401;
-const USER = { username: 'test', password: 'hackme' };
-const GROUP = { name: 'testGroup' };
-const DB_TABLES = ['transactions', 'user_saldos', 'token_group_access', 'users', 'groups', 'tokens', 'knex_migrations'];
 
 const app = require(path.join(cfg.buildDir, 'app'));
 
 describe('API', () => {
 
+    const USER = helper.user;
+    const GROUP = helper.group;
     let HEADERS;
     let API;
 
     // Clear tables and migrate to latest
-    before(() => Promise.each(DB_TABLES, table =>
-            knex.schema.dropTableIfExists(table)
-        )
-        .then(() => knex.migrate.latest({directory: cfg.migrationDir}))
+    before(() => helper.clearDb()
         .then(() => groupCore.createGroup(GROUP.name))
         .then(() => userCore.createUser(USER))
         .then(() => userCore.createSaldoForUser(USER.username, GROUP.name))
