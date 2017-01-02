@@ -22,8 +22,8 @@ export function initTokens() {
                 debug('No tokens in database, creating new ones');
 
                 initializeTokens()
-                .then((tokens) => {
-                    registeredTokens = tokens;
+                .then((newTokens) => {
+                    registeredTokens = newTokens;
                 });
 
             } else {
@@ -41,10 +41,10 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
     if (!_.isUndefined(token)) {
 
         req.groupAccess = { all: false, group: { elevated: false, name: null }};
-        let role = token.role;
 
         // Generic token have access to all groups
-        if (role === 'generic') {
+        if (token.role === 'generic') {
+            debug('Token had generic access');
             req.groupAccess.all = true;
 
         } else {
@@ -53,9 +53,11 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
             req.groupAccess.group.name = token.groupName;
 
             // Elevate group access if role is supervisor
-            if (role === 'supervisor') {
+            if (token.role === 'supervisor') {
                 req.groupAccess.group.elevated = true;
             }
+
+            debug(`Token had access to group "${token.groupName}" with role ${token.role}`);
         }
 
         next();
