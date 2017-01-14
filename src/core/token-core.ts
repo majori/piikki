@@ -26,14 +26,14 @@ export function createGroupToken(groupName: string, role: string, comment?: stri
                 .from('token_group_access')
                 .insert({ 'token_id': id[0], 'group_id': group.id})
             )
-            .then(() => { debug('Created group token', token); return Promise.resolve(); })
+            .then(() => Promise.resolve(debug('Created group token', token)))
             .then(() => Promise.resolve(token))
         );
 };
 
 export function createGenericToken(comment?: string) {
     return generateBase64Token()
-        .then((token) => knex.from('tokens').insert({ token, role: 'generic', comment }))
+        .then((token) => knex.from('tokens').insert({ token, role: 'generic', comment }));
 }
 
 export function getTokens() {
@@ -41,7 +41,7 @@ export function getTokens() {
         .select('tokens.token', 'tokens.role', 'groups.name AS group_name')
         .from('tokens')
         .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' })
+        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
 }
 
 export function getToken(groupName: string) {
@@ -64,6 +64,7 @@ export function initializeTokens() {
         .then(getTokens);
 };
 
+// Generates Base64 string from random bytes
 function generateBase64Token(length = 32): Promise<any> {
     return new Promise((resolve, reject) => {
         crypto.randomBytes(length, (err, buf) => {

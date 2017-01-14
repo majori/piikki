@@ -1,4 +1,3 @@
-
 exports.up = (knex, Promise) => Promise.all([
 
     knex.schema.createTable('users', table => {

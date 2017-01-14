@@ -73,4 +73,4 @@ function updateTokens() {
     .then((tokens) => {
         registeredTokens = tokens;
     });
-}
+};

@@ -21,7 +21,7 @@ export const createUser = createJsonRoute((req: IExtendedRequest, res: Response,
     let user: any = req.body;
 
     return validateUser(user)
-    .then((vUser) => userCore.createUser(vUser))
+    .then((vUser: userCore.IUserDto) => userCore.createUser(vUser))
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
@@ -29,7 +29,8 @@ export const authenticateUser = createJsonRoute((req: IExtendedRequest, res: Res
     let user: any = req.body;
 
     return validateUser(user)
-    .then((vUser) => userCore.authenticateUser(vUser))
+    .then((vUser: userCore.IUserDto) => userCore.authenticateUser(vUser))
+    .then((authenticated) => Promise.resolve({ authenticated }))
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
@@ -38,17 +39,5 @@ export const deleteUser = createJsonRoute((req: IExtendedRequest, res: Response,
 
     return validateUsername(user.username)
     .then((vUsername) => userCore.deleteUser(vUsername))
-    .catch((err) => Promise.reject(badRequestError(err)));
-});
-
-export const putUserToGroup = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-    let params: any = req.body;
-    params.groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : params.groupName;
-
-    return Promise.all([
-        validateUsername(params.username),
-        validateGroupName(params.groupName)
-    ])
-    .spread((vUsername: string, vGroupName: string) => userCore.createSaldoForUser(vUsername, vGroupName))
     .catch((err) => Promise.reject(badRequestError(err)));
 });

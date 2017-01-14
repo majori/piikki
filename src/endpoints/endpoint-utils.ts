@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { IUserDto } from '../core/core-utils';
+import { IUserDto } from '../core/user-core';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
@@ -9,7 +9,7 @@ export function createJsonRoute(func: Function): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             func(req, res)
-                .then((result) => res.json({ ok: true, result }))
+                .then((result) => res.json({ ok: true, result: result || {} }))
                 .catch(next);
         } catch (err) {
             next(err);

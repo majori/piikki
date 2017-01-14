@@ -4,8 +4,14 @@ import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 
 import { knex, IDatabaseUser, IDatabaseGroup } from '../database';
-import { IUserDto, saltRounds } from './core-utils';
 import { groupExists } from './group-core';
+
+export interface IUserDto {
+    username: string;
+    password?: string;
+};
+
+export const SALT_ROUNDS = 6;
 
 // Get all users in group
 export function getUsers() {
@@ -50,7 +56,7 @@ export function createUser(user: IUserDto) {
             Promise.reject(`Username ${user.username} already exists`)
         )
         .then(() => new Promise((resolve, reject) => {
-            bcrypt.hash(user.password, saltRounds, (err, hash) => (err) ?
+            bcrypt.hash(user.password, SALT_ROUNDS, (err, hash) => (err) ?
                 reject(err) :
                 resolve(hash));
             })
@@ -58,7 +64,8 @@ export function createUser(user: IUserDto) {
         .then((hash) => knex.from('users').insert({
             username: user.username,
             password: hash
-        }));
+        }))
+        .then(() => Promise.resolve(user.username));
 };
 
 // Puts user's "active" -status to false
@@ -71,22 +78,8 @@ export function deleteUser(username: string) {
 export function authenticateUser(user: IUserDto) {
     return userExists(user.username)
     .then((row: IDatabaseUser) => new Promise((resolve, reject) => {
-        bcrypt.compare(user.password, row.password, (err, same) => (same) ?
-            resolve() :
-            reject('Invalid password'),
-        );
+        bcrypt.compare(user.password, row.password, (err, same) => resolve(same))
     }));
-};
-
-export function createSaldoForUser(username: string, groupName: string) {
-    return Promise.all([
-        userExists(username),
-        groupExists(groupName)
-    ])
-    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex
-        .from('user_saldos')
-        .insert({group_id: group.id, user_id: user.id})
-    );
 };
 
 // Checks if user is in database
