@@ -2,7 +2,9 @@ import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 import * as Promise from 'bluebird';
 
-import { knex, IDatabaseGroup } from '../database';
+import { userExists } from './user-core';
+import { createGroupToken } from './token-core';
+import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
 
 export function createGroup(groupName: string) {
     return knex('groups')
@@ -11,7 +13,9 @@ export function createGroup(groupName: string) {
             Promise.resolve() :
             Promise.reject(`Group ${groupName} already exists`)
         )
-        .then(() => knex('groups').insert({ name: groupName }));
+        .then(() => knex('groups').insert({ name: groupName }))
+        .then(() => createGroupToken(groupName, 'basic')) // Create automatically access token for group
+        .then(() => Promise.resolve(groupName));
 };
 
 export function groupExists(groupName: string) {
@@ -20,6 +24,20 @@ export function groupExists(groupName: string) {
             Promise.reject(`Group ${groupName} not found`) :
             Promise.resolve(row)
         );
+};
+
+export function userIsAlreadyInGroup(username: string, groupName: string) {
+    return Promise.all([
+        userExists(username),
+        groupExists(groupName)
+    ])
+    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
+        .where({ user_id: user.id, group_id: group.id }).first()
+        .then((row: IDatabaseUserSaldo) => !_.isUndefined(row) ?
+            Promise.reject(`User ${user.username} is already in group ${group.name}`) :
+            Promise.resolve({ user, group })
+        )
+    )
 };
 
 export function getUsersFromGroup(groupName: string) {
@@ -33,5 +51,15 @@ export function getUsersFromGroup(groupName: string) {
 
 export function getGroups() {
     return knex
-        .from('groups');
+        .from('groups')
+        .select('name');
+};
+
+export function addUserToGroup(username: string, groupName: string) {
+    return userIsAlreadyInGroup(username, groupName)
+    .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
+        .from('user_saldos')
+        .insert({group_id: res.group.id, user_id: res.user.id})
+    )
+    .then(() => Promise.resolve(username));
 };

@@ -53,7 +53,7 @@ describe('Users, groups & transactions', () => {
     );
 
     it('create saldo for user', () =>
-        expect(userCore.createSaldoForUser(USER.username, GROUP.name)).to.eventually.be.fulfilled
+        expect(groupCore.addUserToGroup(USER.username, GROUP.name)).to.eventually.be.fulfilled
     );
 
     it('make a transaction', () => {

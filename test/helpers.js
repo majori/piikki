@@ -31,7 +31,7 @@ helper.clearDb = () => Promise
 // Create user, group and token
 helper.initializeUserAndGroup = () => groupCore.createGroup(helper.group.name)
     .then(() => userCore.createUser(helper.user))
-    .then(() => userCore.createSaldoForUser(helper.user.username, helper.group.name));
+    .then(() => groupCore.addUserToGroup(helper.user.username, helper.group.name));
 
 helper.createGroupToken = () => tokenCore.createGroupToken(helper.group.name, 'basic');
 
