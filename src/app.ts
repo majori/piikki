@@ -6,13 +6,12 @@ import * as http from 'http';
 import * as methodOverride from 'method-override';
 
 import { handleTokens, initTokens } from './tokenHandler';
-import { createRouter } from './router';
+import { initializeRoutes } from './router';
 
 export interface IExtendedRequest extends Request {
     groupAccess: {
         all: boolean;
         group: {
-            elevated: boolean;
             name: string;
         };
     };
@@ -31,8 +30,7 @@ export function createApp(cfg: any) {
     app.use(handleTokens);
 
     // Initialize routes
-    const router = createRouter();
-    app.use('/api', router);
+    app.use('/api', initializeRoutes());
 
     // Error logger
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
