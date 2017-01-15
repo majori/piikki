@@ -9,7 +9,7 @@ const cfg = require('../config');
 
 // If environment is not production, use development token
 let registeredTokens = (cfg.isProduction || cfg.isTest) ?
-    [] : [{ token: 'opensesame', role: 'generic', groupName: null }];
+    [] : [{ token: 'opensesame', role: 'global', groupName: null }];
 
 export function initTokens() {
 
@@ -37,14 +37,14 @@ export function initTokens() {
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
 
     debug(`Handling token ${req.get('Authorization')}`);
-    let token = _.find(registeredTokens, ['token', req.get('Authorization')]);
+    const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
     if (!_.isUndefined(token)) {
 
-        req.groupAccess = { all: false, group: { elevated: false, name: null }};
+        req.groupAccess = { all: false, group: { name: null }};
 
-        // Generic token have access to all groups
-        if (token.role === 'generic') {
-            debug('Token had generic access');
+        // Global token have access to all groups
+        if (token.role === 'global') {
+            debug('Token had global access');
             req.groupAccess.all = true;
 
         } else {
@@ -52,16 +52,12 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
             // Get group name from token
             req.groupAccess.group.name = token.groupName;
 
-            // Elevate group access if role is supervisor
-            if (token.role === 'supervisor') {
-                req.groupAccess.group.elevated = true;
-            }
-
             debug(`Token had access to group "${token.groupName}" with role ${token.role}`);
         }
 
         next();
 
+    // Request didn't have a proper token
     } else {
         res.status(401).json({ ok: false, message: 'Unauthorized' });
     }

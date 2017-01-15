@@ -8,32 +8,31 @@ import { groupExists, getGroups } from './group-core';
 
 const debug = Debug('piikki:token-core');
 
-export function createGroupToken(groupName: string, role: string, comment?: string) {
-    role = (_.includes(['basic', 'supervisor'], role)) ? role : 'basic';
+export function createRestrictedToken(groupName: string, comment?: string) {
 
     return Promise.all([
             groupExists(groupName),
-            generateBase64Token()
+            _generateBase64Token()
         ])
         .spread((group: IDatabaseGroup, token: string) => Promise
             .resolve()
             .then(() => knex
                 .from('tokens')
-                .insert({ token, role, comment })
+                .insert({ token, role: 'restricted', comment })
                 .returning('id')
             )
             .then((id) => knex
                 .from('token_group_access')
                 .insert({ 'token_id': id[0], 'group_id': group.id})
             )
-            .then(() => Promise.resolve(debug('Created group token', token)))
+            .then(() => Promise.resolve(debug('Created restricted token', token)))
             .then(() => Promise.resolve(token))
         );
 };
 
-export function createGenericToken(comment?: string) {
-    return generateBase64Token()
-        .then((token) => knex.from('tokens').insert({ token, role: 'generic', comment }));
+export function createGlobalToken(comment?: string) {
+    return _generateBase64Token()
+        .then((token) => knex.from('tokens').insert({ token, role: 'global', comment }));
 }
 
 export function getTokens() {
@@ -54,18 +53,18 @@ export function getToken(groupName: string) {
         .first();
 }
 
-// Creates one generic token and token for every group
+// Creates one global token and restricted token for every group
 export function initializeTokens() {
-    return createGenericToken()
+    return createGlobalToken()
         .then(getGroups)
         .then((groups) => Promise.each(groups, (group: any) => {
-            return createGroupToken(group.name, 'basic');
+            return createRestrictedToken(group.name);
         }))
         .then(getTokens);
 };
 
 // Generates Base64 string from random bytes
-function generateBase64Token(length = 32): Promise<any> {
+function _generateBase64Token(length = 32): Promise<any> {
     return new Promise((resolve, reject) => {
         crypto.randomBytes(length, (err, buf) => {
             if (err) { reject(err); }

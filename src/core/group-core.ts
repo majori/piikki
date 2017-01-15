@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as Promise from 'bluebird';
 
 import { userExists } from './user-core';
-import { createGroupToken } from './token-core';
+import { createRestrictedToken } from './token-core';
 import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
 
 export function createGroup(groupName: string) {
@@ -14,7 +14,7 @@ export function createGroup(groupName: string) {
             Promise.reject(`Group ${groupName} already exists`)
         )
         .then(() => knex('groups').insert({ name: groupName }))
-        .then(() => createGroupToken(groupName, 'basic')) // Create automatically access token for group
+        .then(() => createRestrictedToken(groupName, 'basic')) // Create automatically access token for group
         .then(() => Promise.resolve(groupName));
 };
 
@@ -27,7 +27,7 @@ export function groupExists(groupName: string) {
 };
 
 export function userIsNotInGroup(username: string, groupName: string) {
-    return userInGroup(username, groupName)
+    return _userInGroup(username, groupName)
         .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => !result.found ?
             Promise.resolve({ user: result.user, group: result.group }) :
             Promise.reject(`User ${result.user.username} is already in group ${result.group.name}`)
@@ -35,27 +35,13 @@ export function userIsNotInGroup(username: string, groupName: string) {
 }
 
 export function userIsInGroup(username: string, groupName: string) {
-    return userInGroup(username, groupName)
+    return _userInGroup(username, groupName)
         .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => result.found ?
             Promise.resolve({ user: result.user, group: result.group }) :
             Promise.reject(`User ${result.user.username} is not in group ${result.group.name}`)
         );
 }
 
-function userInGroup(username: string, groupName: string) {
-    return Promise.all([
-        userExists(username),
-        groupExists(groupName)
-    ])
-    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
-        .where({ user_id: user.id, group_id: group.id }).first()
-        .then((row: IDatabaseUserSaldo) => Promise.resolve({
-            found: !_.isUndefined(row),
-            user,
-            group
-        }))
-    )
-};
 
 export function getUsersFromGroup(groupName: string) {
     return knex
@@ -89,4 +75,19 @@ export function removeUserFromGroup(username: string, groupName: string) {
             .del()
         )
         .then(() => Promise.resolve(username));
+};
+
+function _userInGroup(username: string, groupName: string) {
+    return Promise.all([
+        userExists(username),
+        groupExists(groupName)
+    ])
+    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
+        .where({ user_id: user.id, group_id: group.id }).first()
+        .then((row: IDatabaseUserSaldo) => Promise.resolve({
+            found: !_.isUndefined(row),
+            user,
+            group
+        }))
+    )
 };
