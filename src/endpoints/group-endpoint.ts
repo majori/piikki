@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { IExtendedRequest } from '../app';
 import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
+import { IDatabaseGroup, IDatabaseUser } from '../database';
 import { badRequestError, createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
 
 const _endpoint = {
@@ -16,7 +17,7 @@ const _endpoint = {
     },
 
     addMember: (req: IExtendedRequest) => {
-        let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
+        let groupName = req.groupAccess.group.name;
 
         return Promise.all([
             validateUsername(req.body.username),
@@ -27,7 +28,7 @@ const _endpoint = {
     },
 
     removeMember: (req: IExtendedRequest) => {
-        let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
+        let groupName = req.groupAccess.group.name;
 
         return Promise.all([
             validateUsername(req.body.username),
@@ -42,8 +43,23 @@ const _endpoint = {
     },
 
     getGroupMembers: (req: IExtendedRequest) => {
-        return validateGroupName(req.params.groupName)
+        let groupName = req.groupAccess.group.name;
+
+        return validateGroupName(groupName)
             .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
+    },
+
+    getGroupMember: (req: IExtendedRequest) => {
+        let groupName = req.groupAccess.group.name;
+
+        return Promise.all([
+                validateUsername(req.params.username),
+                validateGroupName(groupName)
+            ])
+            .spread((vUsername: string, vGroupName: string) => groupCore.userIsInGroup(vUsername, groupName))
+            .then((res: { user: IDatabaseUser, group: IDatabaseGroup }) =>
+                groupCore.getUserFromGroup(res.group.name, res.user.username)
+            );
     },
 };
 

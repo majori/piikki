@@ -26,7 +26,7 @@ function _commonRoutes() {
     return commonR;
 }
 
-// Group token allowed
+// These routes which can be accessed by restricted token
 function _restrictedTokenRoutes() {
     const restrictedR = Router();
 
@@ -40,17 +40,18 @@ function _restrictedTokenRoutes() {
         }
     });
 
+    // Apply common routes
     restrictedR.use(_commonRoutes());
 
-    // -- /group/removeMember   delete user saldo from group'
-    // -- /users/:username // vain oman ryhmän saldo
-    // -- /group/members
-    // -- /group/addMember
+    restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
+    restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
+    restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
+    restrictedR.post('/group/addMember', groupEndpoint.addMember);
 
     return restrictedR;
 }
 
-// Global token allowed
+// These routes which can be accessed by global token
 function _globalTokenRoutes() {
     const globalR = Router();
 
@@ -72,16 +73,18 @@ function _globalTokenRoutes() {
         next();
     });
 
+    // Apply common routes
     globalR.use(_commonRoutes());
 
-    // -- /groups/:groupName/removeMember      delete user saldo from group'
     globalR.get('/users', userEndpoint.getUsers);
     globalR.get('/users/:username', userEndpoint.getUser);
     globalR.delete('/users', userEndpoint.deleteUser);
     globalR.get('/groups', groupEndpoint.getGroups);
-    globalR.post('/groups', groupEndpoint.createGroup);
+    globalR.post('/groups/create', groupEndpoint.createGroup);
     globalR.get('/groups/:groupName/members', groupEndpoint.getGroupMembers);
+    globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
     globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
+    globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
 
     return globalR;
 }

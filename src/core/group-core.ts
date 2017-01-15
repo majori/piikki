@@ -45,11 +45,21 @@ export function userIsInGroup(username: string, groupName: string) {
 
 export function getUsersFromGroup(groupName: string) {
     return knex
-        .select('users.username')
+        .select('users.username', 'user_saldos.saldo')
         .from('users')
         .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
         .join('groups', { 'groups.id': 'user_saldos.group_id' })
         .where({ 'groups.name': groupName });
+};
+
+export function getUserFromGroup(groupName: string, username: string) {
+    return knex
+        .select('users.username', 'user_saldos.saldo')
+        .from('users')
+        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
+        .join('groups', { 'groups.id': 'user_saldos.group_id' })
+        .where({ 'groups.name': groupName, 'users.username': username})
+        .first();
 };
 
 export function getGroups() {
