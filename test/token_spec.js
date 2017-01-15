@@ -19,18 +19,13 @@ describe('Tokens', () => {
         .then(() => done())
     });
 
-    it('create a new token (group and generic)', (done) => {
-        tokenCore.createGroupToken(GROUP.name, 'basic')
+    it('create a new token (restricted and global)', (done) => {
+        tokenCore.createRestrictedToken(GROUP.name, 'Organization A')
         .then((res) => {
             expect(res).to.be.string;
             return Promise.resolve();
         })
-        .then(() => tokenCore.createGroupToken(GROUP.name, 'supervisor', 'Organization A'))
-        .then((res) => {
-            expect(res).to.be.string;
-            return Promise.resolve();
-        })
-        .then(() => tokenCore.createGenericToken('Generic client'))
+        .then(() => tokenCore.createGlobalToken('For my buddy Bob'))
         .then((res) => {
             expect(res).to.be.string;
             done();
@@ -44,22 +39,14 @@ describe('Tokens', () => {
             expect(tokens).to.have.length(3);
 
             expect(tokens[0]).to.have.property('token');
-            expect(tokens[0]).to.have.property('role', 'basic');
+            expect(tokens[0]).to.have.property('role', 'restricted');
             expect(tokens[0]).to.have.property('group_name', GROUP.name);
 
-            expect(tokens[1]).to.have.property('token');
-            expect(tokens[1]).to.have.property('role', 'supervisor');
-            expect(tokens[1]).to.have.property('group_name', GROUP.name);
-
             expect(tokens[2]).to.have.property('token');
-            expect(tokens[2]).to.have.property('role', 'generic');
+            expect(tokens[2]).to.have.property('role', 'global');
             expect(tokens[2]).to.have.property('group_name', null);
 
             done();
         });
     });
-
-    it('with group token client can access only to specific group');
-
-    it('with generic token client can access all features');
 });

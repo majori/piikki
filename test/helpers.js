@@ -18,7 +18,7 @@ helper.routes = [
     { route: `/users/${helper.user.username}`, method: 'get' },
     { route: '/users/create', method: 'post' },
     { route: '/users/authenticate', method: 'post' },
-    { route: '/users', method: 'delete' },
+    { route: '/users', method: 'del' },
     { route: '/transaction', method: 'post' },
     { route: '/groups', method: 'post' }
 ];
@@ -33,6 +33,7 @@ helper.initializeUserAndGroup = () => groupCore.createGroup(helper.group.name)
     .then(() => userCore.createUser(helper.user))
     .then(() => groupCore.addUserToGroup(helper.user.username, helper.group.name));
 
-helper.createGroupToken = () => tokenCore.createGroupToken(helper.group.name, 'basic');
+helper.createRestrictedToken = () => tokenCore.createRestrictedToken(helper.group.name);
+helper.createGlobalToken = () => tokenCore.createGlobalToken();
 
 module.exports = helper;

@@ -32,7 +32,12 @@ export function createRestrictedToken(groupName: string, comment?: string) {
 
 export function createGlobalToken(comment?: string) {
     return _generateBase64Token()
-        .then((token) => knex.from('tokens').insert({ token, role: 'global', comment }));
+        .then((token) => knex
+            .from('tokens')
+            .insert({ token, role: 'global', comment })
+            .then(() => Promise.resolve(debug('Created global token', token)))
+            .then(() => Promise.resolve(token))
+        );
 }
 
 export function getTokens() {

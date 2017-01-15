@@ -43,13 +43,13 @@ describe('Users, groups & transactions', () => {
     );
 
     it('authenticate user', () =>
-        expect(userCore.authenticateUser(USER)).to.eventually.be.fulfilled
+        expect(userCore.authenticateUser(USER)).to.eventually.equal(true)
     );
 
     it('not authenticate user with wrong password', () => 
         expect(
             userCore.authenticateUser(_.assign(USER, { password: 'wrong' }))
-        ).to.eventually.be.rejectedWith('Invalid password')
+        ).to.eventually.equal(false)
     );
 
     it('create saldo for user', () =>

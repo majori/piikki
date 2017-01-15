@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import * as Debug from 'debug';
 
 import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
 import userEndpoint from './endpoints/user-endpoint';
+
+const debug = Debug('piikki:router');
 
 export function initializeRoutes() {
     const mainRouter = Router();
@@ -32,6 +35,7 @@ function _restrictedTokenRoutes() {
         if (!req.groupAccess.all) {
             next();
         } else {
+            debug('Denied access to restricted routes');
             res.status(401).json({ ok: false, message: 'Unauthorized' });
         }
     });
@@ -55,6 +59,7 @@ function _globalTokenRoutes() {
         if (req.groupAccess.all) {
             next();
         } else {
+            debug('Denied access to global routes');
             res.status(401).json({ ok: false, message: 'Unauthorized' });
         }
     });
@@ -62,6 +67,7 @@ function _globalTokenRoutes() {
     // If client targets some group, insert the group name to request
     // so endpoint functions can look the group name from the same place
     globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
+        if (name) { debug(`Found group name parameter in url: ${name}`)}
         req.groupAccess.group.name = name;
         next();
     });
@@ -69,6 +75,7 @@ function _globalTokenRoutes() {
     globalR.use(_commonRoutes());
 
     // -- /groups/:groupName/removeMember      delete user saldo from group'
+    globalR.get('/users', userEndpoint.getUsers);
     globalR.get('/users/:username', userEndpoint.getUser);
     globalR.delete('/users', userEndpoint.deleteUser);
     globalR.get('/groups', groupEndpoint.getGroups);

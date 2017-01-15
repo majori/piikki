@@ -9,7 +9,7 @@ const cfg = require('../config');
 
 // If environment is not production, use development token
 let registeredTokens = (cfg.isProduction || cfg.isTest) ?
-    [] : [{ token: 'opensesame', role: 'global', groupName: null }];
+    [] : [{ token: 'opensesame', role: 'global', group_name: null }];
 
 export function initTokens() {
 
@@ -48,11 +48,10 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
             req.groupAccess.all = true;
 
         } else {
+            debug(`Token had restricted access to group "${token.group_name}"`);
 
             // Get group name from token
-            req.groupAccess.group.name = token.groupName;
-
-            debug(`Token had access to group "${token.groupName}" with role ${token.role}`);
+            req.groupAccess.group.name = token.group_name;
         }
 
         next();

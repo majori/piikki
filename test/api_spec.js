@@ -36,36 +36,41 @@ describe('API', () => {
     const GROUP = helper.group;
     let HEADERS;
     let API;
+    let GLOBAL_TOKEN;
+    let RESTRICTED_TOKEN;
 
     // Clear tables and migrate to latest
     before((done) => {
         helper.clearDb()
         .then(helper.initializeUserAndGroup)
-        .then(helper.createGroupToken)
+        .then(helper.createRestrictedToken)
         .then((token) => {
-            HEADERS = { Authorization: token };
+            RESTRICTED_TOKEN = token;
+            return Promise.resolve();
+        })
+        .then(helper.createGlobalToken)
+        .then((token) => {
+            GLOBAL_TOKEN = token;
+            return Promise.resolve();
+        })
+        .then(() => { 
             API = app.createApp(cfg);
             done();
         })
     });
 
-    describe('Routes', () => {
+    describe('Restricted', () => {
 
-        it('get users [GET /users]', (done) => {
-            request(API)
-            .get('/api/users')
-            .set(HEADERS)
-            .end((err, res) => {
-                expectOk(err, res);
-                expect(res.body.result).to.have.length(1);
-                expect(_.first(res.body.result)).to.have.property('username', USER.username);
-                done();
-            })
+        const PREFIX = '/api/restricted';
+
+        before((done) => {
+            HEADERS = { Authorization: RESTRICTED_TOKEN };
+            done();
         });
 
         it('create new user [POST /users/create]', (done) => {
             request(API)
-            .post('/api/users/create')
+            .post(`${PREFIX}/users/create`)
             .set(HEADERS)
             .send(USER_2)
             .end((err, res) => {
@@ -74,48 +79,13 @@ describe('API', () => {
             });
         });
 
-        it('delete user (mark it as non-active) [DELETE /users]', (done) => {
-
-            Promise.resolve()
-            .then(() => {
-                request(API)
-                .get('/api/users')
-                .set(HEADERS)
-                .end((err, res) => {
-                    expectOk(err, res);
-                    expect(res.body.result).to.include(_.pick(USER_2, 'username'));
-                    return Promise.resolve();
-                })
-            })
-            .then(() => {
-                request(API)
-                .del('/api/users')
-                .set(HEADERS)
-                .send(USER_2)
-                .end((err, res) => {
-                    expectOk(err, res);
-                    return Promise.resolve();
-                })
-            })
-            .then(() => {
-                request(API)
-                .get('/api/users')
-                .set(HEADERS)
-                .end((err, res) => {
-                    expectOk(err, res);
-                    expect(res.body.result).not.to.include(_.pick(USER_2, 'username'));
-                    done();
-                })
-            })
-        });
-
         it('authenticate user [POST /users/authenticate]', (done) => {
             Promise.resolve()
 
             // With right password
             .then(() => {
                 request(API)
-                .post('/api/users/authenticate')
+                .post(`${PREFIX}/users/authenticate`)
                 .set(HEADERS)
                 .send(USER)
                 .end((err, res) => {
@@ -128,7 +98,7 @@ describe('API', () => {
             // With wrong password
             .then(() => {
                 request(API)
-                .post('/api/users/authenticate')
+                .post(`${PREFIX}/users/authenticate`)
                 .set(HEADERS)
                 .send(_.assign(USER, { password: 'wrong_password' }))
                 .end((err, res) => {
@@ -139,9 +109,19 @@ describe('API', () => {
             });
         });
 
-        it('get all users (if client uses generic token)');
+        
+    });
 
-        it('create group (if client uses generic token)');
+    describe('Global', () => {
+
+        const PREFIX = '/api/global';
+
+        before((done) => {
+            HEADERS = { Authorization: GLOBAL_TOKEN };
+            done();
+        });
+
+        it('create group');
     });
 
     describe('Errors', () => {
@@ -149,6 +129,7 @@ describe('API', () => {
             Promise.each(helper.routes, (route) => {
                 request(API)
                     [route.method](route.route)
+                    .set({ Authorization: 'someGarbage' })
                     .end((err, res) => {
                         expectError(err, res);
                         expect(res).to.have.status(UNAUTHORIZED);
