@@ -25,6 +25,17 @@ export const addMember = createJsonRoute((req: IExtendedRequest, res: Response, 
     .catch((err) => Promise.reject(badRequestError(err)));
 });
 
+export const removeMember = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
+    let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
+
+    return Promise.all([
+        validateUsername(req.body.username),
+        validateGroupName(groupName)
+    ])
+    .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName))
+    .catch((err) => Promise.reject(badRequestError(err)));
+});
+
 export const getGroups = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
     return groupCore.getGroups();
 });

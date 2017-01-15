@@ -26,17 +26,34 @@ export function groupExists(groupName: string) {
         );
 };
 
-export function userIsAlreadyInGroup(username: string, groupName: string) {
+export function userIsNotInGroup(username: string, groupName: string) {
+    return userInGroup(username, groupName)
+        .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => !result.found ?
+            Promise.resolve({ user: result.user, group: result.group }) :
+            Promise.reject(`User ${result.user.username} is already in group ${result.group.name}`)
+        );
+}
+
+export function userIsInGroup(username: string, groupName: string) {
+    return userInGroup(username, groupName)
+        .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => result.found ?
+            Promise.resolve({ user: result.user, group: result.group }) :
+            Promise.reject(`User ${result.user.username} is not in group ${result.group.name}`)
+        );
+}
+
+function userInGroup(username: string, groupName: string) {
     return Promise.all([
         userExists(username),
         groupExists(groupName)
     ])
     .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
         .where({ user_id: user.id, group_id: group.id }).first()
-        .then((row: IDatabaseUserSaldo) => !_.isUndefined(row) ?
-            Promise.reject(`User ${user.username} is already in group ${group.name}`) :
-            Promise.resolve({ user, group })
-        )
+        .then((row: IDatabaseUserSaldo) => Promise.resolve({
+            found: !_.isUndefined(row),
+            user,
+            group
+        }))
     )
 };
 
@@ -56,10 +73,20 @@ export function getGroups() {
 };
 
 export function addUserToGroup(username: string, groupName: string) {
-    return userIsAlreadyInGroup(username, groupName)
-    .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
-        .from('user_saldos')
-        .insert({group_id: res.group.id, user_id: res.user.id})
-    )
-    .then(() => Promise.resolve(username));
+    return userIsNotInGroup(username, groupName)
+        .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
+            .from('user_saldos')
+            .insert({ group_id: res.group.id, user_id: res.user.id })
+        )
+        .then(() => Promise.resolve(username));
+};
+
+export function removeUserFromGroup(username: string, groupName: string) {
+    return userIsInGroup(username, groupName)
+        .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
+            .from('user_saldos')
+            .where({user_id: res.user.id, group_id: res.group.id})
+            .del()
+        )
+        .then(() => Promise.resolve(username));
 };
