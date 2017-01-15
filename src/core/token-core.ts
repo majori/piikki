@@ -5,6 +5,7 @@ import * as Debug from 'debug';
 
 import { knex, IDatabaseGroup } from '../database';
 import { groupExists, getGroups } from './group-core';
+import { updateTokens} from '../tokenHandler';
 
 const debug = Debug('piikki:token-core');
 
@@ -25,7 +26,11 @@ export function createRestrictedToken(groupName: string, comment?: string) {
                 .from('token_group_access')
                 .insert({ 'token_id': id[0], 'group_id': group.id})
             )
-            .then(() => Promise.resolve(debug('Created restricted token', token)))
+            .then(() => {
+                debug('Created restricted token', token);
+                updateTokens(); // Inform token handler about new token
+                return Promise.resolve()
+            })
             .then(() => Promise.resolve(token))
         );
 };
@@ -35,14 +40,18 @@ export function createGlobalToken(comment?: string) {
         .then((token) => knex
             .from('tokens')
             .insert({ token, role: 'global', comment })
-            .then(() => Promise.resolve(debug('Created global token', token)))
+            .then(() => {
+                debug('Created global token', token);
+                updateTokens(); // Inform token handler about new token
+                return Promise.resolve();
+            })
             .then(() => Promise.resolve(token))
         );
 }
 
 export function getTokens() {
     return knex
-        .select('tokens.token', 'tokens.role', 'groups.name AS group_name')
+        .select('tokens.token', 'tokens.role', 'groups.name AS group_name', 'tokens.comment')
         .from('tokens')
         .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
         .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });

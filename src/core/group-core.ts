@@ -14,7 +14,7 @@ export function createGroup(groupName: string) {
             Promise.reject(`Group ${groupName} already exists`)
         )
         .then(() => knex('groups').insert({ name: groupName }))
-        .then(() => createRestrictedToken(groupName, 'basic')) // Create automatically access token for group
+        .then(() => createRestrictedToken(groupName, 'Created for new group'))
         .then(() => Promise.resolve(groupName));
 };
 

@@ -36,7 +36,7 @@ function _restrictedTokenRoutes() {
             next();
         } else {
             debug('Denied access to restricted routes');
-            res.status(401).json({ ok: false, message: 'Unauthorized' });
+            res.status(401).json({ ok: false, message: 'You tried to access restricted routes with global token' });
         }
     });
 
@@ -60,7 +60,7 @@ function _globalTokenRoutes() {
             next();
         } else {
             debug('Denied access to global routes');
-            res.status(401).json({ ok: false, message: 'Unauthorized' });
+            res.status(401).json({ ok: false, message: 'You tried to access global routes with restricted token' });
         }
     });
 

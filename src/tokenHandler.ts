@@ -1,8 +1,10 @@
 import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
-import { getTokens, initializeTokens } from './core/token-core';
+import { getTokens, createGlobalToken } from './core/token-core';
 import { IExtendedRequest } from './app';
 import * as Debug from 'debug';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const debug = Debug('piikki:tokenHandler');
 const cfg = require('../config');
@@ -21,14 +23,12 @@ export function initTokens() {
             if (_.isEmpty(tokens)) {
                 debug('No tokens in database, creating new ones');
 
-                initializeTokens()
-                .then((newTokens) => {
-                    registeredTokens = newTokens;
-                });
+                createGlobalToken('Created on initialize')
+                .then(updateTokens);
 
             } else {
                 debug('Registered tokens:', tokens);
-                registeredTokens = tokens;
+                updateTokens();
             }
         });
     }
@@ -63,9 +63,19 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 };
 
 // Fetch current tokens from database
-function updateTokens() {
+export function updateTokens() {
     getTokens()
     .then((tokens) => {
         registeredTokens = tokens;
+        _writeTokensToFile();
     });
+};
+
+function _writeTokensToFile() {
+    fs.writeFile(
+        path.join(cfg.buildDir, 'tokens.json'),
+        JSON.stringify(registeredTokens, null, '  '),
+        'utf8',
+        (err) => { if (err) { console.error('Error when writing tokens to file: ', err); }}
+    );
 };
