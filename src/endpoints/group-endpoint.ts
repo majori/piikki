@@ -1,47 +1,50 @@
-import { NextFunction, Request, Response } from 'express';
-import { IExtendedRequest } from '../app';
 import * as Promise from 'bluebird';
+import { NextFunction, Request, Response } from 'express';
+import * as _ from 'lodash';
 
+import { IExtendedRequest } from '../app';
 import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
 import { badRequestError, createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
 
-export const createGroup = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-    let group: any = req.body;
+const _endpoint = {
+    createGroup: (req: IExtendedRequest) => {
+        let group: any = req.body;
+        return validateGroupName(group.groupName)
+        .then((vGroupName) => groupCore.createGroup(vGroupName))
+        .catch((err) => badRequestError(err));
+    },
 
-    return validateGroupName(group.groupName)
-    .then((vGroupName) => groupCore.createGroup(vGroupName))
-    .catch((err) => badRequestError(err));
-});
+    addMember: (req: IExtendedRequest) => {
+        let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
 
-export const addMember = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-    let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
+        return Promise.all([
+            validateUsername(req.body.username),
+            validateGroupName(groupName)
+        ])
+        .spread((vUsername: string, vGroupName: string) => groupCore.addUserToGroup(vUsername, vGroupName))
+        .catch((err) => Promise.reject(badRequestError(err)));
+    },
 
-    return Promise.all([
-        validateUsername(req.body.username),
-        validateGroupName(groupName)
-    ])
-    .spread((vUsername: string, vGroupName: string) => groupCore.addUserToGroup(vUsername, vGroupName))
-    .catch((err) => Promise.reject(badRequestError(err)));
-});
+    removeMember: (req: IExtendedRequest) => {
+        let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
 
-export const removeMember = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-    let groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : req.params.groupName;
+        return Promise.all([
+            validateUsername(req.body.username),
+            validateGroupName(groupName)
+        ])
+        .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName))
+        .catch((err) => Promise.reject(badRequestError(err)));
+    },
 
-    return Promise.all([
-        validateUsername(req.body.username),
-        validateGroupName(groupName)
-    ])
-    .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName))
-    .catch((err) => Promise.reject(badRequestError(err)));
-});
+    getGroups: (req: IExtendedRequest) => {
+        return groupCore.getGroups();
+    },
 
-export const getGroups = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-    return groupCore.getGroups();
-});
+    getGroupMembers: (req: IExtendedRequest) => {
+        return validateGroupName(req.params.groupName)
+            .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
+    },
+};
 
-export const getGroupMembers = createJsonRoute((req: IExtendedRequest, res: Response, next: NextFunction) => {
-
-    return validateGroupName(req.params.groupName)
-        .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
-});
+export default _.mapValues(_endpoint, (func) => createJsonRoute(func));

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import * as groupEndpoint from './endpoints/group-endpoint';
-import * as transactionEndpoint from './endpoints/transaction-endpoint';
-import * as userEndpoint from './endpoints/user-endpoint';
+import groupEndpoint from './endpoints/group-endpoint';
+import transactionEndpoint from './endpoints/transaction-endpoint';
+import userEndpoint from './endpoints/user-endpoint';
 
 export function createRouter() {
     const router = Router();
