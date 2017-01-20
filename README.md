@@ -6,3 +6,5 @@
 4. Build project `npm run build`
 5. Initialize database `npm run migrate`
 4. Start server `npm start`
+
+**MORE COMING SOON**
