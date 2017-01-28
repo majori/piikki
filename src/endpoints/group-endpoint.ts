@@ -17,7 +17,7 @@ const _endpoint = {
     },
 
     addMember: (req: IExtendedRequest) => {
-        let groupName = req.groupAccess.group.name;
+        let groupName = req.piikki.groupAccess.group.name;
 
         return Promise.all([
             validateUsername(req.body.username),
@@ -28,7 +28,7 @@ const _endpoint = {
     },
 
     removeMember: (req: IExtendedRequest) => {
-        let groupName = req.groupAccess.group.name;
+        let groupName = req.piikki.groupAccess.group.name;
 
         return Promise.all([
             validateUsername(req.body.username),
@@ -43,14 +43,14 @@ const _endpoint = {
     },
 
     getGroupMembers: (req: IExtendedRequest) => {
-        let groupName = req.groupAccess.group.name;
+        let groupName = req.piikki.groupAccess.group.name;
 
         return validateGroupName(groupName)
             .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
     },
 
     getGroupMember: (req: IExtendedRequest) => {
-        let groupName = req.groupAccess.group.name;
+        let groupName = req.piikki.groupAccess.group.name;
 
         return Promise.all([
                 validateUsername(req.params.username),
@@ -63,4 +63,5 @@ const _endpoint = {
     },
 };
 
+// Wrap endpoint to produce JSON route
 export default _.mapValues(_endpoint, (func) => createJsonRoute(func));

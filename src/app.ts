@@ -9,11 +9,16 @@ import { handleTokens, initTokens } from './tokenHandler';
 import { initializeRoutes } from './router';
 
 export interface IExtendedRequest extends Request {
-    groupAccess: {
-        all: boolean;
-        group: {
-            name: string;
-        };
+    piikki: {
+        groupAccess: {
+            all: boolean;
+            group: {
+                name: string;
+            },
+        },
+        admin: {
+            isAdmin: boolean;
+        },
     };
 }
 

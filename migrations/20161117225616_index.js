@@ -70,7 +70,7 @@ exports.up = (knex, Promise) => Promise.all([
         table.string('token')
             .notNullable()
             .unique();
-        table.enu('role', ['restricted', 'global'])
+        table.enu('role', ['restricted', 'global', 'admin'])
             .notNullable()
             .defaultTo('restricted');
         table.string('comment');

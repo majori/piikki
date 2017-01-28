@@ -49,6 +49,20 @@ export function createGlobalToken(comment?: string) {
         );
 }
 
+export function createAdminToken(comment?: string) {
+    return _generateBase64Token(64)
+        .then((token) => knex
+            .from('tokens')
+            .insert({ token, role: 'admin', comment })
+            .then(() => {
+                debug('Created admin token', token);
+                updateTokens(); // Inform token handler about new token
+                return Promise.resolve();
+            })
+            .then(() => Promise.resolve(token))
+        );
+}
+
 export function getTokens() {
     return knex
         .select('tokens.token', 'tokens.role', 'groups.name AS group_name', 'tokens.comment')

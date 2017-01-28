@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
-import { getTokens, createGlobalToken } from './core/token-core';
+import { getTokens, createAdminToken } from './core/token-core';
 import { IExtendedRequest } from './app';
 import * as Debug from 'debug';
 import * as fs from 'fs';
@@ -21,9 +21,9 @@ export function initTokens() {
         .then((tokens) => {
             // There is no tokens in the database, make new ones
             if (_.isEmpty(tokens)) {
-                debug('No tokens in database, creating new ones');
+                debug('No tokens in database, creating an admin token');
 
-                createGlobalToken('Created on initialize')
+                createAdminToken('Created on initialize')
                 .then(updateTokens);
 
             } else {
@@ -40,18 +40,30 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
     const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
     if (!_.isUndefined(token)) {
 
-        req.groupAccess = { all: false, group: { name: null }};
+        req.piikki = {
+            groupAccess: {
+                all: false,
+                group: { name: null },
+            },
+            admin: {
+                isAdmin: false,
+            },
+        };
 
         // Global token have access to all groups
         if (token.role === 'global') {
             debug('Token had global access');
-            req.groupAccess.all = true;
+            req.piikki.groupAccess.all = true;
+
+        } else if (token.role === 'admin') {
+            debug('Token had admin access');
+            req.piikki.admin.isAdmin = true;
 
         } else {
             debug(`Token had restricted access to group "${token.group_name}"`);
 
             // Get group name from token
-            req.groupAccess.group.name = token.group_name;
+            req.piikki.groupAccess.group.name = token.group_name;
         }
 
         next();

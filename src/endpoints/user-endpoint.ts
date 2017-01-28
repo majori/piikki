@@ -46,4 +46,5 @@ const _endpoint = {
     },
 };
 
+// Wrap endpoint to produce JSON route
 export default _.mapValues(_endpoint, (func) => createJsonRoute(func));

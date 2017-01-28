@@ -25,7 +25,7 @@ const _endpoint = {
         return Promise.map(transactions, (trx: any) => {
 
             // If request comes from group specific token, use token related group name
-            trx.groupName = (req.groupAccess.group.name) ? req.groupAccess.group.name : trx.groupName;
+            trx.groupName = (req.piikki.groupAccess.group.name) ? req.piikki.groupAccess.group.name : trx.groupName;
 
             return Promise.all([
                 validateTransactionAmount(trx.amount),
@@ -38,5 +38,5 @@ const _endpoint = {
     },
 };
 
-
+// Wrap endpoint to produce JSON route
 export default _.mapValues(_endpoint, (func) => createJsonRoute(func));

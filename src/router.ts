@@ -5,6 +5,7 @@ import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
 import userEndpoint from './endpoints/user-endpoint';
+import adminEndpoint from './endpoints/admin-endpoint';
 
 const debug = Debug('piikki:router');
 
@@ -13,6 +14,7 @@ export function initializeRoutes() {
 
     mainRouter.use('/restricted', _restrictedTokenRoutes());
     mainRouter.use('/global', _globalTokenRoutes());
+    mainRouter.use('/admin', _adminTokenRoutes());
 
     return mainRouter;
 };
@@ -32,7 +34,7 @@ function _restrictedTokenRoutes() {
 
     // Authorize restricted token
     restrictedR.use((req: IExtendedRequest, res, next) => {
-        if (!req.groupAccess.all) {
+        if (!req.piikki.groupAccess.all) {
             next();
         } else {
             debug('Denied access to restricted routes');
@@ -57,7 +59,7 @@ function _globalTokenRoutes() {
 
     // Authorize global token
     globalR.use((req: IExtendedRequest, res, next) => {
-        if (req.groupAccess.all) {
+        if (req.piikki.groupAccess.all) {
             next();
         } else {
             debug('Denied access to global routes');
@@ -69,7 +71,7 @@ function _globalTokenRoutes() {
     // so endpoint functions can look the group name from the same place
     globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
         if (name) { debug(`Found group name parameter in url: ${name}`)}
-        req.groupAccess.group.name = name;
+        req.piikki.groupAccess.group.name = name;
         next();
     });
 
@@ -87,4 +89,24 @@ function _globalTokenRoutes() {
     globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
 
     return globalR;
+}
+
+function _adminTokenRoutes() {
+    const adminR = Router();
+
+    // Authorize admin token
+    adminR.use((req: IExtendedRequest, res, next) => {
+        if (req.piikki.admin.isAdmin) {
+            next();
+        } else {
+            debug('Denied access to admin routes');
+            res.status(401).json({ ok: false, message: 'You tried to access admin routes without a proper token' });
+        }
+    });
+
+    adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
+    adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
+    adminR.post('/tokens/admin', adminEndpoint.createAdminToken);
+
+    return adminR;
 }
