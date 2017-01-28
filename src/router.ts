@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as Debug from 'debug';
+import { throttle } from 'lodash';
 
 import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
@@ -8,6 +9,10 @@ import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
 const debug = Debug('piikki:router');
+
+// Throttle admin routes, so that they can only be called
+// every five seconds (against brute-force attacks)
+const ADMIN_ROUTE_THROTTLE = 5000;
 
 export function initializeRoutes() {
     const mainRouter = Router();
@@ -95,14 +100,14 @@ function _adminTokenRoutes() {
     const adminR = Router();
 
     // Authorize admin token
-    adminR.use((req: IExtendedRequest, res, next) => {
+    adminR.use(throttle((req: IExtendedRequest, res, next) => {
         if (req.piikki.admin.isAdmin) {
             next();
         } else {
             debug('Denied access to admin routes');
             res.status(401).json({ ok: false, message: 'You tried to access admin routes without a proper token' });
         }
-    });
+    }, ADMIN_ROUTE_THROTTLE));
 
     adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
     adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
