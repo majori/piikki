@@ -81,6 +81,13 @@ export function getToken(groupName: string) {
         .first();
 }
 
+export function deleteToken(token: string) {
+    return knex
+        .from('tokens')
+        .where({ token })
+        .del();
+}
+
 // Creates one global token and restricted token for every group
 export function initializeTokens() {
     return createGlobalToken()

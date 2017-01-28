@@ -82,7 +82,8 @@ exports.up = (knex, Promise) => Promise.all([
         table.integer('token_id')
             .notNullable()
             .references('id')
-            .inTable('tokens');
+            .inTable('tokens')
+            .onDelete('CASCADE');
         table.integer('group_id')
             .notNullable()
             .references('id')

@@ -28,6 +28,14 @@ const _endpoint = {
         return tokenCore.createAdminToken(comment)
         .catch((err) => Promise.reject(badRequestError(err)));
     },
+
+    deleteToken: (req: IExtendedRequest) => {
+        const token = req.body.token;
+
+        return tokenCore.deleteToken(token)
+            .then((count) => Promise.resolve({ count }));
+    },
+
 };
 
 // Wrap endpoint to produce JSON route

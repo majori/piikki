@@ -112,6 +112,7 @@ function _adminTokenRoutes() {
     adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
     adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
     adminR.post('/tokens/admin', adminEndpoint.createAdminToken);
+    adminR.delete('/tokens', adminEndpoint.deleteToken);
 
     return adminR;
 }
