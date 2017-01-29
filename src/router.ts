@@ -14,7 +14,7 @@ const debug = Debug('piikki:router');
 // every five seconds (against brute-force attacks)
 const ADMIN_ROUTE_THROTTLE = 5000;
 
-export function initializeRoutes() {
+export function initApiRoutes() {
     const mainRouter = Router();
 
     mainRouter.use('/restricted', _restrictedTokenRoutes());
@@ -24,6 +24,7 @@ export function initializeRoutes() {
     return mainRouter;
 };
 
+// These routes can be used from both gloabl and restricted routes
 function _commonRoutes() {
     const commonR = Router();
     commonR.post('/users/create', userEndpoint.createUser);
@@ -75,7 +76,7 @@ function _globalTokenRoutes() {
     // If client targets some group, insert the group name to request
     // so endpoint functions can look the group name from the same place
     globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
-        if (name) { debug(`Found group name parameter in url: ${name}`)}
+        if (name) { debug(`Found group name parameter in url: ${name}`); }
         req.piikki.groupAccess.group.name = name;
         next();
     });
@@ -96,6 +97,7 @@ function _globalTokenRoutes() {
     return globalR;
 }
 
+// These routes which can be accessed by admin token
 function _adminTokenRoutes() {
     const adminR = Router();
 

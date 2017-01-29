@@ -6,8 +6,9 @@ import * as http from 'http';
 import * as methodOverride from 'method-override';
 
 import { handleTokens, initTokens } from './tokenHandler';
-import { initializeRoutes } from './router';
+import { initApiRoutes } from './router';
 
+// Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
     piikki: {
         groupAccess: {
@@ -25,17 +26,19 @@ export interface IExtendedRequest extends Request {
 export function createApp(cfg: any) {
     const app = express();
 
+    // 3rd party middleware
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(methodOverride());
 
+    // Register currently used tokens
     initTokens();
 
     // Authorize request
     app.use(handleTokens);
 
     // Initialize routes
-    app.use('/api', initializeRoutes());
+    app.use('/api', initApiRoutes());
 
     // Error logger
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {

@@ -40,4 +40,8 @@ cfg.db = {
     }
 };
 
+// ### Token configs
+//
+cfg.tokenFilePath = path.join(cfg.buildDir, 'tokens.json');
+
 module.exports = cfg;

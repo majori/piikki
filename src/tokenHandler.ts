@@ -34,6 +34,7 @@ export function initTokens() {
     }
 };
 
+// Authorize request by token found in "Authorization" header
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
 
     debug(`Handling token ${req.get('Authorization')}`);
@@ -50,15 +51,17 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
             },
         };
 
-        // Global token have access to all groups
+        // Set up global group access
         if (token.role === 'global') {
             debug('Token had global access');
             req.piikki.groupAccess.all = true;
 
+        // Set up admin level access
         } else if (token.role === 'admin') {
             debug('Token had admin access');
             req.piikki.admin.isAdmin = true;
 
+        // Set up restricted group access
         } else {
             debug(`Token had restricted access to group "${token.group_name}"`);
 
@@ -83,11 +86,21 @@ export function updateTokens() {
     });
 };
 
+// Write tokens to prettified JSON file 
 function _writeTokensToFile() {
-    fs.writeFile(
-        path.join(cfg.buildDir, 'tokens.json'),
-        JSON.stringify(registeredTokens, null, '  '),
-        'utf8',
-        (err) => { if (err) { console.error('Error when writing tokens to file: ', err); }}
-    );
+    return new Promise((resolve, reject) => {
+        fs.writeFile(
+            cfg.tokenFilePath,
+            JSON.stringify(registeredTokens, null, '  '),
+            'utf8',
+            (err) => {
+                if (err) {
+                    console.error('Error when writing tokens to file: ', err);
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            }
+        );
+    });
 };
