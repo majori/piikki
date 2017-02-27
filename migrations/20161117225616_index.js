@@ -9,7 +9,7 @@ exports.up = (knex, Promise) => Promise.all([
         table.string('password')
             .notNullable();
         table.timestamp('timestamp')
-            .defaultTo(knex.raw('now()'));
+            .defaultTo(knex.raw('GETDATE()'));
         table.boolean('active')
             .notNullable()
             .defaultTo(true);
@@ -22,16 +22,14 @@ exports.up = (knex, Promise) => Promise.all([
             .unsigned()
             .notNullable()
             .references('id')
-            .inTable('users')
-            .onDelete('RESTRICT');
+            .inTable('users');
         table.integer('group_id')
             .unsigned()
             .notNullable()
             .references('id')
-            .inTable('groups')
-            .onDelete('RESTRICT');
+            .inTable('groups');
         table.timestamp('timestamp')
-            .defaultTo(knex.raw('now()'));
+            .defaultTo(knex.raw('GETDATE()'));
         table.float('old_saldo')
             .notNullable();
         table.float('new_saldo')
