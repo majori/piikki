@@ -123,7 +123,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\gulpfile.js" (
 :: 5. Run database migration script
 IF EXIST "%DEPLOYMENT_TARGET%\knexfile.js" (
  pushd "%DEPLOYMENT_TARGET%"
- call .\node_modules\.bin\knex migrate:latest
+ call .\node_modules\.bin\knex migrate:latest --env production
  IF !ERRORLEVEL! NEQ 0 goto error
  popd
 )
