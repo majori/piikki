@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const path = require('path');
 
 let cfg = {};
 
@@ -15,27 +16,29 @@ cfg.isTest = cfg.env === 'test';
 // ### HTTP-server configs
 //
 cfg.hostname = process.env.PIIKKI_HTTP_HOSTNAME || 'localhost';
-cfg.port = process.env.PIIKKI_HTTP_PORT || 4000;
+cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 
 // ### Database configs
 //
 let dbLocalConnection = {
-    host: process.env.PIIKKI_DATABASE_HOSTNAME || 'localhost',
-	port: process.env.PIIKKI_DATABASE_PORT || 5432,
-	user: process.env.PIIKKI_DATABASE_USER || 'piikki',
-	password: process.env.PIIKKI_DATABASE_PASSWORD || 'piikki',
-	database: process.env.PIIKKI_DATABASE_NAME || 'piikkiDB',
-	charset: 'utf8'
+    server: process.env.PIIKKI_DATABASE_HOSTNAME,
+	user: process.env.PIIKKI_DATABASE_USER,
+	password: process.env.PIIKKI_DATABASE_PASSWORD,
+    options: {
+	    port: process.env.PIIKKI_DATABASE_PORT || 1433,
+	    database: process.env.PIIKKI_DATABASE_NAME || 'piikkiDB',
+        encrypt: true,
+    }
 };
 
 // Use different database for testing
 if (cfg.isTest) { _.assign(dbLocalConnection, { database: 'piikkiDB_test' }); };
 
 cfg.db = {
-    client: 'postgresql',
-    connection: process.env.PIIKKI_DATABASE_URL || dbLocalConnection,
-	pool: { min: 0, max: 5 },
+    client: 'mssql',
+    connection: dbLocalConnection,
     migrations: {
+        disableTransactions: true,
         tableName: 'knex_migrations'
     }
 };

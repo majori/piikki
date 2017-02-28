@@ -15,7 +15,7 @@
     "url": "git+https://github.com/majori/piikki.git"
   },
   "engines": {
-    "node": ">=6.9.1"
+    "node": "7.6.0"
   },
   "author": "Antti Kivimäki",
   "license": "MIT",
@@ -58,6 +58,8 @@
     "knex": "^0.12.6",
     "lodash": "^4.17.2",
     "method-override": "^2.3.7",
-    "pg": "^6.1.0"
+    "mssql": "^3.3.0",
+    "pg": "^6.1.0",
+    "typescript": "^2.1.6"
   }
 }
