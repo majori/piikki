@@ -46,7 +46,10 @@ const _endpoint = {
         let groupName = req.piikki.groupAccess.group.name;
 
         return validateGroupName(groupName)
-            .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName))
+            .then((vGroupName) => {
+                return groupCore.groupExists(vGroupName)
+                    .then(() => groupCore.getUsersFromGroup(vGroupName));
+            })
             .catch((err) => Promise.reject(badRequestError(err)));
     },
 
