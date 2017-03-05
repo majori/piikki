@@ -75,8 +75,8 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         // Add token info to track requests
         appInsights.client.commonProperties = {
             token: token.token,
-            role: token.role,
-            comment: token.comment,
+            token_role: token.role,
+            token_comment: token.comment,
         };
 
         next();
