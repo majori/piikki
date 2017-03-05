@@ -1,17 +1,23 @@
 import * as _ from 'lodash';
+import appInsights = require('applicationinsights');
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { IExtendedRequest } from '../app';
 import { IUserDto } from '../core/user-core';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: Function): RequestHandler {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: IExtendedRequest, res: Response, next: NextFunction) => {
         try {
             func(req, res)
-                .then((result) => res.json({ ok: true, result: result || {} }))
+                .then((result) => {
+                    appInsights.client.trackRequest(req, res, { ...req.piikki.token });
+                    res.json({ ok: true, result: result || {} })
+                })
                 .catch(next);
         } catch (err) {
+            appInsights.client.trackException(err);
             next(err);
         }
     };

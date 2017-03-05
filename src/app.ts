@@ -4,6 +4,7 @@ import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import * as http from 'http';
 import * as methodOverride from 'method-override';
+import appInsights = require('applicationinsights');
 
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
@@ -11,6 +12,11 @@ import { initApiRoutes } from './router';
 // Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
     piikki: {
+        token: {
+            token: string,
+            role: string,
+            group_name: string;
+        },
         groupAccess: {
             all: boolean;
             group: {
@@ -40,21 +46,6 @@ export function createApp(cfg: any) {
     // Initialize routes
     app.use('/api', initApiRoutes());
 
-    // Error logger
-    app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
-        const status = err.status ? err.status : 500;
-
-        if (status >= 401) {
-            console.error(err);
-            console.error('Request headers:');
-            console.error(JSON.stringify(req.headers));
-            console.error('Request parameters:');
-            console.error(JSON.stringify(req.params));
-        }
-
-        next(err);
-    });
-
     // Error responder
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
         const status = err.status ? err.status : 500;
@@ -68,6 +59,8 @@ export function createApp(cfg: any) {
         };
 
         res.status(status);
+        appInsights.client.trackRequest(req, res, { response: JSON.stringify(response) });
+
         res.send(response);
     });
 

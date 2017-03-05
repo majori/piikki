@@ -42,6 +42,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
     if (!_.isUndefined(token)) {
 
         req.piikki = {
+            token,
             groupAccess: {
                 all: false,
                 group: { name: null },

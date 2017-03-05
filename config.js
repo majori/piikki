@@ -12,6 +12,7 @@ cfg.migrationDir = `${__dirname}/migrations`;
 cfg.env = process.env.NODE_ENV || 'development';
 cfg.isProduction = cfg.env === 'production';
 cfg.isTest = cfg.env === 'test';
+cfg.appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 
 // ### HTTP-server configs
 //
