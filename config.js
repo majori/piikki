@@ -20,23 +20,25 @@ cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 
 // ### Database configs
 //
-let dbLocalConnection = {
+let dbConnection = {
     server: process.env.PIIKKI_DATABASE_HOSTNAME,
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
     options: {
 	    port: process.env.PIIKKI_DATABASE_PORT || 1433,
-	    database: process.env.PIIKKI_DATABASE_NAME || 'piikkiDB',
+	    database: process.env.PIIKKI_DATABASE_NAME,
         encrypt: true,
     }
 };
 
 // Use different database for testing
-if (cfg.isTest) { _.assign(dbLocalConnection, { database: 'piikkiDB_test' }); };
+if (!cfg.isProduction || cfg.isTest) { _.set(dbConnection, 'options.database', 'piikkiDBdev'); };
+
+const dbClient = process.env.PIIKKI_DATABASE_CLIENT || 'mssql';
 
 cfg.db = {
-    client: 'mssql',
-    connection: dbLocalConnection,
+    client: dbClient,
+    connection: dbConnection,
     migrations: {
         disableTransactions: true,
         tableName: 'knex_migrations'
