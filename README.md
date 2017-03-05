@@ -16,7 +16,13 @@ If you are interested of making your own Piikki client and use our hosted backen
 
 Here is a high-level architechture model of the system.
 
-![Piikki high-level model](https://raw.githubusercontent.com/majori/piikki/development/doc/high-level.png)
+![Piikki high-level model](https://raw.githubusercontent.com/majori/piikki/development/docs/high-level.png)
+
+_More coming soon..._
+
+# API
+
+[Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
 _More coming soon..._
 
