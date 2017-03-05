@@ -1,6 +1,8 @@
 import * as Promise from 'bluebird';
 import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
+
 import { IExtendedRequest } from '../app';
 
 import * as transCore from '../core/transaction-core';
@@ -10,6 +12,7 @@ import {
     validateTransactionAmount,
     validateGroupName,
     validateUsername,
+    validateTimestamp,
 } from './endpoint-utils';
 
 const _endpoint = {
@@ -35,6 +38,34 @@ const _endpoint = {
             .then(() => transCore.makeTransaction(trx.username, trx.groupName, trx.amount, trx.comment))
             .catch((err) => Promise.reject(badRequestError(err)));
         });
+    },
+
+    getUserTransactions: (req: IExtendedRequest) => {
+        const username = req.body.username;
+        const timestamp = req.body.timestamp;
+
+        return Promise.all([
+                validateUsername(username),
+                validateTimestamp(timestamp),
+            ])
+            .spread((vUsername: string, optTimestamp?: Moment) => transCore
+                .getUserTransactions(vUsername, optTimestamp)
+            )
+            .catch((err) => Promise.reject(badRequestError(err)));
+    },
+
+    getGroupTransactions: (req: IExtendedRequest) => {
+        const groupName = req.body.groupName;
+        const timestamp = req.body.timestamp;
+
+        return Promise.all([
+                validateGroupName(groupName),
+                validateTimestamp(timestamp),
+            ])
+            .spread((vGroupName: string, optTimestamp?: Moment) => transCore
+                .getGroupTransactions(vGroupName, optTimestamp)
+            )
+            .catch((err) => Promise.reject(badRequestError(err)));
     },
 };
 

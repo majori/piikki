@@ -1,5 +1,6 @@
 import * as Promise from 'bluebird';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 import { knex } from '../database';
 
@@ -42,5 +43,35 @@ export function userHaveSaldo(username: string, groupName: string) {
         .then((row) =>  _.isUndefined(row) ?
             Promise.reject(`User ${username} has no saldo in group ${groupName}`) :
             Promise.resolve(row)
+        );
+};
+
+export function getUserTransactions(username: string, sinceTimestamp?: moment.Moment) {
+    return _getTransactions('users.username', username, sinceTimestamp);
+};
+
+export function getGroupTransactions(groupName: string, sinceTimestamp?: moment.Moment) {
+    return _getTransactions('groups.name', groupName, sinceTimestamp);
+};
+
+function _getTransactions(filterField: string, filterValue: string, filterTimestamp?: moment.Moment) {
+    const query = knex
+        .from('transactions')
+        .select(
+            'users.username',
+            'groups.name AS group_name',
+            'transactions.timestamp',
+            'transactions.old_saldo',
+            'transactions.new_saldo',
+            'transactions.comment',
         )
-}
+        .join('users', { 'users.id': 'transactions.user_id' })
+        .join('groups', { 'groups.id': 'transactions.group_id' })
+        .where({ [filterField]: filterValue });
+
+    if (filterTimestamp) {
+        query.where('transactions.timestamp', '>', filterTimestamp.format());
+    }
+
+    return query;
+};

@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import appInsights = require('applicationinsights');
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
@@ -76,6 +77,12 @@ export function validateGroupName(name: any): Promise<string> {
     if (name.length > 255)   { return Promise.reject('Group name was longer than 255'); }
 
     return Promise.resolve(name);
+};
+
+export function validateTimestamp(timestamp: any) {
+    const parsed = moment(timestamp);
+
+    return (parsed.isValid()) ? parsed : undefined;
 };
 
 export function badRequestError(msg: string): IBadRequest {
