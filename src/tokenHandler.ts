@@ -5,13 +5,15 @@ import { IExtendedRequest } from './app';
 import * as Debug from 'debug';
 import * as fs from 'fs';
 import * as path from 'path';
+import { STATUS_CODES } from 'http';
+import appInsights = require('applicationinsights');
 
 const debug = Debug('piikki:tokenHandler');
 const cfg = require('../config');
 
 // If environment is not production, use development token
 let registeredTokens = (cfg.isProduction || cfg.isTest) ?
-    [] : [{ token: 'opensesame', role: 'global', group_name: null }];
+    [] : [{ token: 'opensesame', role: 'global', group_name: null, comment: 'dev-token' }];
 
 export function initTokens() {
 
@@ -70,11 +72,29 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
             req.piikki.groupAccess.group.name = token.group_name;
         }
 
+        // Add token info to track requests
+        appInsights.client.commonProperties = {
+            token: token.token,
+            role: token.role,
+            comment: token.comment,
+        };
+
         next();
 
     // Request didn't have a proper token
     } else {
-        res.status(401).json({ ok: false, message: 'Unauthorized' });
+        // Track unauthorized request
+        appInsights.client.trackRequest(res, req);
+
+        // Response with a unauthorized error
+        const status = 401;
+        res.status(status).json({
+            ok: false,
+            error: {
+                code: status,
+                message: STATUS_CODES[status],
+            },
+        });
     }
 };
 

@@ -12,8 +12,10 @@ export function createJsonRoute(func: Function): RequestHandler {
         try {
             func(req, res)
                 .then((result) => {
-                    appInsights.client.trackRequest(req, res, { ...req.piikki.token });
-                    res.json({ ok: true, result: result || {} })
+                    const response = { ok: true, result: result || {} };
+                    // Track a succesful request
+                    appInsights.client.trackRequest(req, res, { response: JSON.stringify(response) });
+                    res.json(response);
                 })
                 .catch(next);
         } catch (err) {

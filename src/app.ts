@@ -2,8 +2,9 @@ import * as bodyParser from 'body-parser';
 import * as errorHandler from 'errorhandler';
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
-import * as http from 'http';
+import { STATUS_CODES } from 'http';
 import * as methodOverride from 'method-override';
+import { toString } from 'lodash';
 import appInsights = require('applicationinsights');
 
 import { handleTokens, initTokens } from './tokenHandler';
@@ -49,19 +50,20 @@ export function createApp(cfg: any) {
     // Error responder
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
         const status = err.status ? err.status : 500;
-        const httpMessage = http.STATUS_CODES[status];
-
-        let message = (status < 500) ? httpMessage + ': ' + err.message : httpMessage;
 
         let response = {
             ok: false,
-            message
+            error: {
+                code: status,
+                message: STATUS_CODES[status],
+                detailedMessage: (status < 500) ? err.message : '',
+            },
         };
 
-        res.status(status);
+        // Track error response
         appInsights.client.trackRequest(req, res, { response: JSON.stringify(response) });
 
-        res.send(response);
+        res.status(status).send(response);
     });
 
     return app;
