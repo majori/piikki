@@ -46,7 +46,8 @@ const _endpoint = {
         let groupName = req.piikki.groupAccess.group.name;
 
         return validateGroupName(groupName)
-            .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
+            .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName))
+            .catch((err) => Promise.reject(badRequestError(err)));
     },
 
     getGroupMember: (req: IExtendedRequest) => {
@@ -59,7 +60,8 @@ const _endpoint = {
             .spread((vUsername: string, vGroupName: string) => groupCore.userIsInGroup(vUsername, groupName))
             .then((res: { user: IDatabaseUser, group: IDatabaseGroup }) =>
                 groupCore.getUserFromGroup(res.group.name, res.user.username)
-            );
+            )
+            .catch((err) => Promise.reject(badRequestError(err)));
     },
 };
 
