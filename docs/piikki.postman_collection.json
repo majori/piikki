@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Piikki",
-		"_postman_id": "43c9f82f-8203-715f-5b8c-cac8e1649eb8",
+		"_postman_id": "2884b368-6a55-b991-1117-f261ec0f736b",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 				{
 					"name": "Create global token",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/admin/tokens/global",
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/global",
 						"method": "POST",
 						"header": [
 							{
@@ -39,7 +39,7 @@
 				{
 					"name": "Create restricted token",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/admin/tokens/restricted",
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/restricted",
 						"method": "POST",
 						"header": [
 							{
@@ -64,7 +64,7 @@
 				{
 					"name": "Create admin token",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/admin/tokens/admin",
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/admin",
 						"method": "POST",
 						"header": [
 							{
@@ -89,7 +89,7 @@
 				{
 					"name": "Delete token",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/admin/tokens",
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens",
 						"method": "DELETE",
 						"header": [
 							{
@@ -120,7 +120,7 @@
 				{
 					"name": "Get users",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/users",
+						"url": "https://{{piikki_domain}}/api/v1/global/users",
 						"method": "GET",
 						"header": [
 							{
@@ -137,7 +137,7 @@
 				{
 					"name": "Get user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/users/{{username}}",
+						"url": "https://{{piikki_domain}}/api/v1/global/users/{{username}}",
 						"method": "GET",
 						"header": [
 							{
@@ -154,7 +154,7 @@
 				{
 					"name": "Delete user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/users",
+						"url": "https://{{piikki_domain}}/api/v1/global/users",
 						"method": "DELETE",
 						"header": [
 							{
@@ -179,7 +179,7 @@
 				{
 					"name": "Get groups",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups",
 						"method": "GET",
 						"header": [
 							{
@@ -196,7 +196,7 @@
 				{
 					"name": "Create group",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups/create",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/create",
 						"method": "POST",
 						"header": [
 							{
@@ -221,7 +221,7 @@
 				{
 					"name": "Get group members",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups/{{groupname}}/members",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/members",
 						"method": "GET",
 						"header": [
 							{
@@ -238,7 +238,7 @@
 				{
 					"name": "Get group member",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups/{{groupname}}/members/{{username}}",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/members/{{username}}",
 						"method": "GET",
 						"header": [
 							{
@@ -255,7 +255,7 @@
 				{
 					"name": "Add member to group",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups/{{groupname}}/addMember",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/addMember",
 						"method": "POST",
 						"header": [
 							{
@@ -280,7 +280,7 @@
 				{
 					"name": "Remove member from group",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/groups/{{groupname}}/removeMember",
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/removeMember",
 						"method": "DELETE",
 						"header": [
 							{
@@ -305,7 +305,7 @@
 				{
 					"name": "Create user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/users/create",
+						"url": "https://{{piikki_domain}}/api/v1/global/users/create",
 						"method": "POST",
 						"header": [
 							{
@@ -330,7 +330,7 @@
 				{
 					"name": "Authenticate user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/users/authenticate",
+						"url": "https://{{piikki_domain}}/api/v1/global/users/authenticate",
 						"method": "POST",
 						"header": [
 							{
@@ -355,7 +355,7 @@
 				{
 					"name": "Make transaction",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/global/transaction",
+						"url": "https://{{piikki_domain}}/api/v1/global/transaction",
 						"method": "POST",
 						"header": [
 							{
@@ -386,7 +386,7 @@
 				{
 					"name": "Get group members",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/group/members",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/members",
 						"method": "GET",
 						"header": [
 							{
@@ -406,7 +406,7 @@
 				{
 					"name": "Get group member",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/group/members/{{username}}",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}",
 						"method": "GET",
 						"header": [
 							{
@@ -426,7 +426,7 @@
 				{
 					"name": "Remove member from group",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/group/removeMember",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/removeMember",
 						"method": "DELETE",
 						"header": [
 							{
@@ -451,7 +451,7 @@
 				{
 					"name": "Add member to group",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/group/addMember",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/addMember",
 						"method": "POST",
 						"header": [
 							{
@@ -476,7 +476,7 @@
 				{
 					"name": "Create user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/users/create",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/users/create",
 						"method": "POST",
 						"header": [
 							{
@@ -501,7 +501,7 @@
 				{
 					"name": "Authenticate user",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/users/authenticate",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/users/authenticate",
 						"method": "POST",
 						"header": [
 							{
@@ -526,7 +526,7 @@
 				{
 					"name": "Make transaction",
 					"request": {
-						"url": "https://{{piikki_domain}}/api/restricted/transaction",
+						"url": "https://{{piikki_domain}}/api/v1/restricted/transaction",
 						"method": "POST",
 						"header": [
 							{

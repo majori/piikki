@@ -45,7 +45,7 @@ export function createApp(cfg: any) {
     app.use(handleTokens);
 
     // Initialize routes
-    app.use('/api', initApiRoutes());
+    app.use('/api/v1', initApiRoutes());
 
     // Error responder
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
