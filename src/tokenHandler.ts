@@ -12,8 +12,7 @@ const debug = Debug('piikki:tokenHandler');
 const cfg = require('../config');
 
 // If environment is not production, use development token
-let registeredTokens = (cfg.isProduction || cfg.isTest) ?
-    [] : [{ token: 'opensesame', role: 'global', group_name: null, comment: 'dev-token' }];
+let registeredTokens = [];
 
 export function initTokens() {
 
