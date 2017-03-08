@@ -63,7 +63,7 @@ export function getUserFromGroup(groupName: string, username: string) {
         .first()
         .then((row) => (_.isEmpty(row)) ?
             Promise.reject(new NotFoundError(`User ${username} is not in group ${groupName}`)) :
-            Promise.resolve());
+            Promise.resolve(row));
 };
 
 export function getGroups() {
