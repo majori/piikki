@@ -102,6 +102,7 @@ function _adminTokenRoutes() {
     const adminR = Router();
 
     // Authorize admin token
+    // TODO: Throttling here doesn't run its purpose
     adminR.use(throttle((req: IExtendedRequest, res, next) => {
         if (req.piikki.admin.isAdmin) {
             next();

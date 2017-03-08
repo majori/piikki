@@ -29,7 +29,7 @@ export function createRestrictedToken(groupName: string, comment?: string) {
             .then(() => {
                 debug('Created restricted token', token);
                 updateTokens(); // Inform token handler about new token
-                return Promise.resolve()
+                return Promise.resolve();
             })
             .then(() => Promise.resolve(token))
         );
@@ -57,9 +57,8 @@ export function createAdminToken(comment?: string) {
             .then(() => {
                 debug('Created admin token', token);
                 updateTokens(); // Inform token handler about new token
-                return Promise.resolve();
+                return Promise.resolve(token);
             })
-            .then(() => Promise.resolve(token))
         );
 }
 
