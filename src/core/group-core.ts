@@ -8,13 +8,14 @@ import { createRestrictedToken } from './token-core';
 import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
 
 export function createGroup(groupName: string) {
-    return knex('groups')
+    return knex
+        .from('groups')
         .where({name: groupName})
         .then((records) => _.isEmpty(records) ?
             Promise.resolve() :
             Promise.reject(new ConflictError(`Group ${groupName} already exists`))
         )
-        .then(() => knex('groups').insert({ name: groupName }))
+        .then(() => knex.from('groups').insert({ name: groupName }))
         .then(() => createRestrictedToken(groupName, `Created for new group ${groupName}`))
         .then(() => Promise.resolve(groupName));
 };
@@ -54,16 +55,12 @@ export function getUsersFromGroup(groupName: string) {
 };
 
 export function getUserFromGroup(groupName: string, username: string) {
-    return knex
-        .select('users.username', 'user_saldos.saldo')
-        .from('users')
-        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
-        .join('groups', { 'groups.id': 'user_saldos.group_id' })
-        .where({ 'groups.name': groupName, 'users.username': username})
+    return getUsersFromGroup(groupName)
+        .andWhere({ 'users.username': username })
         .first()
         .then((row) => (_.isEmpty(row)) ?
             Promise.reject(new NotFoundError(`User ${username} is not in group ${groupName}`)) :
-            Promise.resolve());
+            Promise.resolve(row));
 };
 
 export function getGroups() {
@@ -96,7 +93,8 @@ function _userInGroup(username: string, groupName: string) {
         userExists(username),
         groupExists(groupName)
     ])
-    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex('user_saldos')
+    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex
+        .from('user_saldos')
         .where({ user_id: user.id, group_id: group.id }).first()
         .then((row: IDatabaseUserSaldo) => Promise.resolve({
             found: !_.isUndefined(row),

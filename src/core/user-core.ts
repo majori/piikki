@@ -17,8 +17,8 @@ export const SALT_ROUNDS = 6;
 // Get all users in group
 export function getUsers() {
     return knex
-        .select('username')
         .from('users')
+        .select('username')
         .where({ active: true });
 };
 

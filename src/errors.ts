@@ -3,6 +3,8 @@
 class BadRequestError extends Error {
     constructor(message?: string, name?: string) {
         super();
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+
         this.name = 'BadRequestError';
         this.status = 400;
         this.message = (message || '');
