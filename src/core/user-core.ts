@@ -3,6 +3,7 @@ import * as Promise from 'bluebird';
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 
+import { ConflictError, NotFoundError } from '../errors';
 import { knex, IDatabaseUser, IDatabaseGroup } from '../database';
 import { groupExists } from './group-core';
 
@@ -37,7 +38,7 @@ export function getUser(username: string) {
             .then((results) => {
 
                 // There was no saldos, return only user info
-                if (_.isEmpty(results)) { return Promise.resolve(user) };
+                if (_.isEmpty(results)) { return Promise.resolve(user); };
 
                 // Parse database rows to saldos object
                 return Promise.resolve(_.reduce(results, (result: any, value: any) => {
@@ -53,7 +54,7 @@ export function createUser(user: IUserDto) {
     return knex.from('users').where({username: user.username})
         .then((records) => _.isEmpty(records) ?
             Promise.resolve() :
-            Promise.reject(`Username ${user.username} already exists`)
+            Promise.reject(new ConflictError(`Username ${user.username} already exists`))
         )
         .then(() => new Promise((resolve, reject) => {
             bcrypt.hash(user.password, SALT_ROUNDS, (err, hash) => (err) ?
@@ -86,7 +87,7 @@ export function authenticateUser(user: IUserDto) {
 export function userExists(username: string) {
     return knex.from('users').where({ username }).first()
         .then((row: IDatabaseUser) => _.isUndefined(row) ?
-            Promise.reject(`User ${username} not found`) :
+            Promise.reject(new NotFoundError(`User ${username} not found`)) :
             Promise.resolve(row)
         );
 };

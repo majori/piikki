@@ -12,8 +12,7 @@ const _endpoint = {
     createGroup: (req: IExtendedRequest) => {
         let group: any = req.body;
         return validateGroupName(group.groupName)
-        .then((vGroupName) => groupCore.createGroup(vGroupName))
-        .catch((err) => badRequestError(err));
+            .then((vGroupName) => groupCore.createGroup(vGroupName));
     },
 
     addMember: (req: IExtendedRequest) => {
@@ -23,8 +22,7 @@ const _endpoint = {
             validateUsername(req.body.username),
             validateGroupName(groupName)
         ])
-        .spread((vUsername: string, vGroupName: string) => groupCore.addUserToGroup(vUsername, vGroupName))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .spread((vUsername: string, vGroupName: string) => groupCore.addUserToGroup(vUsername, vGroupName));
     },
 
     removeMember: (req: IExtendedRequest) => {
@@ -34,8 +32,7 @@ const _endpoint = {
             validateUsername(req.body.username),
             validateGroupName(groupName)
         ])
-        .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName));
     },
 
     getGroups: (req: IExtendedRequest) => {
@@ -46,7 +43,10 @@ const _endpoint = {
         let groupName = req.piikki.groupAccess.group.name;
 
         return validateGroupName(groupName)
-            .then((vGroupName) => groupCore.getUsersFromGroup(vGroupName));
+            .then((vGroupName) => {
+                return groupCore.groupExists(vGroupName)
+                    .then(() => groupCore.getUsersFromGroup(vGroupName));
+            });
     },
 
     getGroupMember: (req: IExtendedRequest) => {

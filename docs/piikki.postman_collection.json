@@ -1,0 +1,554 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Piikki",
+		"_postman_id": "2884b368-6a55-b991-1117-f261ec0f736b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"description": "",
+			"item": [
+				{
+					"name": "Create global token",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/global",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comment\": \"<comment-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create restricted token",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/restricted",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"groupName\": \"<groupname-here>\",\n\t\"comment\": \"<comment-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create admin token",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens/admin",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comment\": \"<comment-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete token",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/admin/tokens",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"token\": \"<token-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Global",
+			"description": "",
+			"item": [
+				{
+					"name": "Get users",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/users",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/users/{{username}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/users",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get groups",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create group",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"groupName\": \"<group-name-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group members",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/members",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group member",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/members/{{username}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add member to group",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/addMember",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Remove member from group",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/removeMember",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/users/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/users/authenticate",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Make transaction",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/global/transaction",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restricted",
+			"description": "",
+			"item": [
+				{
+					"name": "Get group members",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/members",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group member",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Remove member from group",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/removeMember",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add member to group",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/group/addMember",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/users/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate user",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/users/authenticate",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Make transaction",
+					"request": {
+						"url": "https://{{piikki_domain}}/api/v1/restricted/transaction",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

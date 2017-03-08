@@ -2,6 +2,7 @@ import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 import * as Promise from 'bluebird';
 
+import { ConflictError, NotFoundError } from '../errors';
 import { userExists } from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
@@ -11,17 +12,17 @@ export function createGroup(groupName: string) {
         .where({name: groupName})
         .then((records) => _.isEmpty(records) ?
             Promise.resolve() :
-            Promise.reject(`Group ${groupName} already exists`)
+            Promise.reject(new ConflictError(`Group ${groupName} already exists`))
         )
         .then(() => knex('groups').insert({ name: groupName }))
-        .then(() => createRestrictedToken(groupName, 'Created for new group'))
+        .then(() => createRestrictedToken(groupName, `Created for new group ${groupName}`))
         .then(() => Promise.resolve(groupName));
 };
 
 export function groupExists(groupName: string) {
     return knex('groups').where({ name: groupName }).first()
         .then((row: IDatabaseGroup) => _.isUndefined(row) ?
-            Promise.reject(`Group ${groupName} not found`) :
+            Promise.reject(new NotFoundError(`Group ${groupName} not found`)) :
             Promise.resolve(row)
         );
 };
@@ -30,7 +31,7 @@ export function userIsNotInGroup(username: string, groupName: string) {
     return _userInGroup(username, groupName)
         .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => !result.found ?
             Promise.resolve({ user: result.user, group: result.group }) :
-            Promise.reject(`User ${result.user.username} is already in group ${result.group.name}`)
+            Promise.reject(new ConflictError(`User ${result.user.username} is already in group ${result.group.name}`))
         );
 }
 
@@ -38,7 +39,7 @@ export function userIsInGroup(username: string, groupName: string) {
     return _userInGroup(username, groupName)
         .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => result.found ?
             Promise.resolve({ user: result.user, group: result.group }) :
-            Promise.reject(`User ${result.user.username} is not in group ${result.group.name}`)
+            Promise.reject(new NotFoundError(`User ${result.user.username} is not in group ${result.group.name}`))
         );
 }
 
@@ -59,7 +60,10 @@ export function getUserFromGroup(groupName: string, username: string) {
         .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
         .join('groups', { 'groups.id': 'user_saldos.group_id' })
         .where({ 'groups.name': groupName, 'users.username': username})
-        .first();
+        .first()
+        .then((row) => (_.isEmpty(row)) ?
+            Promise.reject(new NotFoundError(`User ${username} is not in group ${groupName}`)) :
+            Promise.resolve());
 };
 
 export function getGroups() {

@@ -16,16 +16,14 @@ const _endpoint = {
         let username: any = req.params.username;
 
         return validateUsername(username)
-        .then((vUsername) => userCore.getUser(vUsername))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .then((vUsername) => userCore.getUser(vUsername));
     },
 
     createUser: (req: IExtendedRequest) => {
         let user: any = req.body;
 
         return validateUser(user)
-        .then((vUser: userCore.IUserDto) => userCore.createUser(vUser))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .then((vUser: userCore.IUserDto) => userCore.createUser(vUser));
     },
 
     authenticateUser: (req: IExtendedRequest) => {
@@ -33,16 +31,14 @@ const _endpoint = {
 
         return validateUser(user)
         .then((vUser: userCore.IUserDto) => userCore.authenticateUser(vUser))
-        .then((authenticated) => Promise.resolve({ authenticated }))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .then((authenticated) => Promise.resolve({ authenticated }));
     },
 
     deleteUser: (req: IExtendedRequest) => {
         let user: any = req.body;
 
         return validateUsername(user.username)
-        .then((vUsername) => userCore.deleteUser(vUsername))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .then((vUsername) => userCore.deleteUser(vUsername));
     },
 };
 

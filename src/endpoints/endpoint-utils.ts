@@ -1,17 +1,30 @@
 import * as _ from 'lodash';
-
+import * as moment from 'moment';
+import appInsights = require('applicationinsights');
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+
+import { IExtendedRequest } from '../app';
 import { IUserDto } from '../core/user-core';
+import { ValidationError } from '../errors';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: Function): RequestHandler {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: IExtendedRequest, res: Response, next: NextFunction) => {
         try {
             func(req, res)
-                .then((result) => res.json({ ok: true, result: result || {} }))
+                .then((result) => {
+                    const response = { ok: true, result: result || {} };
+
+                    // Track a succesful request
+                    appInsights.client.trackRequest(req, res, { response: JSON.stringify(response) });
+
+                    // Send the response
+                    res.json(response);
+                })
                 .catch(next);
         } catch (err) {
+            appInsights.client.trackException(err);
             next(err);
         }
     };
@@ -26,17 +39,17 @@ export function validateUser(user: IUserDto): Promise<any> {
         ])
         .then(() => Promise.resolve(user));
     } else {
-        return Promise.reject(badRequestError('Invalid user object'));
+        return Promise.reject(new ValidationError('Invalid user object'));
     }
 };
 
 // Check if username is valid
 export function validateUsername(username: any): Promise<string> {
 
-    if (_.isUndefined(username)) { return Promise.reject(badRequestError('No username defined')); };
-    if (!_.isString(username))   { return Promise.reject(badRequestError(`Username ${username} was not a string`)); };
-    if (_.isEmpty(username))     { return Promise.reject(badRequestError('Username was empty')); };
-    if (username.length > 20)    { return Promise.reject(badRequestError('Username was longer than 20 characters')); };
+    if (_.isUndefined(username)) { return Promise.reject(new ValidationError('No username defined')); };
+    if (!_.isString(username))   { return Promise.reject(new ValidationError(`Username ${username} was not a string`)); };
+    if (_.isEmpty(username))     { return Promise.reject(new ValidationError('Username was empty')); };
+    if (username.length > 20)    { return Promise.reject(new ValidationError('Username was longer than 20 characters')); };
 
     return Promise.resolve(username);
 };
@@ -44,27 +57,33 @@ export function validateUsername(username: any): Promise<string> {
 // Check if password is valid
 export function validatePassword(password: any): Promise<string> {
 
-    if (!_.isString(password)) { return Promise.reject(badRequestError(`Password ${password} was not a string`)); };
-    if (_.isEmpty(password))   { return Promise.reject(badRequestError('Password was empty')); };
+    if (!_.isString(password)) { return Promise.reject(new ValidationError(`Password ${password} was not a string`)); };
+    if (_.isEmpty(password))   { return Promise.reject(new ValidationError('Password was empty')); };
 
     return Promise.resolve(password);
 };
 
 // Check if transaction amount is valid
 export function validateTransactionAmount(amount: any): Promise<string | number> {
-    if (_.isUndefined(amount)) { return Promise.reject(badRequestError('Amount was undefined')); }
-    if (!_.isNumber(amount))   { return Promise.reject(badRequestError(`Amount "${amount}" was not a number`)); }
+    if (_.isUndefined(amount)) { return Promise.reject(new ValidationError('Amount was undefined')); }
+    if (!_.isNumber(amount))   { return Promise.reject(new ValidationError(`Amount "${amount}" was not a number`)); }
 
     return Promise.resolve(amount);
 };
 
 // Check if group name is valid
 export function validateGroupName(name: any): Promise<string> {
-    if (_.isUndefined(name)) { return Promise.reject('Group name was undefined'); }
-    if (!_.isString(name))   { return Promise.reject(`Group name "${name}" was not a string`); }
-    if (name.length > 255)   { return Promise.reject('Group name was longer than 255'); }
+    if (_.isUndefined(name)) { return Promise.reject(new ValidationError('Group name was undefined')); }
+    if (!_.isString(name))   { return Promise.reject(new ValidationError(`Group name "${name}" was not a string`)); }
+    if (name.length > 255)   { return Promise.reject(new ValidationError('Group name was longer than 255')); }
 
     return Promise.resolve(name);
+};
+
+export function validateTimestamp(timestamp: any) {
+    const parsed = moment(timestamp);
+
+    return (parsed.isValid()) ? parsed : undefined;
 };
 
 export function badRequestError(msg: string): IBadRequest {
@@ -79,3 +98,4 @@ interface IHttpError {
 interface IBadRequest extends IHttpError {
     status: 400;
 };
+
