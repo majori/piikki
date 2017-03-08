@@ -35,8 +35,7 @@ const _endpoint = {
                 validateUsername(trx.username),
                 validateGroupName(trx.groupName)
             ])
-            .then(() => transCore.makeTransaction(trx.username, trx.groupName, trx.amount, trx.comment))
-            .catch((err) => Promise.reject(badRequestError(err)));
+            .then(() => transCore.makeTransaction(trx.username, trx.groupName, trx.amount, trx.comment));
         });
     },
 
@@ -50,8 +49,7 @@ const _endpoint = {
             ])
             .spread((vUsername: string, optTimestamp?: Moment) => transCore
                 .getUserTransactions(vUsername, optTimestamp)
-            )
-            .catch((err) => Promise.reject(badRequestError(err)));
+            );
     },
 
     getGroupTransactions: (req: IExtendedRequest) => {
@@ -64,8 +62,7 @@ const _endpoint = {
             ])
             .spread((vGroupName: string, optTimestamp?: Moment) => transCore
                 .getGroupTransactions(vGroupName, optTimestamp)
-            )
-            .catch((err) => Promise.reject(badRequestError(err)));
+            );
     },
 };
 

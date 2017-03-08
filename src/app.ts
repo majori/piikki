@@ -54,9 +54,8 @@ export function createApp(cfg: any) {
         let response = {
             ok: false,
             error: {
-                code: status,
-                message: STATUS_CODES[status],
-                detailedMessage: (status < 500) ? err.message : '',
+                type: (status < 500) ? err.name : STATUS_CODES[status],
+                message: (status < 500) ? err.message : '',
             },
         };
 

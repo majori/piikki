@@ -2,6 +2,7 @@ import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 
+import { NotFoundError } from '../errors';
 import { knex } from '../database';
 
 export function makeTransaction(username: string, groupName: string, amount: number, comment?: string) {
@@ -41,7 +42,7 @@ export function userHaveSaldo(username: string, groupName: string) {
         .where({ 'users.username': username, 'groups.name': groupName })
         .first()
         .then((row) =>  _.isUndefined(row) ?
-            Promise.reject(`User ${username} has no saldo in group ${groupName}`) :
+            Promise.reject(new NotFoundError(`User ${username} has no saldo in group ${groupName}`)) :
             Promise.resolve(row)
         );
 };

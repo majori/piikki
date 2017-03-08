@@ -9,8 +9,7 @@ const _endpoint = {
     createGlobalToken: (req: IExtendedRequest) => {
         const comment = req.body.comment;
 
-        return tokenCore.createGlobalToken(comment)
-        .catch((err) => Promise.reject(badRequestError(err)));
+        return tokenCore.createGlobalToken(comment);
     },
 
     createRestrictedToken: (req: IExtendedRequest) => {
@@ -18,15 +17,13 @@ const _endpoint = {
         const comment = req.body.comment;
 
         return validateGroupName(groupName)
-        .then(() => tokenCore.createRestrictedToken(groupName, comment))
-        .catch((err) => Promise.reject(badRequestError(err)));
+        .then(() => tokenCore.createRestrictedToken(groupName, comment));
     },
 
     createAdminToken: (req: IExtendedRequest) => {
         const comment = req.body.comment;
 
-        return tokenCore.createAdminToken(comment)
-        .catch((err) => Promise.reject(badRequestError(err)));
+        return tokenCore.createAdminToken(comment);
     },
 
     deleteToken: (req: IExtendedRequest) => {
