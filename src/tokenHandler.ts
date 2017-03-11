@@ -42,9 +42,6 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
     const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
     if (!_.isUndefined(token)) {
 
-        // Set response start time
-        req.insights.startTime = Date.now();
-
         req.piikki = {
             token,
             groupAccess: {

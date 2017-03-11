@@ -42,6 +42,12 @@ export function createApp(cfg: any) {
     app.use(bodyParser.json());
     app.use(methodOverride());
 
+    app.use((req: IExtendedRequest, res, next) => {
+        // Set response start time
+        req.insights = { startTime: Date.now() };
+        next();
+    });
+
     // Register currently used tokens
     initTokens();
 
