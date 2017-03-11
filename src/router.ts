@@ -29,6 +29,8 @@ function _commonRoutes() {
     const commonR = Router();
     commonR.post('/users/create', userEndpoint.createUser);
     commonR.post('/users/authenticate', userEndpoint.authenticateUser);
+    commonR.post('/users/reset/username', userEndpoint.resetUsername);
+    commonR.post('/users/reset/password', userEndpoint.resetPassword);
     commonR.post('/transaction', transactionEndpoint.makeTransaction);
 
     return commonR;

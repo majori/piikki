@@ -36,10 +36,42 @@ const _endpoint = {
     },
 
     deleteUser: (req: IExtendedRequest) => {
-        let user: any = req.body;
+        const user: any = req.body;
 
         return validateUsername(user.username)
         .then((vUsername) => userCore.deleteUser(vUsername));
+    },
+
+    resetPassword: (req: IExtendedRequest) => {
+        const user: userCore.IUserDto = {
+            username: req.body.username,
+            password: req.body.oldPassword,
+        };
+        const newPassword = req.body.newPassword;
+
+        return Promise.all([
+            validateUser(user),
+            validatePassword(newPassword),
+        ]).spread((vUser: userCore.IUserDto, vPassword: string) => userCore
+            .resetPassword(vUser, vPassword)
+        );
+
+    },
+
+    resetUsername: (req: IExtendedRequest) => {
+        const oldUsername = req.body.oldUsername;
+        const newUsername = req.body.newUsername;
+        const password = req.body.password;
+
+        return Promise.all([
+            validateUsername(oldUsername),
+            validateUsername(newUsername),
+        ])
+        .then(() => userCore.authenticateUser({ username: oldUsername, password }))
+        .then((auth) => auth ?
+            userCore.resetUsername(oldUsername, newUsername) :
+            Promise.reject(new ConflictError('Invalid password'))
+        ); 
     },
 };
 

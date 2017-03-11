@@ -56,15 +56,10 @@ export function createUser(user: IUserDto) {
             Promise.resolve() :
             Promise.reject(new ConflictError(`Username ${user.username} already exists`))
         )
-        .then(() => new Promise((resolve, reject) => {
-            bcrypt.hash(user.password, SALT_ROUNDS, (err, hash) => (err) ?
-                reject(err) :
-                resolve(hash));
-            })
-        )
+        .then(() => _hashPassword(user.password))
         .then((hash) => knex.from('users').insert({
             username: user.username,
-            password: hash
+            password: hash,
         }))
         .then(() => Promise.resolve(user.username));
 };
@@ -79,7 +74,7 @@ export function deleteUser(username: string) {
 export function authenticateUser(user: IUserDto) {
     return userExists(user.username)
     .then((row: IDatabaseUser) => new Promise((resolve, reject) => {
-        bcrypt.compare(user.password, row.password, (err, same) => resolve(same))
+        bcrypt.compare(user.password, row.password, (err, same) => err ? reject(err) : resolve(same));
     }));
 };
 
@@ -91,3 +86,49 @@ export function userExists(username: string) {
             Promise.resolve(row)
         );
 };
+
+export function userNotExists(username: string) {
+    return userExists(username)
+        .then(() => Promise.reject(new ConflictError(`User ${username} already exists`)))
+        .catch(NotFoundError, () => Promise.resolve());
+}
+
+export function resetPassword(user: IUserDto, newPassword: string) {
+    return authenticateUser(user)
+        .then((isSame) => !isSame ?
+            Promise.reject(new ConflictError('Old password did not match')) :
+            _hashPassword(newPassword)
+        )
+        .then((hash) => knex
+            .from('users')
+            .where({ username: user.username })
+            .update({ password: hash })
+        )
+        .then(() => Promise.resolve());
+};
+
+// This function doesn't require old password.
+// Currently only admin can use
+export function forceResetPassword(username: string, password) {
+    // TODO
+}
+
+export function resetUsername(oldUsername: string, newUsername: string) {
+    return userExists(oldUsername)
+        .then(() => userExists(oldUsername))    // Check if user with username exists
+        .then(() => userNotExists(newUsername)) // Check if new username doesn't exists
+        .then(() => knex
+            .from('users')
+            .where({ username: oldUsername })
+            .update({ username: newUsername })
+        )
+        .then(() => Promise.resolve({ username: newUsername }));
+};
+
+function _hashPassword(password: string) {
+    return new Promise((resolve, reject) => {
+        bcrypt.hash(password, SALT_ROUNDS, (err, hash) => (err) ?
+            reject(err) :
+            resolve(hash));
+    });
+}
