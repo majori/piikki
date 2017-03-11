@@ -7,7 +7,6 @@ import { IExtendedRequest } from '../app';
 
 import * as transCore from '../core/transaction-core';
 import {
-    badRequestError,
     createJsonRoute,
     validateTransactionAmount,
     validateGroupName,

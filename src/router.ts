@@ -44,7 +44,13 @@ function _restrictedTokenRoutes() {
             next();
         } else {
             debug('Denied access to restricted routes');
-            res.status(401).json({ ok: false, message: 'You tried to access restricted routes with global token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access restricted routes without a proper token' 
+                },
+            });
         }
     });
 
@@ -69,7 +75,13 @@ function _globalTokenRoutes() {
             next();
         } else {
             debug('Denied access to global routes');
-            res.status(401).json({ ok: false, message: 'You tried to access global routes with restricted token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access global routes without a proper token'
+                },
+            });
         }
     });
 
@@ -108,7 +120,13 @@ function _adminTokenRoutes() {
             next();
         } else {
             debug('Denied access to admin routes');
-            res.status(401).json({ ok: false, message: 'You tried to access admin routes without a proper token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access admin routes without a proper token',
+                },
+            });
         }
     }, ADMIN_ROUTE_THROTTLE));
 

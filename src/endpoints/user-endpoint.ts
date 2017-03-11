@@ -4,7 +4,8 @@ import { NextFunction, Response } from 'express';
 import { IExtendedRequest } from '../app';
 
 import * as userCore from '../core/user-core';
-import { badRequestError, createJsonRoute, validateUser, validateUsername, validateGroupName} from './endpoint-utils';
+import { ConflictError } from '../errors';
+import { createJsonRoute, validateUser, validateUsername, validateGroupName, validatePassword} from './endpoint-utils';
 
 const _endpoint = {
 
