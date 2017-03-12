@@ -55,7 +55,16 @@ const _endpoint = {
         ]).spread((vUser: userCore.IUserDto, vPassword: string) => userCore
             .resetPassword(vUser, vPassword)
         );
+    },
 
+    forceResetPassword: (req: IExtendedRequest) => {
+        const username = req.body.username;
+        const newPassword = req.body.newPassword;
+
+        return Promise.all([
+            validateUsername(username),
+            validatePassword(newPassword),
+        ]).then(() => userCore.forceResetPassword(username, newPassword));
     },
 
     resetUsername: (req: IExtendedRequest) => {

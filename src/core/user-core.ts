@@ -109,8 +109,15 @@ export function resetPassword(user: IUserDto, newPassword: string) {
 
 // This function doesn't require old password.
 // Currently only admin can use
-export function forceResetPassword(username: string, password) {
-    // TODO
+export function forceResetPassword(username: string, password: string) {
+    return userExists(username)
+        .then(() => _hashPassword(password))
+        .then((hash) => knex
+            .from('users')
+            .where({ username })
+            .update({ password: hash })
+        )
+        .then(() => Promise.resolve());
 }
 
 export function resetUsername(oldUsername: string, newUsername: string) {

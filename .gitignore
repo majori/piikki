@@ -1,4 +1,7 @@
 node_modules/
 dist/
 .vscode/
+.vs/
+
+npm-debug.log.*
 env.ps1

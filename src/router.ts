@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as Debug from 'debug';
-import { throttle } from 'lodash';
 
 import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
@@ -9,10 +8,6 @@ import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
 const debug = Debug('piikki:router');
-
-// Throttle admin routes, so that they can only be called
-// every five seconds (against brute-force attacks)
-const ADMIN_ROUTE_THROTTLE = 5000;
 
 export function initApiRoutes() {
     const mainRouter = Router();
@@ -116,8 +111,7 @@ function _adminTokenRoutes() {
     const adminR = Router();
 
     // Authorize admin token
-    // TODO: Throttling here doesn't run its purpose
-    adminR.use(throttle((req: IExtendedRequest, res, next) => {
+    adminR.use((req: IExtendedRequest, res, next) => {
         if (req.piikki.admin.isAdmin) {
             next();
         } else {
@@ -130,12 +124,13 @@ function _adminTokenRoutes() {
                 },
             });
         }
-    }, ADMIN_ROUTE_THROTTLE));
+    });
 
     adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
     adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
     adminR.post('/tokens/admin', adminEndpoint.createAdminToken);
     adminR.delete('/tokens', adminEndpoint.deleteToken);
+    adminR.put('/users/force-reset/password', userEndpoint.forceResetPassword);
 
     return adminR;
 }

@@ -110,6 +110,31 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Force reset password",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/admin/users/force-reset/password",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"newPassword\": \"<new-password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -294,31 +319,6 @@
 					"response": []
 				},
 				{
-					"name": "Create group",
-					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/groups/create",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{global_token}}",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"groupName\": \"<group-name-here>\"\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
 					"name": "Get group members",
 					"request": {
 						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/groups/{{groupname}}/members",
@@ -348,6 +348,31 @@
 							}
 						],
 						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create group",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/groups/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"groupName\": \"<group-name-here>\"\n}"
+						},
 						"description": ""
 					},
 					"response": []
