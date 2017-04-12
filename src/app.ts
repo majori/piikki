@@ -12,6 +12,10 @@ import { initApiRoutes } from './router';
 
 // Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
+    insights: {
+        startTime: number;
+    },
+
     piikki: {
         token: {
             token: string,
@@ -38,6 +42,12 @@ export function createApp(cfg: any) {
     app.use(bodyParser.json());
     app.use(methodOverride());
 
+    app.use((req: IExtendedRequest, res, next) => {
+        // Set response start time
+        req.insights = { startTime: Date.now() };
+        next();
+    });
+
     // Register currently used tokens
     initTokens();
 
@@ -51,7 +61,7 @@ export function createApp(cfg: any) {
     app.use((err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
         const status = err.status ? err.status : 500;
 
-        let response = {
+        const response = {
             ok: false,
             error: {
                 type: (status < 500) ? err.name : STATUS_CODES[status],
@@ -60,7 +70,11 @@ export function createApp(cfg: any) {
         };
 
         // Track error response
-        appInsights.client.trackRequest(req, res, { response: JSON.stringify(response) });
+        const responseTime =  Date.now() - req.insights.startTime;
+        appInsights.client.trackRequestSync(req, res, responseTime, {
+            type: err.name,
+            message: err.message,
+        });
 
         res.status(status).send(response);
     });

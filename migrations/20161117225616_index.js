@@ -1,7 +1,9 @@
 exports.up = (knex, Promise) => {
 
     // Use GETDATE() when in mssql, in postgresql use NOW()
-    const timestampFunc = (knex.client.config.client === 'mssql') ? 'GETDATE()' : 'NOW()';
+    const timestampFunc = (knex.client.config.client === 'mssql') ?
+        'GETDATE()' :
+        'NOW()';
 
     return Promise.all([
         knex.schema.createTableIfNotExists('users', table => {

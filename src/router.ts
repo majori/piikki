@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as Debug from 'debug';
-import { throttle } from 'lodash';
 
 import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
@@ -9,10 +8,6 @@ import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
 const debug = Debug('piikki:router');
-
-// Throttle admin routes, so that they can only be called
-// every five seconds (against brute-force attacks)
-const ADMIN_ROUTE_THROTTLE = 5000;
 
 export function initApiRoutes() {
     const mainRouter = Router();
@@ -29,6 +24,8 @@ function _commonRoutes() {
     const commonR = Router();
     commonR.post('/users/create', userEndpoint.createUser);
     commonR.post('/users/authenticate', userEndpoint.authenticateUser);
+    commonR.put('/users/reset/username', userEndpoint.resetUsername);
+    commonR.put('/users/reset/password', userEndpoint.resetPassword);
     commonR.post('/transaction', transactionEndpoint.makeTransaction);
 
     return commonR;
@@ -44,7 +41,13 @@ function _restrictedTokenRoutes() {
             next();
         } else {
             debug('Denied access to restricted routes');
-            res.status(401).json({ ok: false, message: 'You tried to access restricted routes with global token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access restricted routes without a proper token' 
+                },
+            });
         }
     });
 
@@ -69,7 +72,13 @@ function _globalTokenRoutes() {
             next();
         } else {
             debug('Denied access to global routes');
-            res.status(401).json({ ok: false, message: 'You tried to access global routes with restricted token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access global routes without a proper token'
+                },
+            });
         }
     });
 
@@ -102,20 +111,26 @@ function _adminTokenRoutes() {
     const adminR = Router();
 
     // Authorize admin token
-    // TODO: Throttling here doesn't run its purpose
-    adminR.use(throttle((req: IExtendedRequest, res, next) => {
+    adminR.use((req: IExtendedRequest, res, next) => {
         if (req.piikki.admin.isAdmin) {
             next();
         } else {
             debug('Denied access to admin routes');
-            res.status(401).json({ ok: false, message: 'You tried to access admin routes without a proper token' });
+            res.status(403).json({
+                ok: false,
+                error: {
+                    type: 'AuthorizationError',
+                    message: 'You tried to access admin routes without a proper token',
+                },
+            });
         }
-    }, ADMIN_ROUTE_THROTTLE));
+    });
 
     adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
     adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
     adminR.post('/tokens/admin', adminEndpoint.createAdminToken);
     adminR.delete('/tokens', adminEndpoint.deleteToken);
+    adminR.put('/users/force-reset/password', userEndpoint.forceResetPassword);
 
     return adminR;
 }

@@ -47,28 +47,35 @@ export function userHaveSaldo(username: string, groupName: string) {
         );
 };
 
+// Get user's all transactions
 export function getUserTransactions(username: string, sinceTimestamp?: moment.Moment) {
-    return _getTransactions('users.username', username, sinceTimestamp);
+    return _getTransactions({ 'users.username': username }, sinceTimestamp);
 };
 
+// Get all group's member transactions
 export function getGroupTransactions(groupName: string, sinceTimestamp?: moment.Moment) {
-    return _getTransactions('groups.name', groupName, sinceTimestamp);
+    return _getTransactions({ 'groups.name': groupName }, sinceTimestamp);
 };
 
-function _getTransactions(filterField: string, filterValue: string, filterTimestamp?: moment.Moment) {
+// Get transactions of the single member in group
+export function getUserTransactionsFromGroup(username: string, groupName: string, sinceTimestamp?: moment.Moment) {
+    return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceTimestamp);
+};
+
+function _getTransactions(filterObject: object, filterTimestamp?: moment.Moment) {
     const query = knex
         .from('transactions')
         .select(
             'users.username',
-            'groups.name AS group_name',
+            'groups.name AS groupName',
             'transactions.timestamp',
-            'transactions.old_saldo',
-            'transactions.new_saldo',
+            'transactions.old_saldo AS oldSaldo',
+            'transactions.new_saldo AS newSaldo',
             'transactions.comment',
         )
         .join('users', { 'users.id': 'transactions.user_id' })
         .join('groups', { 'groups.id': 'transactions.group_id' })
-        .where({ [filterField]: filterValue });
+        .where(filterObject);
 
     if (filterTimestamp) {
         query.where('transactions.timestamp', '>', filterTimestamp.format());

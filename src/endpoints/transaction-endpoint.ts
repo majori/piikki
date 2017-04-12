@@ -7,7 +7,6 @@ import { IExtendedRequest } from '../app';
 
 import * as transCore from '../core/transaction-core';
 import {
-    badRequestError,
     createJsonRoute,
     validateTransactionAmount,
     validateGroupName,
@@ -28,7 +27,9 @@ const _endpoint = {
         return Promise.map(transactions, (trx: any) => {
 
             // If request comes from group specific token, use token related group name
-            trx.groupName = (req.piikki.groupAccess.group.name) ? req.piikki.groupAccess.group.name : trx.groupName;
+            trx.groupName = (req.piikki.groupAccess.group.name) ?
+                req.piikki.groupAccess.group.name :
+                trx.groupName;
 
             return Promise.all([
                 validateTransactionAmount(trx.amount),

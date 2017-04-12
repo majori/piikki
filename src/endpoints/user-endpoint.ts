@@ -4,7 +4,8 @@ import { NextFunction, Response } from 'express';
 import { IExtendedRequest } from '../app';
 
 import * as userCore from '../core/user-core';
-import { badRequestError, createJsonRoute, validateUser, validateUsername, validateGroupName} from './endpoint-utils';
+import { ConflictError } from '../errors';
+import { createJsonRoute, validateUser, validateUsername, validateGroupName, validatePassword} from './endpoint-utils';
 
 const _endpoint = {
 
@@ -35,10 +36,51 @@ const _endpoint = {
     },
 
     deleteUser: (req: IExtendedRequest) => {
-        let user: any = req.body;
+        const user: any = req.body;
 
         return validateUsername(user.username)
         .then((vUsername) => userCore.deleteUser(vUsername));
+    },
+
+    resetPassword: (req: IExtendedRequest) => {
+        const user: userCore.IUserDto = {
+            username: req.body.username,
+            password: req.body.oldPassword,
+        };
+        const newPassword = req.body.newPassword;
+
+        return Promise.all([
+            validateUser(user),
+            validatePassword(newPassword),
+        ]).spread((vUser: userCore.IUserDto, vPassword: string) => userCore
+            .resetPassword(vUser, vPassword)
+        );
+    },
+
+    forceResetPassword: (req: IExtendedRequest) => {
+        const username = req.body.username;
+        const newPassword = req.body.newPassword;
+
+        return Promise.all([
+            validateUsername(username),
+            validatePassword(newPassword),
+        ]).then(() => userCore.forceResetPassword(username, newPassword));
+    },
+
+    resetUsername: (req: IExtendedRequest) => {
+        const oldUsername = req.body.oldUsername;
+        const newUsername = req.body.newUsername;
+        const password = req.body.password;
+
+        return Promise.all([
+            validateUsername(oldUsername),
+            validateUsername(newUsername),
+        ])
+        .then(() => userCore.authenticateUser({ username: oldUsername, password }))
+        .then((auth) => auth ?
+            userCore.resetUsername(oldUsername, newUsername) :
+            Promise.reject(new ConflictError('Invalid password'))
+        ); 
     },
 };
 

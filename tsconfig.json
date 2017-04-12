@@ -4,7 +4,10 @@
         "module": "commonjs",
         "removeComments": true,
         "outDir": "dist",
-        "sourceMap": true
+        "sourceMap": true,
+        "types": [
+            "bluebird-global"
+        ]
     },
     "include": [
         "src/**/*.ts"

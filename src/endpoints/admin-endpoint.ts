@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { IExtendedRequest } from '../app';
 import * as tokenCore from '../core/token-core';
-import { createJsonRoute, validateGroupName, badRequestError} from './endpoint-utils';
+import { createJsonRoute, validateGroupName } from './endpoint-utils';
 
 const _endpoint = {
     createGlobalToken: (req: IExtendedRequest) => {

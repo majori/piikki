@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Advance payment system for Spinni",
   "main": "dist/index.js",
   "scripts": {
@@ -24,8 +24,10 @@
   },
   "homepage": "https://github.com/majori/piikki#readme",
   "devDependencies": {
+    "@types/applicationinsights": "^0.15.33",
     "@types/bcrypt": "0.0.30",
-    "@types/bluebird": "^3.0.35",
+    "@types/bluebird": "^3.5.0",
+    "@types/bluebird-global": "^3.5.0",
     "@types/body-parser": "0.0.33",
     "@types/debug": "0.0.29",
     "@types/errorhandler": "0.0.30",
@@ -50,7 +52,6 @@
     "typescript": "^2.1.4"
   },
   "dependencies": {
-    "@types/applicationinsights": "^0.15.33",
     "applicationinsights": "^0.18.0",
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.6",

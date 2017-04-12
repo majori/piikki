@@ -6,7 +6,7 @@ import { IExtendedRequest } from '../app';
 import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
 import { IDatabaseGroup, IDatabaseUser } from '../database';
-import { badRequestError, createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
+import { createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
 
 const _endpoint = {
     createGroup: (req: IExtendedRequest) => {
