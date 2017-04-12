@@ -122,7 +122,6 @@ export function forceResetPassword(username: string, password: string) {
 
 export function resetUsername(oldUsername: string, newUsername: string) {
     return userExists(oldUsername)
-        .then(() => userExists(oldUsername))    // Check if user with username exists
         .then(() => userNotExists(newUsername)) // Check if new username doesn't exists
         .then(() => knex
             .from('users')
