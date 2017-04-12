@@ -20,8 +20,7 @@ export function createJsonRoute(func: Function): RequestHandler {
                     const response = { ok: true, result: result || {} };
 
                     // Track a succesful request
-                    const responseTime =  Date.now() - req.insights.startTime;
-                    appInsights.client.trackRequestSync(req, res, responseTime, { response: JSON.stringify(response) });
+                    appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
 
                     // Send the response
                     res.json(response);

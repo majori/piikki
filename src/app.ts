@@ -71,7 +71,10 @@ export function createApp(cfg: any) {
 
         // Track error response
         const responseTime =  Date.now() - req.insights.startTime;
-        appInsights.client.trackRequestSync(req, res, responseTime, { response: JSON.stringify(response) });
+        appInsights.client.trackRequestSync(req, res, responseTime, {
+            type: err.name,
+            message: err.message,
+        });
 
         res.status(status).send(response);
     });
