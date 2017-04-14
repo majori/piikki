@@ -8,6 +8,8 @@ const debug = Debug('piikki:express');
 appInsights.setup(cfg.appInsightsKey)
     .setAutoCollectRequests(false)
     .setAutoCollectPerformance(false)
+    .setAutoCollectExceptions(false)
+    .setAutoCollectConsole(false)
     .start();
 
 const app = createApp(cfg);
