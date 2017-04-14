@@ -87,7 +87,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         res.status(401);
 
         // Track unauthorized request
-        appInsights.client.trackRequestSync(res, req, (Date.now() - req.insights.startTime));
+        appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
 
         // Response with a unauthorized error
         res.json({
