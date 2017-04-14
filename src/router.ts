@@ -22,6 +22,10 @@ export function initApiRoutes() {
 // These routes can be used from both gloabl and restricted routes
 function _commonRoutes() {
     const commonR = Router();
+
+    // Root is forbidden
+    commonR.get('/', (req, res) => res.status(403).send());
+
     commonR.post('/users/create', userEndpoint.createUser);
     commonR.post('/users/authenticate', userEndpoint.authenticateUser);
     commonR.put('/users/reset/username', userEndpoint.resetUsername);
