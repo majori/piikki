@@ -82,12 +82,15 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
     // Request didn't have a proper token
     } else {
+
+        // Set status to unauthorized
+        res.status(401);
+
         // Track unauthorized request
-        const responseTime = Date.now() - req.insights.startTime;
-        appInsights.client.trackRequestSync(res, req, responseTime);
+        appInsights.client.trackRequestSync(res, req, (Date.now() - req.insights.startTime));
 
         // Response with a unauthorized error
-        res.status(401).json({
+        res.json({
             ok: false,
             error: {
                 type: 'AuthorizationError',

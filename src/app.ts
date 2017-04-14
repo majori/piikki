@@ -69,14 +69,22 @@ export function createApp(cfg: any) {
             },
         };
 
-        // Track error response
-        const responseTime =  Date.now() - req.insights.startTime;
-        appInsights.client.trackRequestSync(req, res, responseTime, {
-            type: err.name,
-            message: err.message,
-        });
+        // Set response status
+        res.status(status);
 
-        res.status(status).send(response);
+        // Track error response
+        appInsights.client.trackRequestSync(
+            req,
+            res,
+            (Date.now() - req.insights.startTime),
+            {
+                type: err.name,
+                status: err.status,
+                message: err.message,
+            },
+        );
+
+        res.send(response);
     });
 
     return app;

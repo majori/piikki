@@ -19,6 +19,9 @@ export function createJsonRoute(func: Function): RequestHandler {
                 .then((result) => {
                     const response = { ok: true, result: result || {} };
 
+                    // Set status to OK
+                    res.status(200);
+
                     // Track a succesful request
                     appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
 
