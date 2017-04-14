@@ -79,8 +79,9 @@ export function createApp(cfg: any) {
             (Date.now() - req.insights.startTime),
             {
                 type: err.name,
-                status: err.status,
+                status: err.status || 'Unknown',
                 message: err.message,
+                stack: JSON.stringify(err.stack),
             },
         );
 
