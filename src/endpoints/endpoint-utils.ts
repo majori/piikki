@@ -51,11 +51,14 @@ export function validateUser(user: IUserDto): Promise<any> {
 
 // Check if username is valid
 export function validateUsername(username: any): Promise<string> {
+    // Allow a-z, A-Z, 0-9, underscore and hyphen
+    const regEx = /^[a-zA-Z0-9-_]+$/;
 
     if (_.isUndefined(username)) { return reject(new ValidationError('No username defined')); };
     if (!_.isString(username))   { return reject(new ValidationError(`Username ${username} was not a string`)); };
     if (_.isEmpty(username))     { return reject(new ValidationError('Username was empty')); };
     if (username.length > 20)    { return reject(new ValidationError('Username was longer than 20 characters')); };
+    if (regEx.test(username))    { return reject(new ValidationError(`Username ${username} had invalid characters`)); }
 
     return Promise.resolve(username);
 };
