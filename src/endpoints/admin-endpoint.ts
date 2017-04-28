@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 
 import { IExtendedRequest } from '../app';
@@ -6,31 +5,29 @@ import * as tokenCore from '../core/token-core';
 import { createJsonRoute, validateGroupName } from './endpoint-utils';
 
 const _endpoint = {
-    createGlobalToken: (req: IExtendedRequest) => {
+    createGlobalToken: async (req: IExtendedRequest) => {
         const comment = req.body.comment;
 
         return tokenCore.createGlobalToken(comment);
     },
 
-    createRestrictedToken: (req: IExtendedRequest) => {
-        const groupName = req.body.groupName;
+    createRestrictedToken: async (req: IExtendedRequest) => {
+        const groupName = validateGroupName(req.body.groupName);
         const comment = req.body.comment;
 
-        return validateGroupName(groupName)
-        .then(() => tokenCore.createRestrictedToken(groupName, comment));
+        return tokenCore.createRestrictedToken(groupName, comment);
     },
 
-    createAdminToken: (req: IExtendedRequest) => {
+    createAdminToken: async (req: IExtendedRequest) => {
         const comment = req.body.comment;
 
         return tokenCore.createAdminToken(comment);
     },
 
-    deleteToken: (req: IExtendedRequest) => {
+    deleteToken: async (req: IExtendedRequest) => {
         const token = req.body.token;
 
-        return tokenCore.deleteToken(token)
-            .then((count) => Promise.resolve({ count }));
+        return tokenCore.deleteToken(token);
     },
 
 };
