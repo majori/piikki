@@ -56,7 +56,7 @@ export function validateUsername(username: any): string {
     if (!_.isString(username))   { throw new ValidationError(`Username ${username} was not a string`); };
     if (_.isEmpty(username))     { throw new ValidationError('Username was empty'); };
     if (username.length > 20)    { throw new ValidationError('Username was longer than 20 characters'); };
-    if (regEx.test(username))    { throw new ValidationError(`Username ${username} had invalid characters`); }
+    if (!regEx.test(username))   { throw new ValidationError(`Username ${username} had invalid characters`); }
 
     return username;
 };
