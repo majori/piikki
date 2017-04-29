@@ -1,47 +1,52 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
-import * as Promise from 'bluebird';
 
 import { ConflictError, NotFoundError } from '../errors';
 import { userExists } from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
 
-export function createGroup(groupName: string) {
-    return knex
-        .from('groups')
-        .where({name: groupName})
-        .then((records) => _.isEmpty(records) ?
-            Promise.resolve() :
-            Promise.reject(new ConflictError(`Group ${groupName} already exists`))
-        )
-        .then(() => knex.from('groups').insert({ name: groupName }))
-        .then(() => createRestrictedToken(groupName, `Created for new group ${groupName}`))
-        .then(() => Promise.resolve(groupName));
+export async function createGroup(groupName: string) {
+    const records = await knex.from('groups').where({name: groupName});
+
+    if (!_.isEmpty(records)) {
+        throw new ConflictError(`Group ${groupName} already exists`);
+    }
+
+    await knex.from('groups').insert({ name: groupName });
+    await createRestrictedToken(groupName, `Created for new group ${groupName}`);
+
+    return groupName;
 };
 
-export function groupExists(groupName: string) {
-    return knex('groups').where({ name: groupName }).first()
-        .then((row: IDatabaseGroup) => _.isUndefined(row) ?
-            Promise.reject(new NotFoundError(`Group ${groupName} not found`)) :
-            Promise.resolve(row)
-        );
+export async function groupExists(groupName: string) {
+    const row: IDatabaseGroup = await knex('groups').where({ name: groupName }).first();
+
+    if (row) {
+        return row;
+    } else {
+        throw new NotFoundError(`Group ${groupName} not found`);
+    }
 };
 
-export function userIsNotInGroup(username: string, groupName: string) {
-    return _userInGroup(username, groupName)
-        .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => !result.found ?
-            Promise.resolve({ user: result.user, group: result.group }) :
-            Promise.reject(new ConflictError(`User ${result.user.username} is already in group ${result.group.name}`))
-        );
+export async function userIsNotInGroup(username: string, groupName: string) {
+    const result = await _userInGroup(username, groupName);
+
+    if (!result.found) {
+        return { user: result.user, group: result.group };
+    } else {
+        throw new ConflictError(`User ${result.user.username} is already in group ${result.group.name}`);
+    }
 }
 
-export function userIsInGroup(username: string, groupName: string) {
-    return _userInGroup(username, groupName)
-        .then((result: { found: boolean, user: IDatabaseUser, group: IDatabaseGroup}) => result.found ?
-            Promise.resolve({ user: result.user, group: result.group }) :
-            Promise.reject(new NotFoundError(`User ${result.user.username} is not in group ${result.group.name}`))
-        );
+export async function userIsInGroup(username: string, groupName: string) {
+    const result = await _userInGroup(username, groupName);
+
+    if (result.found) {
+        return { user: result.user, group: result.group };
+    } else {
+        throw new NotFoundError(`User ${result.user.username} is not in group ${result.group.name}`);
+    }
 }
 
 
@@ -54,13 +59,16 @@ export function getUsersFromGroup(groupName: string) {
         .where({ 'groups.name': groupName });
 };
 
-export function getUserFromGroup(groupName: string, username: string) {
-    return getUsersFromGroup(groupName)
+export async function getUserFromGroup(groupName: string, username: string) {
+    const row = await getUsersFromGroup(groupName)
         .andWhere({ 'users.username': username })
-        .first()
-        .then((row) => (_.isEmpty(row)) ?
-            Promise.reject(new NotFoundError(`User ${username} is not in group ${groupName}`)) :
-            Promise.resolve(row));
+        .first();
+
+    if (!_.isEmpty(row)) {
+        return row;
+    } else {
+        throw new NotFoundError(`User ${username} is not in group ${groupName}`);
+    }
 };
 
 export function getGroups() {
@@ -69,37 +77,38 @@ export function getGroups() {
         .select('name');
 };
 
-export function addUserToGroup(username: string, groupName: string) {
-    return userIsNotInGroup(username, groupName)
-        .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
-            .from('user_saldos')
-            .insert({ group_id: res.group.id, user_id: res.user.id })
-        )
-        .then(() => Promise.resolve(username));
-};
+export async function addUserToGroup(username: string, groupName: string) {
+    const result = await userIsNotInGroup(username, groupName);
 
-export function removeUserFromGroup(username: string, groupName: string) {
-    return userIsInGroup(username, groupName)
-        .then((res: { user: IDatabaseUser, group: IDatabaseGroup}) => knex
-            .from('user_saldos')
-            .where({user_id: res.user.id, group_id: res.group.id})
-            .del()
-        )
-        .then(() => Promise.resolve(username));
-};
-
-function _userInGroup(username: string, groupName: string) {
-    return Promise.all([
-        userExists(username),
-        groupExists(groupName)
-    ])
-    .spread((user: IDatabaseUser, group: IDatabaseGroup) => knex
+    await knex
         .from('user_saldos')
-        .where({ user_id: user.id, group_id: group.id }).first()
-        .then((row: IDatabaseUserSaldo) => Promise.resolve({
-            found: !_.isUndefined(row),
-            user,
-            group
-        }))
-    )
+        .insert({ group_id: result.group.id, user_id: result.user.id });
+
+    return username;
+};
+
+export async function removeUserFromGroup(username: string, groupName: string) {
+    const result = await userIsInGroup(username, groupName);
+    await knex
+        .from('user_saldos')
+        .where({user_id: result.user.id, group_id: result.group.id})
+        .del();
+
+    return username;
+};
+
+async function _userInGroup(username: string, groupName: string) {
+    const user = await userExists(username);
+    const group = await groupExists(groupName);
+
+    const row = knex
+        .from('user_saldos')
+        .where({ user_id: user.id, group_id: group.id })
+        .first();
+
+    return {
+        found: !_.isUndefined(row),
+        user,
+        group,
+    };
 };
