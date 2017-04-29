@@ -2,9 +2,9 @@
   "name": "piikki",
   "version": "0.2.2",
   "description": "Advance payment system for Spinni",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node build/index.js",
     "migrate": "knex migrate:latest",
     "build": "gulp build",
     "build:watch": "gulp",

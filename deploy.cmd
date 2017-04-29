@@ -88,11 +88,11 @@ goto :EOF
 :Deployment
 echo Handling node.js deployment.
 
-:: 0. Create empty dist\index.js to make KuduSync happy
+:: 0. Create empty build\index.js to make KuduSync happy
 :: see https://github.com/projectkudu/kudu/issues/1753
-IF NOT EXIST "%DEPLOYMENT_SOURCE%\dist" (
-  call :ExecuteCmd mkdir "%DEPLOYMENT_SOURCE%\dist"
-  call :ExecuteCmd copy NUL "%DEPLOYMENT_SOURCE%\dist\index.js"
+IF NOT EXIST "%DEPLOYMENT_SOURCE%\build" (
+  call :ExecuteCmd mkdir "%DEPLOYMENT_SOURCE%\build"
+  call :ExecuteCmd copy NUL "%DEPLOYMENT_SOURCE%\build\index.js"
 )
 
 :: 1. KuduSync

@@ -3,7 +3,7 @@ const path = require('path');
 
 let cfg = {};
 
-cfg.buildDir = `${__dirname}/dist`;
+cfg.buildDir = `${__dirname}/build`;
 cfg.sourceDir = `${__dirname}/src`;
 cfg.migrationDir = `${__dirname}/migrations`;
 
