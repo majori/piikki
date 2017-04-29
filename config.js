@@ -32,22 +32,13 @@ let dbConnection = {
     }
 };
 
-// Use different database for testing
-if (!cfg.isProduction || cfg.isTest) { _.set(dbConnection, 'options.database', 'piikkiDBdev'); };
-
-const dbClient = process.env.PIIKKI_DATABASE_CLIENT || 'mssql';
-
 cfg.db = {
-    client: dbClient,
+    client: process.env.PIIKKI_DATABASE_CLIENT || 'mssql',
     connection: dbConnection,
     migrations: {
         disableTransactions: true,
         tableName: 'knex_migrations'
     }
 };
-
-// ### Token configs
-//
-cfg.tokenFilePath = path.join(cfg.buildDir, 'tokens.json');
 
 module.exports = cfg;

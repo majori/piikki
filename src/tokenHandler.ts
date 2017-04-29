@@ -1,7 +1,6 @@
 import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
 import * as Debug from 'debug';
-import * as fs from 'fs';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
 import appInsights = require('applicationinsights');
@@ -101,25 +100,5 @@ export function updateTokens() {
     getTokens()
     .then((tokens) => {
         registeredTokens = tokens;
-        _writeTokensToFile();
-    });
-};
-
-// Write tokens to prettified JSON file 
-function _writeTokensToFile() {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(
-            cfg.tokenFilePath,
-            JSON.stringify(registeredTokens, null, '  '),
-            'utf8',
-            (err) => {
-                if (err) {
-                    console.error('Error when writing tokens to file: ', err);
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            }
-        );
     });
 };
