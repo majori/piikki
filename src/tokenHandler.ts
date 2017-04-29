@@ -1,12 +1,13 @@
 import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
-import { getTokens, createAdminToken } from './core/token-core';
-import { IExtendedRequest } from './app';
 import * as Debug from 'debug';
 import * as fs from 'fs';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
 import appInsights = require('applicationinsights');
+import { IExtendedRequest } from './app';
+import { getTokens, createAdminToken } from './core/token-core';
+import { AuthorizationError } from './errors';
 
 const debug = Debug('piikki:tokenHandler');
 const cfg = require('../config');
@@ -89,14 +90,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         // Track unauthorized request
         appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
 
-        // Response with a unauthorized error
-        res.json({
-            ok: false,
-            error: {
-                type: 'AuthorizationError',
-                message: 'Unauthorized',
-            },
-        });
+        throw new AuthorizationError();
     }
 };
 
