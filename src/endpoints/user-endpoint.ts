@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 import { NextFunction, Response } from 'express';
 import { IExtendedRequest } from '../app';
@@ -9,78 +8,63 @@ import { createJsonRoute, validateUser, validateUsername, validateGroupName, val
 
 const _endpoint = {
 
-    getUsers: (req: IExtendedRequest) => {
+    getUsers: async (req: IExtendedRequest) => {
         return userCore.getUsers();
     },
 
-    getUser: (req: IExtendedRequest) => {
-        let username: any = req.params.username;
+    getUser: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.params.username);
 
-        return validateUsername(username)
-        .then((vUsername) => userCore.getUser(vUsername));
+        return userCore.getUser(username);
     },
 
-    createUser: (req: IExtendedRequest) => {
-        let user: any = req.body;
+    createUser: async (req: IExtendedRequest) => {
+        const user = validateUser(req.body);
 
-        return validateUser(user)
-        .then((vUser: userCore.IUserDto) => userCore.createUser(vUser));
+        return userCore.createUser(user);
     },
 
-    authenticateUser: (req: IExtendedRequest) => {
-        let user: any = req.body;
+    authenticateUser: async (req: IExtendedRequest) => {
+        const user = validateUser(req.body);
 
-        return validateUser(user)
-        .then((vUser: userCore.IUserDto) => userCore.authenticateUser(vUser))
-        .then((authenticated) => Promise.resolve({ authenticated }));
+        const authenticated = await userCore.authenticateUser(user);
+        return { authenticated };
     },
 
-    deleteUser: (req: IExtendedRequest) => {
-        const user: any = req.body;
+    deleteUser: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.body.username);
 
-        return validateUsername(user.username)
-        .then((vUsername) => userCore.deleteUser(vUsername));
+        return userCore.deleteUser(username);
     },
 
-    resetPassword: (req: IExtendedRequest) => {
-        const user: userCore.IUserDto = {
+    resetPassword: async (req: IExtendedRequest) => {
+        const user: userCore.IUserDto = validateUser({
             username: req.body.username,
             password: req.body.oldPassword,
-        };
-        const newPassword = req.body.newPassword;
+        });
+        const newPassword = validatePassword(req.body.newPassword);
 
-        return Promise.all([
-            validateUser(user),
-            validatePassword(newPassword),
-        ]).spread((vUser: userCore.IUserDto, vPassword: string) => userCore
-            .resetPassword(vUser, vPassword)
-        );
+        return userCore.resetPassword(user, newPassword)
     },
 
-    forceResetPassword: (req: IExtendedRequest) => {
-        const username = req.body.username;
-        const newPassword = req.body.newPassword;
+    forceResetPassword: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.body.username);
+        const newPassword = validatePassword(req.body.newPassword);
 
-        return Promise.all([
-            validateUsername(username),
-            validatePassword(newPassword),
-        ]).then(() => userCore.forceResetPassword(username, newPassword));
+        return userCore.forceResetPassword(username, newPassword);
     },
 
-    resetUsername: (req: IExtendedRequest) => {
-        const oldUsername = req.body.oldUsername;
-        const newUsername = req.body.newUsername;
-        const password = req.body.password;
+    resetUsername: async (req: IExtendedRequest) => {
+        const oldUsername = validateUsername(req.body.oldUsername);
+        const newUsername = validateUsername(req.body.newUsername);
+        const password = validatePassword(req.body.password);
 
-        return Promise.all([
-            validateUsername(oldUsername),
-            validateUsername(newUsername),
-        ])
-        .then(() => userCore.authenticateUser({ username: oldUsername, password }))
-        .then((auth) => auth ?
-            userCore.resetUsername(oldUsername, newUsername) :
-            Promise.reject(new ConflictError('Invalid password'))
-        ); 
+        const auth = await userCore.authenticateUser({ username: oldUsername, password });
+        if (auth) {
+            return userCore.resetUsername(oldUsername, newUsername);
+        } else {
+            throw new ConflictError('Invalid password');
+        }
     },
 };
 

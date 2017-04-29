@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
@@ -9,57 +8,43 @@ import { IDatabaseGroup, IDatabaseUser } from '../database';
 import { createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
 
 const _endpoint = {
-    createGroup: (req: IExtendedRequest) => {
-        let group: any = req.body;
-        return validateGroupName(group.groupName)
-            .then((vGroupName) => groupCore.createGroup(vGroupName));
+    createGroup: async (req: IExtendedRequest) => {
+        const groupName = validateGroupName(req.body.groupName);
+
+        return groupCore.createGroup(groupName);
     },
 
-    addMember: (req: IExtendedRequest) => {
-        let groupName = req.piikki.groupAccess.group.name;
+    addMember: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.body.username);
+        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        return Promise.all([
-            validateUsername(req.body.username),
-            validateGroupName(groupName)
-        ])
-        .spread((vUsername: string, vGroupName: string) => groupCore.addUserToGroup(vUsername, vGroupName));
+        return groupCore.addUserToGroup(username, groupName);
     },
 
-    removeMember: (req: IExtendedRequest) => {
-        let groupName = req.piikki.groupAccess.group.name;
+    removeMember: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.body.username);
+        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        return Promise.all([
-            validateUsername(req.body.username),
-            validateGroupName(groupName)
-        ])
-        .spread((vUsername: string, vGroupName: string) => groupCore.removeUserFromGroup(vUsername, vGroupName));
+        return groupCore.removeUserFromGroup(username, groupName);
     },
 
-    getGroups: (req: IExtendedRequest) => {
+    getGroups: async (req: IExtendedRequest) => {
         return groupCore.getGroups();
     },
 
-    getGroupMembers: (req: IExtendedRequest) => {
-        let groupName = req.piikki.groupAccess.group.name;
+    getGroupMembers: async (req: IExtendedRequest) => {
+        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+        await groupCore.groupExists(groupName);
 
-        return validateGroupName(groupName)
-            .then((vGroupName) => {
-                return groupCore.groupExists(vGroupName)
-                    .then(() => groupCore.getUsersFromGroup(vGroupName));
-            });
+        return groupCore.getUsersFromGroup(groupName);
     },
 
-    getGroupMember: (req: IExtendedRequest) => {
-        let groupName = req.piikki.groupAccess.group.name;
+    getGroupMember: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.params.username);
+        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        return Promise.all([
-                validateUsername(req.params.username),
-                validateGroupName(groupName)
-            ])
-            .spread((vUsername: string, vGroupName: string) => groupCore.userIsInGroup(vUsername, groupName))
-            .then((res: { user: IDatabaseUser, group: IDatabaseGroup }) =>
-                groupCore.getUserFromGroup(res.group.name, res.user.username)
-            );
+        const result = await groupCore.userIsInGroup(username, groupName);
+        return groupCore.getUserFromGroup(result.group.name, result.user.username);
     },
 };
 
