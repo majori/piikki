@@ -7,7 +7,7 @@ import { createRestrictedToken } from './token-core';
 import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
 
 export async function createGroup(groupName: string) {
-    const records = await knex.from('groups').where({name: groupName});
+    const records: IDatabaseGroup[] = await knex.from('groups').where({name: groupName});
 
     if (!_.isEmpty(records)) {
         throw new ConflictError(`Group ${groupName} already exists`);
@@ -50,7 +50,7 @@ export async function userIsInGroup(username: string, groupName: string) {
 }
 
 
-export function getUsersFromGroup(groupName: string) {
+export function getUsersFromGroup(groupName: string): QueryBuilder {
     return knex
         .select('users.username', 'user_saldos.saldo')
         .from('users')
@@ -60,7 +60,7 @@ export function getUsersFromGroup(groupName: string) {
 };
 
 export async function getUserFromGroup(groupName: string, username: string) {
-    const row = await getUsersFromGroup(groupName)
+    const row: IDatabaseUser = await getUsersFromGroup(groupName)
         .andWhere({ 'users.username': username })
         .first();
 
@@ -71,7 +71,7 @@ export async function getUserFromGroup(groupName: string, username: string) {
     }
 };
 
-export function getGroups() {
+export function getGroups(): QueryBuilder {
     return knex
         .from('groups')
         .select('name');

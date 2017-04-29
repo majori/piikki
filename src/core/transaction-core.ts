@@ -18,9 +18,10 @@ export async function makeTransaction(username: string, groupName: string, amoun
             newSaldo = userSaldo.saldo + amount;
 
             await trx
-            .table('user_saldos')
-            .where({user_id: userSaldo.user_id, group_id: userSaldo.group_id})
-            .update({saldo: newSaldo})
+                .table('user_saldos')
+                .where({user_id: userSaldo.user_id, group_id: userSaldo.group_id})
+                .update({saldo: newSaldo})
+                .transacting(trx);
 
             const transaction = {
                 new_saldo: newSaldo,
@@ -28,13 +29,18 @@ export async function makeTransaction(username: string, groupName: string, amoun
                 group_id: userSaldo.group_id,
                 user_id: userSaldo.user_id
             };
-            await trx.table('transactions').insert(
-                _.isString(comment) ?
-                _.assign(transaction, { comment }) :
-                transaction,
-            );
+
+            await trx
+                .table('transactions')
+                .insert(
+                    _.isString(comment) ?
+                    _.assign(transaction, { comment }) :
+                    transaction,
+                )
+                .transacting(trx);
 
             await trx.commit();
+
         } catch (err) {
             trx.rollback();
         }
