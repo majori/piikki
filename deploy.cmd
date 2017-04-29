@@ -113,9 +113,9 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
 )
 
 :: 4. Run Gulp task
-IF EXIST "%DEPLOYMENT_TARGET%\gulpfile.js" (
+IF EXIST "%DEPLOYMENT_TARGET%\tsconfig.json" (
  pushd "%DEPLOYMENT_TARGET%"
- call .\node_modules\.bin\gulp build --production
+ call .\node_modules\.bin\tsc
  IF !ERRORLEVEL! NEQ 0 goto error
  popd
 )
