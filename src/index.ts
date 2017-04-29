@@ -1,8 +1,8 @@
 import { createApp } from './app';
 import * as Debug from 'debug';
-import appInsights = require('applicationinsights');
+import * as appInsights from 'applicationinsights';
 
-import cfg = require('../config');
+const cfg: any = require('../config'); // tslint:disable-line
 const debug = Debug('piikki:express');
 
 appInsights.setup(cfg.appInsightsKey)
