@@ -87,8 +87,10 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         // Set status to unauthorized
         res.status(401);
 
-        // Track unauthorized request
-        appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+        // Track unauthorized request if the request is not from azure ping service
+        if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
+            appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+        }
 
         throw new AuthorizationError();
     }
