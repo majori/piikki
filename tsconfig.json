@@ -3,11 +3,9 @@
         "target": "es6",
         "module": "commonjs",
         "removeComments": true,
-        "outDir": "dist",
+        "outDir": "build",
         "sourceMap": true,
-        "types": [
-            "bluebird-global"
-        ]
+        "allowJs": false
     },
     "include": [
         "src/**/*.ts"

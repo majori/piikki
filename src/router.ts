@@ -106,6 +106,8 @@ function _globalTokenRoutes() {
     globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
     globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
     globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
+    globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
+    globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
 
     return globalR;
 }

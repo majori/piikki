@@ -88,11 +88,11 @@ goto :EOF
 :Deployment
 echo Handling node.js deployment.
 
-:: 0. Create empty dist\index.js to make KuduSync happy
+:: 0. Create empty build\index.js to make KuduSync happy
 :: see https://github.com/projectkudu/kudu/issues/1753
-IF NOT EXIST "%DEPLOYMENT_SOURCE%\dist" (
-  call :ExecuteCmd mkdir "%DEPLOYMENT_SOURCE%\dist"
-  call :ExecuteCmd copy NUL "%DEPLOYMENT_SOURCE%\dist\index.js"
+IF NOT EXIST "%DEPLOYMENT_SOURCE%\build" (
+  call :ExecuteCmd mkdir "%DEPLOYMENT_SOURCE%\build"
+  call :ExecuteCmd copy NUL "%DEPLOYMENT_SOURCE%\build\index.js"
 )
 
 :: 1. KuduSync
@@ -113,9 +113,9 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
 )
 
 :: 4. Run Gulp task
-IF EXIST "%DEPLOYMENT_TARGET%\gulpfile.js" (
+IF EXIST "%DEPLOYMENT_TARGET%\tsconfig.json" (
  pushd "%DEPLOYMENT_TARGET%"
- call .\node_modules\.bin\gulp build --production
+ call .\node_modules\.bin\tsc
  IF !ERRORLEVEL! NEQ 0 goto error
  popd
 )

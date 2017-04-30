@@ -1,15 +1,16 @@
 import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
-import { getTokens, createAdminToken } from './core/token-core';
-import { IExtendedRequest } from './app';
 import * as Debug from 'debug';
-import * as fs from 'fs';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
 import appInsights = require('applicationinsights');
+import { IExtendedRequest } from './app';
+import { getTokens, createAdminToken } from './core/token-core';
+import { AuthorizationError } from './errors';
 
 const debug = Debug('piikki:tokenHandler');
-const cfg = require('../config');
+
+const cfg: any = require('../config'); // tslint:disable-line
 
 // If environment is not production, use development token
 let registeredTokens = [];
@@ -72,11 +73,13 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         }
 
         // Add token info to track requests
-        appInsights.client.commonProperties = {
-            token: token.token,
-            token_role: token.role,
-            token_comment: token.comment,
-        };
+        if (cfg.appInsightsKey) {
+            appInsights.client.commonProperties = {
+                token: token.token,
+                token_role: token.role,
+                token_comment: token.comment,
+            };
+        }
 
         next();
 
@@ -86,17 +89,12 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         // Set status to unauthorized
         res.status(401);
 
-        // Track unauthorized request
-        appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+        // Track unauthorized request if the request is not from azure ping service
+        if (cfg.appInsightsKey && !_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
+            appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+        }
 
-        // Response with a unauthorized error
-        res.json({
-            ok: false,
-            error: {
-                type: 'AuthorizationError',
-                message: 'Unauthorized',
-            },
-        });
+        throw new AuthorizationError();
     }
 };
 
@@ -105,25 +103,5 @@ export function updateTokens() {
     getTokens()
     .then((tokens) => {
         registeredTokens = tokens;
-        _writeTokensToFile();
-    });
-};
-
-// Write tokens to prettified JSON file 
-function _writeTokensToFile() {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(
-            cfg.tokenFilePath,
-            JSON.stringify(registeredTokens, null, '  '),
-            'utf8',
-            (err) => {
-                if (err) {
-                    console.error('Error when writing tokens to file: ', err);
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            }
-        );
     });
 };

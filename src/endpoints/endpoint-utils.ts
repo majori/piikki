@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as Promise from 'bluebird';
 import appInsights = require('applicationinsights');
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
@@ -8,87 +7,104 @@ import { IExtendedRequest } from '../app';
 import { IUserDto } from '../core/user-core';
 import { ValidationError } from '../errors';
 
-const reject = Promise.reject;
+const cfg: any = require('../../config'); // tslint:disable-line
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: Function): RequestHandler {
-    return (req: IExtendedRequest, res: Response, next: NextFunction) => {
+    return async (req: IExtendedRequest, res: Response, next: NextFunction) => {
         try {
-            func(req, res)
-                .then((result) => {
-                    const response = { ok: true, result: result || {} };
+            const result = await func(req, res);
+            const response = { ok: true, result: result || {} };
 
-                    // Set status to OK
-                    res.status(200);
+            // Set status to OK
+            res.status(200);
 
-                    // Track a succesful request
-                    appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+            // Track a succesful request
+            if (cfg.appInsightsKey) {
+                appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+            }
 
-                    // Send the response
-                    res.json(response);
-                })
-                .catch(next);
+            // Send the response
+            res.json(response);
+
         } catch (err) {
-            appInsights.client.trackException(err);
+            if (cfg.appInsightsKey) {
+                appInsights.client.trackException(err);
+            }
+            console.error(err);
             next(err);
         }
     };
 }
 
 // Check if username and password is valid
-export function validateUser(user: IUserDto): Promise<any> {
+export function validateUser(user: IUserDto) {
     if (!_.isObject(user)) {
-        return reject(new ValidationError('Invalid user object'));
+        throw new ValidationError('Invalid user object');
     }
 
-    return Promise.all([
-        validateUsername(user.username),
-        validatePassword(user.password),
-    ])
-    .then(() => Promise.resolve(user));
+    try {
+        validatePassword(user.password);
+        validateUsername(user.username);
+    } catch (err) {
+        throw err;
+    }
+
+    return user;
 };
 
 // Check if username is valid
-export function validateUsername(username: any): Promise<string> {
+export function validateUsername(username: any): string {
+    // Allow a-z, A-Z, 0-9, underscore and hyphen
+    const regEx = /^[a-zA-Z0-9-_]+$/;
 
-    if (_.isUndefined(username)) { return reject(new ValidationError('No username defined')); };
-    if (!_.isString(username))   { return reject(new ValidationError(`Username ${username} was not a string`)); };
-    if (_.isEmpty(username))     { return reject(new ValidationError('Username was empty')); };
-    if (username.length > 20)    { return reject(new ValidationError('Username was longer than 20 characters')); };
+    if (_.isUndefined(username)) { throw new ValidationError('No username defined'); };
+    if (!_.isString(username))   { throw new ValidationError(`Username ${username} was not a string`); };
+    if (_.isEmpty(username))     { throw new ValidationError('Username was empty'); };
+    if (username.length > 20)    { throw new ValidationError('Username was longer than 20 characters'); };
+    if (!regEx.test(username))   {
+        throw new ValidationError(
+            `Username ${username} had invalid characters.` +
+            'Allowed characters are a-z, A-Z, 0-9, "-" and "_".'
+        );
+    }
 
-    return Promise.resolve(username);
+    return username;
 };
 
 // Check if password is valid
-export function validatePassword(password: any): Promise<string> {
+export function validatePassword(password: any): string {
 
-    if (_.isUndefined(password)) { return reject(new ValidationError('No password defined')); };
-    if (!_.isString(password)) { return reject(new ValidationError(`Password ${password} was not a string`)); };
-    if (_.isEmpty(password))   { return reject(new ValidationError('Password was empty')); };
+    if (_.isUndefined(password)) { throw new ValidationError('No password defined'); };
+    if (!_.isString(password))   { throw new ValidationError(`Password ${password} was not a string`); };
+    if (_.isEmpty(password))     { throw new ValidationError('Password was empty'); };
 
-    return Promise.resolve(password);
+    return password;
 };
 
 // Check if transaction amount is valid
-export function validateTransactionAmount(amount: any): Promise<string | number> {
-    if (_.isUndefined(amount)) { return reject(new ValidationError('Amount was undefined')); }
-    if (!_.isNumber(amount))   { return reject(new ValidationError(`Amount "${amount}" was not a number`)); }
+export function validateTransactionAmount(amount: any): number {
+    if (_.isUndefined(amount)) { throw new ValidationError('Amount was undefined'); }
+    if (!_.isNumber(amount))   { throw new ValidationError(`Amount "${amount}" was not a number`); }
 
-    return Promise.resolve(amount);
+    return amount;
 };
 
 // Check if group name is valid
-export function validateGroupName(name: any): Promise<string> {
-    if (_.isUndefined(name)) { return reject(new ValidationError('Group name was undefined')); }
-    if (!_.isString(name))   { return reject(new ValidationError(`Group name "${name}" was not a string`)); }
-    if (name.length > 255)   { return reject(new ValidationError('Group name was longer than 255')); }
+export function validateGroupName(name: any): string {
+    if (_.isUndefined(name)) { throw new ValidationError('Group name was undefined'); }
+    if (!_.isString(name))   { throw new ValidationError(`Group name "${name}" was not a string`); }
+    if (name.length > 255)   { throw new ValidationError('Group name was longer than 255'); }
 
-    return Promise.resolve(name);
+    return name;
 };
 
 export function validateTimestamp(timestamp: any) {
-    const parsed = moment(timestamp);
-
-    return (parsed.isValid()) ? parsed : undefined;
+    if (timestamp) {
+        const parsed = moment(timestamp);
+        return (parsed.isValid()) ? parsed : undefined;
+    } else {
+        return undefined;
+    }
 };

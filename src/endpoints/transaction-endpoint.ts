@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
@@ -14,8 +13,15 @@ import {
     validateTimestamp,
 } from './endpoint-utils';
 
+interface ITransactionDto {
+    username: string;
+    amount: number;
+    groupName: string;
+    comment: string;
+}
+
 const _endpoint = {
-    makeTransaction: (req: IExtendedRequest) => {
+    makeTransaction: async (req: IExtendedRequest) => {
         let transactions = req.body;
 
         // Allow body to have one or multiple transactions
@@ -24,46 +30,33 @@ const _endpoint = {
         }
 
         // TODO: If only one transaction fails, tell about the succeed ones
-        return Promise.map(transactions, (trx: any) => {
+        return Promise.all(_.map(transactions, (trx: ITransactionDto) => {
 
             // If request comes from group specific token, use token related group name
             trx.groupName = (req.piikki.groupAccess.group.name) ?
                 req.piikki.groupAccess.group.name :
                 trx.groupName;
 
-            return Promise.all([
-                validateTransactionAmount(trx.amount),
-                validateUsername(trx.username),
-                validateGroupName(trx.groupName)
-            ])
-            .then(() => transCore.makeTransaction(trx.username, trx.groupName, trx.amount, trx.comment));
-        });
+            const username = validateUsername(trx.username);
+            const amount = validateTransactionAmount(trx.amount);
+            const groupName = validateGroupName(trx.groupName);
+
+            return transCore.makeTransaction(username, groupName, amount, trx.comment);
+        }));
     },
 
-    getUserTransactions: (req: IExtendedRequest) => {
-        const username = req.body.username;
-        const timestamp = req.body.timestamp;
+    getUserTransactions: async (req: IExtendedRequest) => {
+        const username = validateUsername(req.params.username);
+        const timestamp = validateTimestamp(req.query.timestamp);
 
-        return Promise.all([
-                validateUsername(username),
-                validateTimestamp(timestamp),
-            ])
-            .spread((vUsername: string, optTimestamp?: Moment) => transCore
-                .getUserTransactions(vUsername, optTimestamp)
-            );
+        return transCore.getUserTransactions(username, timestamp);
     },
 
-    getGroupTransactions: (req: IExtendedRequest) => {
-        const groupName = req.body.groupName;
-        const timestamp = req.body.timestamp;
+    getGroupTransactions: async (req: IExtendedRequest) => {
+        const groupName = validateGroupName(req.params.groupName);
+        const timestamp = validateTimestamp(req.query.timestamp);
 
-        return Promise.all([
-                validateGroupName(groupName),
-                validateTimestamp(timestamp),
-            ])
-            .spread((vGroupName: string, optTimestamp?: Moment) => transCore
-                .getGroupTransactions(vGroupName, optTimestamp)
-            );
+        return transCore.getGroupTransactions(groupName, timestamp);
     },
 };
 

@@ -1,21 +1,26 @@
 import { createApp } from './app';
 import * as Debug from 'debug';
-import appInsights = require('applicationinsights');
+import * as appInsights from 'applicationinsights';
 
-import cfg = require('../config');
+const cfg: any = require('../config'); // tslint:disable-line
 const debug = Debug('piikki:express');
 
-appInsights.setup(cfg.appInsightsKey)
-    .setAutoCollectRequests(false)
-    .setAutoCollectPerformance(false)
-    .setAutoCollectExceptions(false)
-    .setAutoCollectConsole(false)
-    .start();
+if (cfg.appInsightsKey) {
+    appInsights
+        .setup(cfg.appInsightsKey)
+        .setAutoCollectRequests(false)
+        .setAutoCollectPerformance(false)
+        .setAutoCollectExceptions(false)
+        .setAutoCollectConsole(false)
+        .start();
+}
 
 const app = createApp(cfg);
 
 // Start server
 app.listen(cfg.port, cfg.hostname, () => {
-    appInsights.client.trackEvent('Server start', { host: cfg.hostname, port: cfg.port });
+    if (cfg.appInsightsKey) {
+        appInsights.client.trackEvent('Server start', { host: cfg.hostname, port: cfg.port });
+    }
     debug(`Server listening on http://${cfg.hostname}:${cfg.port}`);
 });
