@@ -7,6 +7,8 @@ import { IExtendedRequest } from '../app';
 import { IUserDto } from '../core/user-core';
 import { ValidationError } from '../errors';
 
+const cfg: any = require('../../config'); // tslint:disable-line
+
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: Function): RequestHandler {
@@ -19,13 +21,17 @@ export function createJsonRoute(func: Function): RequestHandler {
             res.status(200);
 
             // Track a succesful request
-            appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+            if (cfg.appInsightsKey) {
+                appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+            }
 
             // Send the response
             res.json(response);
 
         } catch (err) {
-            appInsights.client.trackException(err);
+            if (cfg.appInsightsKey) {
+                appInsights.client.trackException(err);
+            }
             next(err);
         }
     };

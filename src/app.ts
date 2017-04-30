@@ -10,6 +10,8 @@ import appInsights = require('applicationinsights');
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
 
+const cfg: any = require('../config'); // tslint:disable-line
+
 // Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
     insights: {
@@ -73,17 +75,19 @@ export function createApp(cfg: any) {
         res.status(status);
 
         // Track error response
-        appInsights.client.trackRequestSync(
-            req,
-            res,
-            (Date.now() - req.insights.startTime),
-            {
-                type: err.name,
-                status: err.status || 'Unknown',
-                message: err.message,
-                stack: JSON.stringify(err.stack),
-            },
-        );
+        if (cfg.appInsightsKey) {
+            appInsights.client.trackRequestSync(
+                req,
+                res,
+                (Date.now() - req.insights.startTime),
+                {
+                    type: err.name,
+                    status: err.status || 'Unknown',
+                    message: err.message,
+                    stack: JSON.stringify(err.stack),
+                },
+            );
+        }
 
         res.send(response);
     });
