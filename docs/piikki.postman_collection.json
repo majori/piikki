@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Piikki",
-		"_postman_id": "2884b368-6a55-b991-1117-f261ec0f736b",
+		"_postman_id": "ff511c93-f38b-f251-5159-0717af8c634d",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -154,7 +154,10 @@
 								"description": ""
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -171,7 +174,10 @@
 								"description": ""
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -313,7 +319,10 @@
 								"description": ""
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -330,7 +339,10 @@
 								"description": ""
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -347,7 +359,10 @@
 								"description": ""
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -432,6 +447,56 @@
 					"request": {
 						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/transaction",
 						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group transactions",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/group/{{groupname}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get user transactions",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/user/{{username}}",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
