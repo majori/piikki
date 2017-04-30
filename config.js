@@ -37,8 +37,8 @@ cfg.db = {
     connection: dbConnection,
     migrations: {
         disableTransactions: true,
-        tableName: 'knex_migrations'
-    }
+        tableName: 'knex_migrations',
+    },
 };
 
 module.exports = cfg;

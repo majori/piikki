@@ -56,7 +56,12 @@ export function validateUsername(username: any): string {
     if (!_.isString(username))   { throw new ValidationError(`Username ${username} was not a string`); };
     if (_.isEmpty(username))     { throw new ValidationError('Username was empty'); };
     if (username.length > 20)    { throw new ValidationError('Username was longer than 20 characters'); };
-    if (!regEx.test(username))   { throw new ValidationError(`Username ${username} had invalid characters`); }
+    if (!regEx.test(username))   {
+        throw new ValidationError(
+            `Username ${username} had invalid characters.` +
+            'Allowed characters are a-z, A-Z, 0-9, "-" and "_".'
+        );
+    }
 
     return username;
 };
@@ -65,8 +70,8 @@ export function validateUsername(username: any): string {
 export function validatePassword(password: any): string {
 
     if (_.isUndefined(password)) { throw new ValidationError('No password defined'); };
-    if (!_.isString(password)) { throw new ValidationError(`Password ${password} was not a string`); };
-    if (_.isEmpty(password))   { throw new ValidationError('Password was empty'); };
+    if (!_.isString(password))   { throw new ValidationError(`Password ${password} was not a string`); };
+    if (_.isEmpty(password))     { throw new ValidationError('Password was empty'); };
 
     return password;
 };
