@@ -72,13 +72,7 @@ export async function deleteUser(username: string) {
 export async function authenticateUser(user: IUserDto) {
     const row = await userExists(user.username);
 
-    return await new Promise((resolve, reject) => {
-        bcrypt.compare(
-            user.password,
-            row.password,
-            (err, same) => err ? reject(err) : resolve(same),
-        );
-    });
+    return await bcrypt.compare(user.password, row.password);
 };
 
 // Checks if user is in database
@@ -145,10 +139,6 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
     return { username: newUsername };
 };
 
-function _hashPassword(password: string) {
-    return new Promise((resolve, reject) => {
-        bcrypt.hash(password, SALT_ROUNDS, (err, hash) => (err) ?
-            reject(err) :
-            resolve(hash));
-    });
+async function _hashPassword(password: string) {
+    return bcrypt.hash(password, SALT_ROUNDS);
 }
