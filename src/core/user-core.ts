@@ -20,7 +20,9 @@ export async function getUsers() {
     return _.chain(results)
         .groupBy((x) => x.username)
         .map((x, key) => _.reduce(x, (user: any, value: any) => {
-                user.saldos[value.groupName] = value.saldo;
+                if (value.groupName) {
+                    user.saldos[value.groupName] = value.saldo;
+                }
                 return user;
             },
             {
@@ -39,13 +41,14 @@ export async function getUser(username: string) {
 
     // Fetch possible saldos in groups
     const results = await _getUsersWithSaldos().andWhere({ 'users.username': username });
-
     // There was no saldos, return only user info
     if (_.isEmpty(results)) { return user; };
 
     // Parse database rows to saldos object
     return _.reduce(results, (result: any, value: any) => {
-        result.saldos[value.groupName] =  value.saldo;
+        if (value.groupName) {
+            result.saldos[value.groupName] =  value.saldo;
+        }
         return result;
     }, user);
 };
@@ -148,8 +151,8 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
 export function _getUsersWithSaldos(): QueryBuilder {
     return knex
         .from('users')
-        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
-        .join('groups', { 'groups.id': 'user_saldos.group_id' })
+        .leftJoin('user_saldos', { 'user_saldos.user_id': 'users.id' })
+        .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })
         .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
         .where({ 'users.active': true });
 };
