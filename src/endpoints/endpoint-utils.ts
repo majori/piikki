@@ -32,6 +32,7 @@ export function createJsonRoute(func: Function): RequestHandler {
             if (cfg.appInsightsKey) {
                 appInsights.client.trackException(err);
             }
+            console.error(err);
             next(err);
         }
     };

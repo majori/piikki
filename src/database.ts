@@ -33,7 +33,7 @@ export interface IDatabaseUserSaldo {
 
 export interface IDatabaseToken {
     token: string;
-    role: 'restricted' | 'global';
+    role: 'restricted' | 'global' | 'admin';
     group_name: string;
 }
 
