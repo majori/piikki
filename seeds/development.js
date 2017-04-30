@@ -15,7 +15,8 @@ exports.seed = (knex, Promise) => {
       "INSERT INTO users(id, username, password) VALUES " +
       `(1,'testUser1','${bcrypt.hashSync('1234', 6)}'),` +
       `(2,'testUser2','${bcrypt.hashSync('4321', 6)}'),` +
-      `(3,'testUser3','${bcrypt.hashSync('1243', 6)}');` +
+      `(3,'testUser3','${bcrypt.hashSync('1243', 6)}'),` +
+      `(4,'testUser4','${bcrypt.hashSync('4312', 6)}');` +
       "SET IDENTITY_INSERT users OFF;"
     ))
 
