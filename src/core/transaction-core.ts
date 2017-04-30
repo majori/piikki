@@ -96,7 +96,11 @@ function _getTransactions(filterObject: IFilter, filterTimestamp?: moment.Moment
         .where(filterObject);
 
     if (filterTimestamp) {
-        query.where('transactions.timestamp', '>', filterTimestamp.format());
+        query.where(
+            'transactions.timestamp',
+            '>',
+            filterTimestamp.format('YYYY-MM-DD HH:mm:ss.SSS')
+        );
     }
 
     return query;

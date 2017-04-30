@@ -46,15 +46,15 @@ const _endpoint = {
     },
 
     getUserTransactions: async (req: IExtendedRequest) => {
-        const username = validateUsername(req.body.username);
-        const timestamp = validateTimestamp(req.body.timestamp);
+        const username = validateUsername(req.params.username);
+        const timestamp = validateTimestamp(req.query.timestamp);
 
         return transCore.getUserTransactions(username, timestamp);
     },
 
     getGroupTransactions: async (req: IExtendedRequest) => {
-        const groupName = validateGroupName(req.body.groupName);
-        const timestamp = validateTimestamp(req.body.timestamp);
+        const groupName = validateGroupName(req.params.groupName);
+        const timestamp = validateTimestamp(req.query.timestamp);
 
         return transCore.getGroupTransactions(groupName, timestamp);
     },

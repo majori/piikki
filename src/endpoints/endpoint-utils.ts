@@ -100,7 +100,10 @@ export function validateGroupName(name: any): string {
 };
 
 export function validateTimestamp(timestamp: any) {
-    const parsed = moment(timestamp);
-
-    return (parsed.isValid()) ? parsed : undefined;
+    if (timestamp) {
+        const parsed = moment(timestamp);
+        return (parsed.isValid()) ? parsed : undefined;
+    } else {
+        return undefined;
+    }
 };
