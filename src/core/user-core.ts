@@ -15,10 +15,20 @@ export const SALT_ROUNDS = 6;
 
 // Get all users in group
 export async function getUsers() {
-    return await knex
-        .from('users')
-        .select('username')
-        .where({ active: true });
+    const results = await _getUsersWithSaldos();
+
+    return _.chain(results)
+        .groupBy((x) => x.username)
+        .map((x, key) => _.reduce(x, (user: any, value: any) => {
+                user.saldos[value.groupName] = value.saldo;
+                return user;
+            },
+            {
+                username: key,
+                saldos: {},
+            })
+        )
+        .value();
 };
 
 // Get user info and saldo in each group
@@ -27,13 +37,8 @@ export async function getUser(username: string) {
 
     await userExists(username);
 
-        // Fetch possible saldos in groups
-    const results = await knex
-            .from('users')
-            .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
-            .join('groups', { 'groups.id': 'user_saldos.group_id' })
-            .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
-            .where({ 'users.username': username, 'users.active': true });
+    // Fetch possible saldos in groups
+    const results = await _getUsersWithSaldos().andWhere({ 'users.username': username });
 
     // There was no saldos, return only user info
     if (_.isEmpty(results)) { return user; };
@@ -137,6 +142,16 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
         .update({ username: newUsername });
 
     return { username: newUsername };
+};
+
+// Get all users in group
+export function _getUsersWithSaldos(): QueryBuilder {
+    return knex
+        .from('users')
+        .join('user_saldos', { 'user_saldos.user_id': 'users.id' })
+        .join('groups', { 'groups.id': 'user_saldos.group_id' })
+        .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
+        .where({ 'users.active': true });
 };
 
 async function _hashPassword(password: string) {
