@@ -1,0 +1,607 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.3.0",
+    "title": "Piikki",
+    "description": "API definition for Piikki API"
+  },
+  "basePath": "/api/v1/",
+  "tags": [
+    {
+      "name": "Global",
+      "description": "Endpoints which are authorized for global token"
+    },
+    {
+      "name": "Restricted",
+      "description": "Endpoints which are authorized for restricted token"
+    },
+    {
+      "name": "Admin",
+      "description": "Endpoints which are authorized for admin token"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/restricted/users/create": {
+      "post": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Create user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User to add to the database",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/users/authenticate": {
+      "post": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Authenticate user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User to authenticate",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/users/reset/password": {
+      "put": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Reset user password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                },
+                "oldPassword": {
+                  "$ref": "#/definitions/password"
+                },
+                "newPassword": {
+                  "$ref": "#/definitions/password"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/users/reset/username": {
+      "put": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Reset user username",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "oldUsername": {
+                  "$ref": "#/definitions/username"
+                },
+                "newUsername": {
+                  "$ref": "#/definitions/username"
+                },
+                "password": {
+                  "$ref": "#/definitions/password"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/group/members": {
+      "get": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Get group members"
+      }
+    },
+    "/restricted/group/members/{username}": {
+      "get": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Get group member",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": "true",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/restricted/group/addMember": {
+      "post": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Add user to the group",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/group/removeMember": {
+      "delete": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Remove user from the group",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/restricted/transaction": {
+      "post": {
+        "tags": [
+          "Restricted"
+        ],
+        "description": "Make transaction",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                },
+                "amount": {
+                  "$ref": "#/definitions/amount"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/global/users/create": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Create user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User to add to the database",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        ]
+      }
+    },
+    "/global/users/authenticate": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Authenticate user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User to authenticate",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        ]
+      }
+    },
+    "/global/users/reset/password": {
+      "put": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Reset user password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                },
+                "oldPassword": {
+                  "$ref": "#/definitions/password"
+                },
+                "newPassword": {
+                  "$ref": "#/definitions/password"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/global/users/reset/username": {
+      "put": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Reset user username",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "oldUsername": {
+                  "$ref": "#/definitions/username"
+                },
+                "newUsername": {
+                  "$ref": "#/definitions/username"
+                },
+                "password": {
+                  "$ref": "#/definitions/password"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/global/users": {
+      "get": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Get all users",
+        "operationId": "for the URL",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "description": "Job to add to the database",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Delete user",
+        "operationId": "for the URL",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/global/users/{username}": {
+      "get": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Get a user",
+        "operationId": "for the URL",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "User's username",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/global/groups": {
+      "get": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Get all groups",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {}
+      }
+    },
+    "/global/groups/{groupName}/members": {
+      "get": {
+        "tags": [
+          "Global"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "description": "Get a specific group",
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Group name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/global/groups/{groupName}/members/{username}": {
+      "get": {
+        "tags": [
+          "Global"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Group name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "User's username",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/global/groups/create": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/global/groups/{groupName}/addMember": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Group name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/global/groups/{groupName}/removeMember": {
+      "delete": {
+        "tags": [
+          "Global"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Group name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/admin/tokens/restricted": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Comment for the token",
+            "schema": {
+              "$ref": "#/definitions/comment"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/admin/tokens/global": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Comment for the token",
+            "schema": {
+              "$ref": "#/definitions/comment"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/admin/tokens/admin": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Comment for the token",
+            "schema": {
+              "$ref": "#/definitions/comment"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/admin/tokens": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/admin/users/force-reset/password": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    }
+  },
+  "definitions": {
+    "username": {
+      "required": true,
+      "type": "string",
+      "example": "Dr4gonSl4yer"
+    },
+    "password": {
+      "required": true,
+      "type": "string",
+      "example": "p4ssw0rd"
+    },
+    "amount": {
+      "required": true,
+      "type": "number",
+      "example": 4
+    },
+    "comment": {
+      "properties": {
+        "comment": {
+          "required": false,
+          "type": "string",
+          "example": "This token is reserved for the special one"
+        }
+      }
+    },
+    
+    "user": {
+      "properties": {
+        "username": {
+          "$ref": "#/definitions/username"
+        },
+        "password": {
+          "$ref": "#/definitions/password"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "APIKeyHeader": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization"
+    }
+  }
+}
