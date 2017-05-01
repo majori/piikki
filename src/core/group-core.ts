@@ -1,5 +1,6 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
+import * as appInsights from 'applicationinsights';
 
 import { ConflictError, NotFoundError } from '../errors';
 import { userExists } from './user-core';
@@ -16,6 +17,7 @@ export async function createGroup(groupName: string) {
     await knex.from('groups').insert({ name: groupName });
     await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
+    appInsights.client.trackEvent('Group create', { groupName });
     return groupName;
 };
 

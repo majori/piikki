@@ -10,8 +10,6 @@ import { AuthorizationError } from './errors';
 
 const debug = Debug('piikki:tokenHandler');
 
-const cfg: any = require('../config'); // tslint:disable-line
-
 // If environment is not production, use development token
 let registeredTokens = [];
 
@@ -73,13 +71,11 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         }
 
         // Add token info to track requests
-        if (cfg.appInsightsKey) {
-            appInsights.client.commonProperties = {
-                token: token.token,
-                token_role: token.role,
-                token_comment: token.comment,
-            };
-        }
+        appInsights.client.commonProperties = {
+            token: token.token,
+            token_role: token.role,
+            token_comment: token.comment,
+        };
 
         next();
 
@@ -90,7 +86,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         res.status(401);
 
         // Track unauthorized request if the request is not from azure ping service
-        if (cfg.appInsightsKey && !_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
+        if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
             appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
         }
 

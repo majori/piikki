@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { ConflictError, NotFoundError } from '../errors';
 import { knex, IDatabaseUser, IDatabaseGroup } from '../database';
 import { groupExists } from './group-core';
+import * as appInsights from 'applicationinsights';
 
 export interface IUserDto {
     username: string;
@@ -67,6 +68,7 @@ export async function createUser(user: IUserDto) {
         password: hash,
     });
 
+    appInsights.client.trackEvent('User create', { username: user.username });
     return user.username;
 };
 
