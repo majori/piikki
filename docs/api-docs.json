@@ -35,7 +35,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Create user",
+        "summary": "Create a new user",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -46,7 +47,22 @@
               "$ref": "#/definitions/user"
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns username of the new user",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/users/authenticate": {
@@ -54,7 +70,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Authenticate user",
+        "summary": "Authenticate user",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -65,7 +82,26 @@
               "$ref": "#/definitions/user"
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if password was right/wrong",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/users/reset/password": {
@@ -73,7 +109,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Reset user password",
+        "summary": "Reset user password",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -93,7 +130,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/users/reset/username": {
@@ -101,7 +153,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Reset user username",
+        "summary": "Reset user username",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -121,7 +174,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/group/members": {
@@ -129,7 +197,26 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Get group members"
+        "summary": "Get all members of the group",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/userWithSaldo"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/group/members/{username}": {
@@ -137,7 +224,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Get group member",
+        "summary": "Get user from the group",
+        "description": "",
         "parameters": [
           {
             "name": "username",
@@ -145,7 +233,22 @@
             "required": "true",
             "type": "string"
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "$ref": "#/definitions/userWithSaldo"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/group/addMember": {
@@ -153,7 +256,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Add user to the group",
+        "summary": "Add user to the group",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -167,7 +271,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Return added member's username",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/group/removeMember": {
@@ -175,7 +294,8 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Remove user from the group",
+        "summary": "Remove user from the group",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -189,7 +309,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Return removed member's username",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/restricted/transaction": {
@@ -197,9 +332,11 @@
         "tags": [
           "Restricted"
         ],
-        "description": "Make transaction",
+        "summary": "Make a transaction",
+        "description": "",
         "parameters": [
           {
+            "description": "Body can also be list of items showed below",
             "name": "body",
             "in": "body",
             "required": true,
@@ -214,7 +351,25 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of users with their new saldo in the group",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/userWithSaldo"     
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/users/create": {
@@ -222,7 +377,8 @@
         "tags": [
           "Global"
         ],
-        "description": "Create user",
+        "summary": "Create a new user",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -233,26 +389,22 @@
               "$ref": "#/definitions/user"
             }
           }
-        ]
-      }
-    },
-    "/global/users/authenticate": {
-      "post": {
-        "tags": [
-          "Global"
         ],
-        "description": "Authenticate user",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "User to authenticate",
-            "required": true,
+        "responses": {
+          "200": {
+            "description": "Returns username of the new user",
             "schema": {
-              "$ref": "#/definitions/user"
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
             }
           }
-        ]
+        }
       }
     },
     "/global/users/reset/password": {
@@ -260,7 +412,8 @@
         "tags": [
           "Global"
         ],
-        "description": "Reset user password",
+        "summary": "Reset user password",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -280,7 +433,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/users/reset/username": {
@@ -288,7 +456,8 @@
         "tags": [
           "Global"
         ],
-        "description": "Reset user username",
+        "summary": "Reset user username",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -308,7 +477,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/users": {
@@ -316,25 +500,47 @@
         "tags": [
           "Global"
         ],
-        "description": "Get all users",
-        "operationId": "for the URL",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "description": "Job to add to the database",
-            "required": true
+        "summary": "Get all users",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Return all users and their saldos in each group",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "username": {
+                        "type": "string"
+                      },
+                      "saldos": {
+                        "properties": {
+                          "[groupName1]": {
+                            "type": "number"
+                          },
+                          "[groupName2]": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
-        ],
-        "responses": {}
+        }
       },
       "delete": {
         "tags": [
           "Global"
         ],
-        "description": "Delete user",
+        "summary": "Delete user",
+        "description": "",
         "operationId": "for the URL",
         "produces": [
           "application/json"
@@ -353,7 +559,22 @@
               }
             }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/users/{username}": {
@@ -361,11 +582,8 @@
         "tags": [
           "Global"
         ],
-        "description": "Get a user",
-        "operationId": "for the URL",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get user",
+        "description": "",
         "parameters": [
           {
             "name": "username",
@@ -375,7 +593,35 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Returns user and his/her saldos in each group",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "saldos": {
+                      "properties": {
+                        "[groupName1]": {
+                          "type": "number"
+                        },
+                        "[groupName2]": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups": {
@@ -383,11 +629,30 @@
         "tags": [
           "Global"
         ],
-        "description": "Get all groups",
-        "produces": [
-          "application/json"
-        ],
-        "responses": {}
+        "summary": "Get all groups",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "groupName": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups/{groupName}/members": {
@@ -398,7 +663,8 @@
         "produces": [
           "application/json"
         ],
-        "description": "Get a specific group",
+        "summary": "Get all members of the group",
+        "description": "",
         "parameters": [
           {
             "name": "groupName",
@@ -408,7 +674,24 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/userWithSaldo"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups/{groupName}/members/{username}": {
@@ -416,6 +699,7 @@
         "tags": [
           "Global"
         ],
+        "summary": "Get user from the group",
         "description": "",
         "parameters": [
           {
@@ -433,7 +717,21 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "$ref": "#/definitions/userWithSaldo"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups/create": {
@@ -441,9 +739,24 @@
         "tags": [
           "Global"
         ],
+        "summary": "Create a group",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups/{groupName}/addMember": {
@@ -451,6 +764,7 @@
         "tags": [
           "Global"
         ],
+        "summary": "Add user to the group",
         "description": "",
         "parameters": [
           {
@@ -461,7 +775,21 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Return added member's username",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/global/groups/{groupName}/removeMember": {
@@ -469,6 +797,7 @@
         "tags": [
           "Global"
         ],
+        "summary": "Remove member from the group",
         "description": "",
         "parameters": [
           {
@@ -479,7 +808,69 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Return removed member's username",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/global/transaction": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "summary": "Make a transaction",
+        "description": "",
+        "parameters": [
+          {
+            "description": "Body can also be list of items showed below",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "username": {
+                  "$ref": "#/definitions/username"
+                },
+                "groupName": {
+                  "$ref": "#/definitions/groupName"
+                },
+                "amount": {
+                  "$ref": "#/definitions/amount"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of users with their new saldo in the group",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/userWithSaldo"     
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/tokens/restricted": {
@@ -487,6 +878,7 @@
         "tags": [
           "Admin"
         ],
+        "summary": "Create restricted token",
         "description": "",
         "parameters": [
           {
@@ -494,11 +886,32 @@
             "in": "body",
             "description": "Comment for the token",
             "schema": {
-              "$ref": "#/definitions/comment"
+              "properties": {
+                "groupName": {
+                  "type": "string"
+                },
+                "comment": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Returns the created token",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/tokens/global": {
@@ -506,6 +919,7 @@
         "tags": [
           "Admin"
         ],
+        "summary": "Create global token",
         "description": "",
         "parameters": [
           {
@@ -517,7 +931,21 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Returns the created token",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/tokens/admin": {
@@ -525,6 +953,7 @@
         "tags": [
           "Admin"
         ],
+        "summary": "Create admin token",
         "description": "",
         "parameters": [
           {
@@ -536,7 +965,21 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Returns the created token",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/tokens": {
@@ -544,9 +987,24 @@
         "tags": [
           "Admin"
         ],
+        "summary": "Delete token",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/users/force-reset/password": {
@@ -554,9 +1012,24 @@
         "tags": [
           "Admin"
         ],
-        "description": "",
+        "summary": "Force-reset user password",
+        "description": "Reset user password without needing the old one",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -564,7 +1037,12 @@
     "username": {
       "required": true,
       "type": "string",
-      "example": "Dr4gonSl4yer"
+      "example": "mr_awesome"
+    },
+    "groupName": {
+      "required": true,
+      "type": "string",
+      "example": "group1"
     },
     "password": {
       "required": true,
@@ -593,6 +1071,17 @@
         },
         "password": {
           "$ref": "#/definitions/password"
+        }
+      }
+    },
+
+    "userWithSaldo": {
+      "properties": {
+        "username": {
+          "$ref": "#/definitions/username"
+        },
+        "saldo": {
+          "type": "number"
         }
       }
     }
