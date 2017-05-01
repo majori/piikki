@@ -22,9 +22,9 @@ _More coming soon..._
 
 # API
 
-[Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
+[API Definition](https://piikki-backend-dev.azurewebsites.net/swagger/ui/)
 
-_More coming soon..._
+[Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
 ## Acknowledgements
 This project is supported by [Eatech](https://www.eatech.fi/)!
