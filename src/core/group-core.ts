@@ -103,7 +103,7 @@ async function _userInGroup(username: string, groupName: string) {
     const user = await userExists(username);
     const group = await groupExists(groupName);
 
-    const row = knex
+    const row = await knex
         .from('user_saldos')
         .where({ user_id: user.id, group_id: group.id })
         .first();
