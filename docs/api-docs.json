@@ -29,6 +29,9 @@
   "produces": [
     "application/json"
   ],
+  "security": {
+    "APIKeyHeader": []
+  },
   "paths": {
     "/restricted/users/create": {
       "post": {
