@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Advance payment system for Spinni",
   "main": "build/index.js",
   "scripts": {

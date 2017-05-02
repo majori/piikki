@@ -1,29 +1,25 @@
 import * as bodyParser from 'body-parser';
 import * as errorHandler from 'errorhandler';
 import * as express from 'express';
+import * as methodOverride from 'method-override';
+import * as appInsights from 'applicationinsights';
 import { Request, Response, NextFunction } from 'express';
 import { STATUS_CODES } from 'http';
-import * as methodOverride from 'method-override';
 import { toString } from 'lodash';
-import appInsights = require('applicationinsights');
 
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
-
-const cfg: any = require('../config'); // tslint:disable-line
+import { IDatabaseToken } from './database';
+import swagger from './swagger';
 
 // Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
     insights: {
         startTime: number;
-    },
+    };
 
     piikki: {
-        token: {
-            token: string,
-            role: string,
-            group_name: string;
-        },
+        token: IDatabaseToken;
         groupAccess: {
             all: boolean;
             group: {
@@ -50,6 +46,8 @@ export function createApp(cfg: any) {
         next();
     });
 
+    app.use('/swagger', swagger(cfg));
+
     // Register currently used tokens
     initTokens();
 
@@ -75,19 +73,17 @@ export function createApp(cfg: any) {
         res.status(status);
 
         // Track error response
-        if (cfg.appInsightsKey) {
-            appInsights.client.trackRequestSync(
-                req,
-                res,
-                (Date.now() - req.insights.startTime),
-                {
-                    type: err.name,
-                    status: err.status || 'Unknown',
-                    message: err.message,
-                    stack: JSON.stringify(err.stack),
-                },
-            );
-        }
+        appInsights.client.trackRequestSync(
+            req,
+            res,
+            (Date.now() - req.insights.startTime),
+            {
+                type: err.name,
+                status: err.status || 'Unknown',
+                message: err.message,
+                stack: JSON.stringify(err.stack),
+            },
+        );
 
         res.send(response);
     });

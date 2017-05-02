@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import * as Debug from 'debug';
+import { QueryBuilder } from 'knex';
 
 import { knex, IDatabaseGroup } from '../database';
 import { groupExists, getGroups } from './group-core';
@@ -57,19 +58,11 @@ export async function createAdminToken(comment?: string) {
 }
 
 export async function getTokens() {
-    return await knex
-        .select('tokens.token', 'tokens.role', 'groups.name AS group_name', 'tokens.comment')
-        .from('tokens')
-        .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
+    return await _getTokens();
 }
 
 export async function getToken(groupName: string) {
-    return await knex
-        .select('tokens.token', 'tokens.role', 'groups.name AS group_name')
-        .from('tokens')
-        .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' })
+    return await _getTokens()
         .where({ 'groups.name': groupName })
         .first();
 }
@@ -91,6 +84,19 @@ export async function initializeTokens() {
     });
     return await getTokens;
 };
+
+function _getTokens(): QueryBuilder {
+    return knex
+        .select(
+            'tokens.id',
+            'tokens.token',
+            'tokens.role',
+            'groups.name AS group_name',
+            'tokens.comment')
+        .from('tokens')
+        .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
+        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
+}
 
 // Generates Base64 string from random bytes
 async function _generateBase64Token(length = 32) {

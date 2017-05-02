@@ -32,9 +32,11 @@ export interface IDatabaseUserSaldo {
 }
 
 export interface IDatabaseToken {
+    id: number;
     token: string;
     role: 'restricted' | 'global' | 'admin';
     group_name: string;
+    comment?: string;
 }
 
 export const knex = _knex(cfg.db);
