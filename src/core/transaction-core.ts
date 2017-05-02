@@ -15,7 +15,7 @@ export async function makeTransaction(username: string, groupName: string, amoun
     let newSaldo;
     await knex.transaction(async (trx) => {
         try {
-            newSaldo = userSaldo.saldo + amount;
+            newSaldo = _.round(userSaldo.saldo + amount, 2);
 
             await trx
                 .table('user_saldos')
