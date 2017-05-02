@@ -7,11 +7,12 @@ import appInsights = require('applicationinsights');
 import { IExtendedRequest } from './app';
 import { getTokens, createAdminToken } from './core/token-core';
 import { AuthorizationError } from './errors';
+import { IDatabaseToken } from './database';
 
 const debug = Debug('piikki:tokenHandler');
 
 // If environment is not production, use development token
-let registeredTokens = [];
+let registeredTokens: IDatabaseToken[] = [];
 
 export function initTokens() {
 

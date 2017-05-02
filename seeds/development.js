@@ -29,18 +29,6 @@ exports.seed = (knex, Promise) => {
       "SET IDENTITY_INSERT groups OFF;"
     ))
 
-    // TRANSACTIONS
-    .then(() => knex.raw(
-      "SET IDENTITY_INSERT transactions ON;" +
-      "INSERT INTO transactions"+
-      "(id, user_id, group_id, old_saldo, new_saldo) VALUES " +
-      "(1,1,1,0,10)," +
-      "(2,2,1,0,-10)," +
-      "(3,3,1,0,5)," +
-      "(4,3,2,0,-5);" +
-      "SET IDENTITY_INSERT transactions OFF;"
-    ))
-
     // USER SALDOS
     .then(() => knex.raw(
       "SET IDENTITY_INSERT user_saldos ON;" +
@@ -68,5 +56,17 @@ exports.seed = (knex, Promise) => {
       "INSERT INTO token_group_access(id, token_id, group_id) VALUES " +
       "(1,1,1);" +
       "SET IDENTITY_INSERT token_group_access OFF;"
+    ))
+
+    // TRANSACTIONS
+    .then(() => knex.raw(
+      "SET IDENTITY_INSERT transactions ON;" +
+      "INSERT INTO transactions"+
+      "(id, user_id, group_id, token_id, old_saldo, new_saldo) VALUES " +
+      "(1,1,1,2,0,10)," +
+      "(2,2,1,2,0,-10)," +
+      "(3,3,1,2,0,5)," +
+      "(4,3,2,2,0,-5);" +
+      "SET IDENTITY_INSERT transactions OFF;"
     ));
 };

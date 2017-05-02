@@ -9,7 +9,7 @@ interface IFilter {
     'groups.name'?: string;
 }
 
-export async function makeTransaction(username: string, groupName: string, amount: number, comment?: string) {
+export async function makeTransaction(username: string, groupName: string, amount: number, tokenId: number, comment?: string) {
     const userSaldo = await userHaveSaldo(username, groupName);
 
     let newSaldo;
@@ -27,7 +27,8 @@ export async function makeTransaction(username: string, groupName: string, amoun
                 new_saldo: newSaldo,
                 old_saldo: userSaldo.saldo,
                 group_id: userSaldo.group_id,
-                user_id: userSaldo.user_id
+                user_id: userSaldo.user_id,
+                token_id: tokenId,
             };
 
             await trx

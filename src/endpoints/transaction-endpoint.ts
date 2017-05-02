@@ -41,7 +41,7 @@ const _endpoint = {
             const amount = validateTransactionAmount(trx.amount);
             const groupName = validateGroupName(trx.groupName);
 
-            return transCore.makeTransaction(username, groupName, amount, trx.comment);
+            return transCore.makeTransaction(username, groupName, amount, req.piikki.token.id, trx.comment);
         }));
     },
 

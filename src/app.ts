@@ -9,20 +9,17 @@ import { toString } from 'lodash';
 
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
+import { IDatabaseToken } from './database';
 import swagger from './swagger';
 
 // Extend Express own request object with additional info
 export interface IExtendedRequest extends Request {
     insights: {
         startTime: number;
-    },
+    };
 
     piikki: {
-        token: {
-            token: string,
-            role: string,
-            group_name: string;
-        },
+        token: IDatabaseToken;
         groupAccess: {
             all: boolean;
             group: {
