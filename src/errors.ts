@@ -1,8 +1,43 @@
-/* tslint:disable */
+/* tslint:disable max-classes-per-file */
+
+import { Request, Response, NextFunction } from 'express';
+import { STATUS_CODES } from 'http';
+import { IExtendedRequest } from './app';
+import * as appInsights from 'applicationinsights';
+
+export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
+  const status = err.status ? err.status : 500;
+
+  const response = {
+      ok: false,
+      error: {
+          type: (status < 500) ? err.name : STATUS_CODES[status],
+          message: (status < 500) ? err.message : '',
+      },
+  };
+
+  // Set response status
+  res.status(status);
+
+  // Track error response
+  appInsights.client.trackRequestSync(
+      req,
+      res,
+      (Date.now() - req.insights.startTime),
+      {
+          type: err.name,
+          status: err.status || 'Unknown',
+          message: err.message,
+          stack: JSON.stringify(err.stack),
+      },
+  );
+
+  res.send(response);
+};
 
 export class AuthorizationError extends Error {
-    status: 401;
-    name: 'AuthorizationError';
+    public status: 401;
+    public name: 'AuthorizationError';
 
     constructor(message?: string) {
         super();
@@ -15,7 +50,7 @@ export class AuthorizationError extends Error {
 }
 
 abstract class BadRequestError extends Error {
-    status: 400;
+    public status: 400;
 
     constructor(message?: string) {
         super();
@@ -26,7 +61,7 @@ abstract class BadRequestError extends Error {
 }
 
 export class ValidationError extends BadRequestError {
-    name: 'ValidationError';
+    public name: 'ValidationError';
 
     constructor(message?: string) {
         super(message);
@@ -36,7 +71,7 @@ export class ValidationError extends BadRequestError {
 }
 
 export class ConflictError extends BadRequestError {
-    name: 'ConflictError';
+    public name: 'ConflictError';
 
     constructor(message?: string) {
         super(message);
@@ -46,13 +81,11 @@ export class ConflictError extends BadRequestError {
 }
 
 export class NotFoundError extends BadRequestError {
-    name: 'NotFoundError';
-    
+    public name: 'NotFoundError';
+
     constructor(message?: string) {
         super(message);
         this.name = 'NotFoundError';
         Object.setPrototypeOf(this, NotFoundError.prototype);
     }
 }
-
-/* tslint:enable */
