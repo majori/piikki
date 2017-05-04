@@ -5,105 +5,105 @@ import { QueryBuilder } from 'knex';
 
 import { knex, IDatabaseGroup } from '../database';
 import { groupExists, getGroups } from './group-core';
-import { updateTokens} from '../tokenHandler';
+import { updateTokens } from '../tokenHandler';
 
 const debug = Debug('piikki:token-core');
 
 export async function createRestrictedToken(groupName: string, comment?: string) {
 
-    const group = await groupExists(groupName);
-    const token = await _generateBase64Token();
+  const group = await groupExists(groupName);
+  const token = await _generateBase64Token();
 
-    const id = await knex
-        .from('tokens')
-        .insert({ token, role: 'restricted', comment })
-        .returning('id');
+  const id = await knex
+    .from('tokens')
+    .insert({ token, role: 'restricted', comment })
+    .returning('id');
 
-    await knex
-        .from('token_group_access')
-        .insert({ 'token_id': id[0], 'group_id': group.id});
+  await knex
+    .from('token_group_access')
+    .insert({ 'token_id': id[0], 'group_id': group.id });
 
 
-    debug('Created restricted token', token);
-    updateTokens(); // Inform token handler about new token
+  debug('Created restricted token', token);
+  updateTokens(); // Inform token handler about new token
 
-    return token;
+  return token;
 };
 
 export async function createGlobalToken(comment?: string) {
-    const token = await _generateBase64Token();
+  const token = await _generateBase64Token();
 
-    await knex
-        .from('tokens')
-        .insert({ token, role: 'global', comment });
+  await knex
+    .from('tokens')
+    .insert({ token, role: 'global', comment });
 
-    debug('Created global token', token);
-    updateTokens(); // Inform token handler about new token
+  debug('Created global token', token);
+  updateTokens(); // Inform token handler about new token
 
-    return token;
+  return token;
 }
 
 export async function createAdminToken(comment?: string) {
-    const token = _generateBase64Token(64);
+  const token = _generateBase64Token(64);
 
-    await knex
-        .from('tokens')
-        .insert({ token, role: 'admin', comment });
+  await knex
+    .from('tokens')
+    .insert({ token, role: 'admin', comment });
 
-    debug('Created admin token', token);
-    updateTokens(); // Inform token handler about new token
-    return token;
+  debug('Created admin token', token);
+  updateTokens(); // Inform token handler about new token
+  return token;
 }
 
 export async function getTokens() {
-    return await _getTokens();
+  return await _getTokens();
 }
 
 export async function getToken(groupName: string) {
-    return await _getTokens()
-        .where({ 'groups.name': groupName })
-        .first();
+  return await _getTokens()
+    .where({ 'groups.name': groupName })
+    .first();
 }
 
 export async function deleteToken(token: string) {
-    return await knex
-        .from('tokens')
-        .where({ token })
-        .del();
+  return await knex
+    .from('tokens')
+    .where({ token })
+    .del();
 }
 
 // Creates one global token and restricted token for every group
 export async function initializeTokens() {
-    const token = await createGlobalToken();
-    const groups = await getGroups();
+  const token = await createGlobalToken();
+  const groups = await getGroups();
 
-    for (let group of groups) {
-      await createRestrictedToken(group.name);
-    }
+  for (let group of groups) {
+    await createRestrictedToken(group.name);
+  }
 
-    return await getTokens;
+  return await getTokens;
 };
 
 function _getTokens(): QueryBuilder {
-    return knex
-        .select(
-            'tokens.id',
-            'tokens.token',
-            'tokens.role',
-            'groups.name AS group_name',
-            'tokens.comment')
-        .from('tokens')
-        .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-        .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
+  return knex
+    .select(
+    'tokens.id',
+    'tokens.token',
+    'tokens.role',
+    'groups.name AS group_name',
+    'tokens.comment')
+    .from('tokens')
+    .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
+    .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
 }
 
 // Generates Base64 string from random bytes
 async function _generateBase64Token(length = 32) {
-    return new Promise((resolve, reject) => {
-        crypto.randomBytes(length, (err, buf) => {
-            if (err) { reject(err); }
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(length, (err, buf) => {
+      if (err) { reject(err); }
 
-            resolve(buf.toString('base64'));
-        });
+      resolve(buf.toString('base64'));
     });
+  });
 }

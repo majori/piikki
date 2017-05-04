@@ -9,11 +9,11 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
   const status = err.status ? err.status : 500;
 
   const response = {
-      ok: false,
-      error: {
-          type: (status < 500) ? err.name : STATUS_CODES[status],
-          message: (status < 500) ? err.message : '',
-      },
+    ok: false,
+    error: {
+      type: (status < 500) ? err.name : STATUS_CODES[status],
+      message: (status < 500) ? err.message : '',
+    },
   };
 
   // Set response status
@@ -21,71 +21,71 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
 
   // Track error response
   appInsights.client.trackRequestSync(
-      req,
-      res,
-      (Date.now() - req.insights.startTime),
-      {
-          type: err.name,
-          status: err.status || 'Unknown',
-          message: err.message,
-          stack: JSON.stringify(err.stack),
-      },
+    req,
+    res,
+    (Date.now() - req.insights.startTime),
+    {
+      type: err.name,
+      status: err.status || 'Unknown',
+      message: err.message,
+      stack: JSON.stringify(err.stack),
+    },
   );
 
   res.send(response);
 };
 
 export class AuthorizationError extends Error {
-    public status: 401;
-    public name: 'AuthorizationError';
+  public status: 401;
+  public name: 'AuthorizationError';
 
-    constructor(message?: string) {
-        super();
-        Object.setPrototypeOf(this, AuthorizationError.prototype);
+  constructor(message?: string) {
+    super();
+    Object.setPrototypeOf(this, AuthorizationError.prototype);
 
-        this.name = 'AuthorizationError';
-        this.status = 401;
-        this.message = (message || 'Unauthorized');
-    }
+    this.name = 'AuthorizationError';
+    this.status = 401;
+    this.message = (message || 'Unauthorized');
+  }
 }
 
 abstract class BadRequestError extends Error {
-    public status: 400;
+  public status: 400;
 
-    constructor(message?: string) {
-        super();
-        this.name = 'BadRequestError';
-        this.status = 400;
-        this.message = (message || '');
-    }
+  constructor(message?: string) {
+    super();
+    this.name = 'BadRequestError';
+    this.status = 400;
+    this.message = (message || '');
+  }
 }
 
 export class ValidationError extends BadRequestError {
-    public name: 'ValidationError';
+  public name: 'ValidationError';
 
-    constructor(message?: string) {
-        super(message);
-        this.name = 'ValidationError';
-        Object.setPrototypeOf(this, ValidationError.prototype)
-    }
+  constructor(message?: string) {
+    super(message);
+    this.name = 'ValidationError';
+    Object.setPrototypeOf(this, ValidationError.prototype)
+  }
 }
 
 export class ConflictError extends BadRequestError {
-    public name: 'ConflictError';
+  public name: 'ConflictError';
 
-    constructor(message?: string) {
-        super(message);
-        this.name = 'ConflictError';
-        Object.setPrototypeOf(this, ConflictError.prototype);
-    }
+  constructor(message?: string) {
+    super(message);
+    this.name = 'ConflictError';
+    Object.setPrototypeOf(this, ConflictError.prototype);
+  }
 }
 
 export class NotFoundError extends BadRequestError {
-    public name: 'NotFoundError';
+  public name: 'NotFoundError';
 
-    constructor(message?: string) {
-        super(message);
-        this.name = 'NotFoundError';
-        Object.setPrototypeOf(this, NotFoundError.prototype);
-    }
+  constructor(message?: string) {
+    super(message);
+    this.name = 'NotFoundError';
+    Object.setPrototypeOf(this, NotFoundError.prototype);
+  }
 }
