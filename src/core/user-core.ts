@@ -9,18 +9,24 @@ import * as appInsights from 'applicationinsights';
 
 export interface IUserDto {
     username: string;
-    password?: string;
+    password: string;
 };
+
+export interface IUserWithSaldo {
+  username: string;
+  groupName: string;
+  saldo: number;
+}
 
 export const SALT_ROUNDS = 6;
 
 // Get all users in group
 export async function getUsers() {
-    const results = await _getUsersWithSaldos();
+    const results: IUserWithSaldo[] = await _getUsersWithSaldos();
 
     return _.chain(results)
         .groupBy((x) => x.username)
-        .map((x, key) => _.reduce(x, (user: any, value: any) => {
+        .map((x: IUserWithSaldo[], key: string) => _.reduce(x, (user: any, value: IUserWithSaldo) => {
                 if (value.groupName) {
                     user.saldos[value.groupName] = value.saldo;
                 }

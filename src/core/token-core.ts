@@ -53,8 +53,6 @@ export async function createAdminToken(comment?: string) {
     debug('Created admin token', token);
     updateTokens(); // Inform token handler about new token
     return token;
-
-
 }
 
 export async function getTokens() {
@@ -79,9 +77,10 @@ export async function initializeTokens() {
     const token = await createGlobalToken();
     const groups = await getGroups();
 
-    await Promise.each(groups, (group: any) => {
-        return createRestrictedToken(group.name);
-    });
+    for (let group of groups) {
+      await createRestrictedToken(group.name);
+    }
+
     return await getTokens;
 };
 

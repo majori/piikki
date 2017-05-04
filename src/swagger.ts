@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Router, static as serveStatic } from 'express';
 
-export default function (cfg) {
+export default function (cfg: any) {
     const swagger = Router();
 
     // Path to swagger-ui

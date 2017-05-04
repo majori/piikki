@@ -75,7 +75,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
         appInsights.client.commonProperties = {
             token: token.token,
             token_role: token.role,
-            token_comment: token.comment,
+            token_comment: token.comment || '',
         };
 
         next();
