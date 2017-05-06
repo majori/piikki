@@ -33,7 +33,7 @@ export interface IExtendedRequest extends Request {
   };
 }
 
-export function createApp(cfg: any) {
+export async function createApp(cfg: any) {
   const app = express();
 
   // 3rd party middleware
@@ -65,12 +65,12 @@ export function createApp(cfg: any) {
   app.use('/swagger', swagger(cfg));
 
   // Register currently used tokens
-  initTokens();
+  await initTokens();
 
   // Authorize request
   app.use(handleTokens);
 
-  // Initialize routes
+  // Initialize API routes
   app.use('/api/v1', initApiRoutes());
 
   // Setup error responder

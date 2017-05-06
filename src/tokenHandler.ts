@@ -14,24 +14,22 @@ const debug = Debug('piikki:tokenHandler');
 // If environment is not production, use development token
 let registeredTokens: IDatabaseToken[] = [];
 
-export function initTokens() {
+export async function initTokens() {
 
   // Fetch tokens from database if no tokens registered
   if (_.isEmpty(registeredTokens)) {
-    getTokens()
-      .then((tokens) => {
+    const tokens = await getTokens();
         // There is no tokens in the database, make new ones
-        if (_.isEmpty(tokens)) {
-          debug('No tokens in database, creating an admin token');
+    if (_.isEmpty(tokens)) {
+      debug('No tokens in database, creating an admin token');
 
-          createAdminToken('Created on initialize')
-            .then(updateTokens);
+      await createAdminToken('Created on initialize');
 
-        } else {
-          debug('Registered tokens:', tokens);
-          updateTokens();
-        }
-      });
+    } else {
+      debug('Registered tokens:', tokens);
+    }
+
+    await updateTokens();
   }
 }
 
