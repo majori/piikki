@@ -43,7 +43,7 @@ export function createApp(cfg: any) {
 
   // Setup Application Insights
   const insights = appInsights
-    .setup(cfg.appInsightsKey)
+    .setup(cfg.appInsightsKey || 'gibberish')
     .setAutoCollectRequests(false)
     .setAutoCollectPerformance(false)
     .setAutoCollectExceptions(false)
