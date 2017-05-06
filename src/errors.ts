@@ -66,7 +66,7 @@ export class ValidationError extends BadRequestError {
   constructor(message?: string) {
     super(message);
     this.name = 'ValidationError';
-    Object.setPrototypeOf(this, ValidationError.prototype)
+    Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
 

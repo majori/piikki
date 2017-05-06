@@ -22,22 +22,22 @@ cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 // ### Database configs
 //
 let dbConnection = {
-    server: process.env.PIIKKI_DATABASE_HOSTNAME,
+  server: process.env.PIIKKI_DATABASE_HOSTNAME,
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
-    options: {
-	    port: process.env.PIIKKI_DATABASE_PORT || 1433,
-	    database: process.env.PIIKKI_DATABASE_NAME,
-        encrypt: true,
-    }
+  options: {
+    port: process.env.PIIKKI_DATABASE_PORT || 1433,
+    database: process.env.PIIKKI_DATABASE_NAME,
+    encrypt: true,
+  }
 };
 
 cfg.db = {
     client: process.env.PIIKKI_DATABASE_CLIENT || 'mssql',
     connection: dbConnection,
     migrations: {
-        disableTransactions: true,
-        tableName: 'knex_migrations',
+      disableTransactions: true,
+      tableName: 'knex_migrations',
     },
 };
 

@@ -17,7 +17,7 @@ export function initApiRoutes() {
   mainRouter.use('/admin', _adminTokenRoutes());
 
   return mainRouter;
-};
+}
 
 // These routes can be used from both gloabl and restricted routes
 function _commonRoutes() {
@@ -49,7 +49,7 @@ function _restrictedTokenRoutes() {
         ok: false,
         error: {
           type: 'AuthorizationError',
-          message: 'You tried to access restricted routes without a proper token'
+          message: 'You tried to access restricted routes without a proper token',
         },
       });
     }
@@ -80,7 +80,7 @@ function _globalTokenRoutes() {
         ok: false,
         error: {
           type: 'AuthorizationError',
-          message: 'You tried to access global routes without a proper token'
+          message: 'You tried to access global routes without a proper token',
         },
       });
     }

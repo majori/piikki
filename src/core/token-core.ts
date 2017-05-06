@@ -21,14 +21,13 @@ export async function createRestrictedToken(groupName: string, comment?: string)
 
   await knex
     .from('token_group_access')
-    .insert({ 'token_id': id[0], 'group_id': group.id });
-
+    .insert({ token_id: id[0], group_id: group.id });
 
   debug('Created restricted token', token);
   updateTokens(); // Inform token handler about new token
 
   return token;
-};
+}
 
 export async function createGlobalToken(comment?: string) {
   const token = await _generateBase64Token();
@@ -77,12 +76,12 @@ export async function initializeTokens() {
   const token = await createGlobalToken();
   const groups = await getGroups();
 
-  for (let group of groups) {
+  for (const group of groups) {
     await createRestrictedToken(group.name);
   }
 
   return await getTokens;
-};
+}
 
 function _getTokens(): QueryBuilder {
   return knex

@@ -33,7 +33,7 @@ export function initTokens() {
         }
       });
   }
-};
+}
 
 // Authorize request by token found in "Authorization" header
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
@@ -93,7 +93,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
     throw new AuthorizationError();
   }
-};
+}
 
 // Fetch current tokens from database
 export function updateTokens() {
@@ -101,4 +101,4 @@ export function updateTokens() {
     .then((tokens) => {
       registeredTokens = tokens;
     });
-};
+}

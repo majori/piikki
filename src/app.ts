@@ -77,4 +77,4 @@ export function createApp(cfg: any) {
   app.use(errorResponder);
 
   return app;
-};
+}

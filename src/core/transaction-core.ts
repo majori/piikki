@@ -9,13 +9,21 @@ interface IFilter {
   'groups.name'?: string;
 }
 
-export async function makeTransaction(username: string, groupName: string, amount: number, tokenId: number, comment?: string) {
-  const userSaldo = await userHaveSaldo(username, groupName);
+interface ITransaction {
+  username: string;
+  groupName: string;
+  amount: number;
+  tokenId: number;
+  comment?: string;
+}
+
+export async function makeTransaction(newTrx: ITransaction) {
+  const userSaldo = await userHaveSaldo(newTrx.username, newTrx.groupName);
 
   let newSaldo;
   await knex.transaction(async (trx) => {
     try {
-      newSaldo = _.round(userSaldo.saldo + amount, 2);
+      newSaldo = _.round(userSaldo.saldo + newTrx.amount, 2);
 
       await trx
         .table('user_saldos')
@@ -28,14 +36,14 @@ export async function makeTransaction(username: string, groupName: string, amoun
         old_saldo: userSaldo.saldo,
         group_id: userSaldo.group_id,
         user_id: userSaldo.user_id,
-        token_id: tokenId,
+        token_id: newTrx.tokenId,
       };
 
       await trx
         .table('transactions')
         .insert(
-        _.isString(comment) ?
-          _.assign(transaction, { comment }) :
+        _.isString(newTrx.comment) ?
+          _.assign(transaction, { comment: newTrx.comment }) :
           transaction,
       )
         .transacting(trx);
@@ -47,8 +55,8 @@ export async function makeTransaction(username: string, groupName: string, amoun
     }
   });
 
-  return { username, saldo: newSaldo };
-};
+  return { username: newTrx.username, saldo: newSaldo };
+}
 
 export async function userHaveSaldo(username: string, groupName: string) {
   const row = knex
@@ -64,22 +72,22 @@ export async function userHaveSaldo(username: string, groupName: string) {
   } else {
     throw new NotFoundError(`User ${username} has no saldo in group ${groupName}`);
   }
-};
+}
 
 // Get user's all transactions
 export async function getUserTransactions(username: string, sinceTimestamp?: moment.Moment) {
   return _getTransactions({ 'users.username': username }, sinceTimestamp);
-};
+}
 
 // Get all group's member transactions
 export async function getGroupTransactions(groupName: string, sinceTimestamp?: moment.Moment) {
   return _getTransactions({ 'groups.name': groupName }, sinceTimestamp);
-};
+}
 
 // Get transactions of the single member in group
-export async function getUserTransactionsFromGroup(username: string, groupName: string, sinceTimestamp?: moment.Moment) {
-  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceTimestamp);
-};
+export async function getUserTransactionsFromGroup(username: string, groupName: string, sinceDate?: moment.Moment) {
+  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceDate);
+}
 
 function _getTransactions(filterObject: IFilter, filterTimestamp?: moment.Moment) {
   const query = knex
@@ -100,9 +108,9 @@ function _getTransactions(filterObject: IFilter, filterTimestamp?: moment.Moment
     query.where(
       'transactions.timestamp',
       '>',
-      filterTimestamp.format('YYYY-MM-DD HH:mm:ss.SSS')
+      filterTimestamp.format('YYYY-MM-DD HH:mm:ss.SSS'),
     );
   }
 
   return query;
-};
+}

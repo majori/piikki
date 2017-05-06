@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Router, static as serveStatic } from 'express';
 
-export default function (cfg: any) {
+export default function(cfg: any) {
   const swagger = Router();
 
   // Path to swagger-ui
@@ -17,7 +17,7 @@ export default function (cfg: any) {
   swagger.use('/ui', serveStatic(dist));
   swagger.get('/ui', (req, res) => {
     res.sendFile(path.join(dist, 'index.html'));
-  })
+  });
 
   return swagger;
 }

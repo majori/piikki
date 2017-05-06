@@ -10,7 +10,7 @@ import * as appInsights from 'applicationinsights';
 export interface IUserDto {
   username: string;
   password: string;
-};
+}
 
 export interface IUserWithSaldo {
   username: string;
@@ -35,10 +35,10 @@ export async function getUsers() {
       {
         username: key,
         saldos: {},
-      })
+      }),
     )
     .value();
-};
+}
 
 // Get user info and saldo in each group
 export async function getUser(username: string) {
@@ -49,7 +49,7 @@ export async function getUser(username: string) {
   // Fetch possible saldos in groups
   const results = await _getUsersWithSaldos().andWhere({ 'users.username': username });
   // There was no saldos, return only user info
-  if (_.isEmpty(results)) { return user; };
+  if (_.isEmpty(results)) { return user; }
 
   // Parse database rows to saldos object
   return _.reduce(results, (result: any, value: any) => {
@@ -58,7 +58,7 @@ export async function getUser(username: string) {
     }
     return result;
   }, user);
-};
+}
 
 // Create new user
 export async function createUser(user: IUserDto) {
@@ -76,7 +76,7 @@ export async function createUser(user: IUserDto) {
 
   appInsights.client.trackEvent('User create', { username: user.username });
   return user.username;
-};
+}
 
 // Puts user's "active" -status to false
 export async function deleteUser(username: string) {
@@ -89,7 +89,7 @@ export async function authenticateUser(user: IUserDto) {
   const row = await userExists(user.username);
 
   return await bcrypt.compare(user.password, row.password);
-};
+}
 
 // Checks if user is in database
 export async function userExists(username: string) {
@@ -100,7 +100,7 @@ export async function userExists(username: string) {
   } else {
     throw new NotFoundError(`User ${username} not found`);
   }
-};
+}
 
 export async function userNotExists(username: string) {
   try {
@@ -126,10 +126,10 @@ export async function resetPassword(user: IUserDto, newPassword: string) {
   await knex
     .from('users')
     .where({ username: user.username })
-    .update({ password: hash })
+    .update({ password: hash });
 
   return;
-};
+}
 
 // This function doesn't require old password.
 // Currently only admin can use
@@ -139,7 +139,7 @@ export async function forceResetPassword(username: string, password: string) {
   await knex
     .from('users')
     .where({ username })
-    .update({ password: hash })
+    .update({ password: hash });
 
   return;
 }
@@ -153,7 +153,7 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
     .update({ username: newUsername });
 
   return { username: newUsername };
-};
+}
 
 // Get all users in group
 export function _getUsersWithSaldos(): QueryBuilder {
@@ -163,7 +163,7 @@ export function _getUsersWithSaldos(): QueryBuilder {
     .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })
     .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
     .where({ 'users.active': true });
-};
+}
 
 async function _hashPassword(password: string) {
   return bcrypt.hash(password, SALT_ROUNDS);
