@@ -39,6 +39,9 @@ cfg.db = {
       disableTransactions: true,
       tableName: 'knex_migrations',
     },
+    seeds: {
+      directory: './seeds/development'
+    }
 };
 
 module.exports = cfg;
