@@ -1,8 +1,5 @@
-import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
-
-import { IExtendedRequest } from '../app';
 
 import * as transCore from '../core/transaction-core';
 import {
@@ -13,12 +10,8 @@ import {
   validateTimestamp,
 } from './endpoint-utils';
 
-interface ITransactionDto {
-  username: string;
-  amount: number;
-  groupName: string;
-  comment: string;
-}
+import { IExtendedRequest } from '../models/http';
+import { ITransactionDto } from '../models/transaction';
 
 const _endpoint = {
   makeTransaction: async (req: IExtendedRequest) => {

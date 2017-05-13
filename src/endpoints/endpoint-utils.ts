@@ -3,11 +3,10 @@ import * as moment from 'moment';
 import appInsights = require('applicationinsights');
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { IExtendedRequest } from '../app';
-import { IUserDto } from '../core/user-core';
 import { ValidationError } from '../errors';
 
-type EndpointFunction = (req: IExtendedRequest, res: Response) => Promise<any>;
+import { IExtendedRequest, EndpointFunction } from '../models/http';
+import { IUserDto } from '../models/user';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler

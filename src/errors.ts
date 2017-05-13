@@ -2,7 +2,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { STATUS_CODES } from 'http';
-import { IExtendedRequest } from './app';
+import { IExtendedRequest } from './models/http';
 import * as appInsights from 'applicationinsights';
 
 export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {

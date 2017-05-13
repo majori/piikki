@@ -1,11 +1,13 @@
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import * as Debug from 'debug';
-import { QueryBuilder } from 'knex';
 
-import { knex, IDatabaseGroup } from '../database';
+import { knex } from '../database';
 import { groupExists, getGroups } from './group-core';
 import { updateTokens } from '../tokenHandler';
+
+import { QueryBuilder } from 'knex';
+import { IDatabaseGroup } from '../models/database';
 
 const debug = Debug('piikki:token-core');
 

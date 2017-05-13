@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import * as Debug from 'debug';
 
-import { IExtendedRequest } from './app';
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
 import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
+
+import { IExtendedRequest } from './models/http';
 
 const debug = Debug('piikki:router');
 

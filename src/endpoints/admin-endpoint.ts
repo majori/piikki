@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 
-import { IExtendedRequest } from '../app';
 import * as tokenCore from '../core/token-core';
 import { createJsonRoute, validateGroupName } from './endpoint-utils';
+
+import { IExtendedRequest } from '../models/http';
 
 const _endpoint = {
   createGlobalToken: async (req: IExtendedRequest) => {

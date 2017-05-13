@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
-import { IExtendedRequest } from '../app';
 import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
-import { IDatabaseGroup, IDatabaseUser } from '../database';
 import { createJsonRoute, validateGroupName, validateUsername } from './endpoint-utils';
+
+import { IDatabaseGroup, IDatabaseUser } from '../models/database';
+import { IExtendedRequest } from '../models/http';
 
 const _endpoint = {
   createGroup: async (req: IExtendedRequest) => {

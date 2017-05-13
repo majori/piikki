@@ -1,13 +1,14 @@
-import { Response, NextFunction } from 'express';
 import * as _ from 'lodash';
 import * as Debug from 'debug';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
 import appInsights = require('applicationinsights');
-import { IExtendedRequest } from './app';
 import { getTokens, createAdminToken } from './core/token-core';
 import { AuthorizationError } from './errors';
-import { IDatabaseToken } from './database';
+
+import { Response, NextFunction } from 'express';
+import { IExtendedRequest } from './models/http';
+import { IDatabaseToken } from './models/database';
 
 const debug = Debug('piikki:tokenHandler');
 

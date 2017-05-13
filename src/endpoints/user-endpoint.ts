@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
-import { NextFunction, Response } from 'express';
-import { IExtendedRequest } from '../app';
 
 import * as userCore from '../core/user-core';
 import { ConflictError } from '../errors';
 import { createJsonRoute, validateUser, validateUsername, validateGroupName, validatePassword } from './endpoint-utils';
+
+import { IExtendedRequest } from '../models/http';
+import { IUserDto } from '../models/user';
 
 const _endpoint = {
 
@@ -38,7 +39,7 @@ const _endpoint = {
   },
 
   resetPassword: async (req: IExtendedRequest) => {
-    const user: userCore.IUserDto = validateUser({
+    const user: IUserDto = validateUser({
       username: req.body.username,
       password: req.body.oldPassword,
     });

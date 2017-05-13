@@ -3,20 +3,12 @@ import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 
 import { ConflictError, NotFoundError } from '../errors';
-import { knex, IDatabaseUser, IDatabaseGroup } from '../database';
+import { knex} from '../database';
 import { groupExists } from './group-core';
 import * as appInsights from 'applicationinsights';
 
-export interface IUserDto {
-  username: string;
-  password: string;
-}
-
-export interface IUserWithSaldo {
-  username: string;
-  groupName: string;
-  saldo: number;
-}
+import { IDatabaseUser, IDatabaseGroup } from '../models/database';
+import { IUserDto, IUserWithSaldo } from '../models/user';
 
 export const SALT_ROUNDS = 6;
 

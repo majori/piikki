@@ -5,7 +5,9 @@ import * as appInsights from 'applicationinsights';
 import { ConflictError, NotFoundError } from '../errors';
 import { userExists } from './user-core';
 import { createRestrictedToken } from './token-core';
-import { knex, IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo } from '../database';
+import { knex } from '../database';
+
+import { IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo  } from '../models/database';
 
 export async function createGroup(groupName: string) {
   const records: IDatabaseGroup[] = await knex.from('groups').where({ name: groupName });

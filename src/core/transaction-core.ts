@@ -3,21 +3,10 @@ import * as moment from 'moment';
 
 import { NotFoundError } from '../errors';
 import { knex } from '../database';
+import { IDatabaseTransaction } from '../models/database';
+import { ITransactionDto, ITransactionFilter } from '../models/transaction';
 
-interface IFilter {
-  'users.username'?: string;
-  'groups.name'?: string;
-}
-
-interface ITransaction {
-  username: string;
-  groupName: string;
-  amount: number;
-  tokenId: number;
-  comment?: string;
-}
-
-export async function makeTransaction(newTrx: ITransaction) {
+export async function makeTransaction(newTrx: ITransactionDto) {
   const userSaldo = await userHaveSaldo(newTrx.username, newTrx.groupName);
 
   let newSaldo;
