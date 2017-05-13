@@ -78,19 +78,20 @@ export async function getUserTransactionsFromGroup(username: string, groupName: 
   return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceDate);
 }
 
-function _getTransactions(filterObject: IFilter, filterTimestamp?: moment.Moment) {
+async function _getTransactions(filterObject: ITransactionFilter, filterTimestamp?: moment.Moment) {
   const query = knex
     .from('transactions')
     .select(
-    'users.username',
-    'groups.name AS groupName',
-    'transactions.timestamp',
-    'transactions.old_saldo AS oldSaldo',
-    'transactions.new_saldo AS newSaldo',
-    'transactions.comment',
-  )
+      'users.username',
+      'groups.name AS groupName',
+      'transactions.timestamp',
+      'transactions.old_saldo AS oldSaldo',
+      'transactions.new_saldo AS newSaldo',
+      'transactions.comment',
+    )
     .join('users', { 'users.id': 'transactions.user_id' })
     .join('groups', { 'groups.id': 'transactions.group_id' })
+    .orderBy('transactions.timestamp', 'desc')
     .where(filterObject);
 
   if (filterTimestamp) {
@@ -101,5 +102,8 @@ function _getTransactions(filterObject: IFilter, filterTimestamp?: moment.Moment
     );
   }
 
-  return query;
+  const results: IDatabaseTransaction[] = await query;
+
+  // Omit comment field if it is null
+  return _.map(results, (row) => (row.comment) ? row : _.omit(row, ['comment']));
 }
