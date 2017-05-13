@@ -8,7 +8,7 @@
     "start:watch": "nodemon --delay 1 --inspect=5858 build/index.js",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
-    "build": "tsc",
+    "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
     "dev": "concurrently \"npm run build:watch\" \"npm run start:watch\"",
     "test": "mocha test/**/*_spec.js"
