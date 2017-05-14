@@ -5,10 +5,10 @@ export default function(cfg: any) {
   const swagger = Router();
 
   // Path to swagger-ui
-  const dist = path.join(__dirname, '..', 'lib', 'swagger-ui');
+  const dist = path.join(cfg.dir.library, 'swagger-ui');
 
   // Path to documents
-  const docs = path.join(__dirname, '..', 'docs');
+  const docs = cfg.dir.documents;
 
   swagger.get('/api-docs.json', (req, res) => {
     res.sendFile(path.join(docs, 'api-docs.json'));

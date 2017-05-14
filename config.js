@@ -3,9 +3,13 @@ const path = require('path');
 
 let cfg = {};
 
-cfg.buildDir = `${__dirname}/build`;
-cfg.sourceDir = `${__dirname}/src`;
-cfg.migrationDir = `${__dirname}/migrations`;
+cfg.dir = {
+  source: path.join(__dirname, 'src'),
+  build: path.join(__dirname, 'build'),
+  migrations: path.join(__dirname, 'migrations'),
+  library: path.join(__dirname, 'lib'),
+  documents: path.join(__dirname, 'docs'),
+};
 
 // ## Environment configs
 //
