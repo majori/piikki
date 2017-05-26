@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "start:watch": "nodemon --delay 1 --inspect=5858 build/index.js",
+    "start:watch": "env-cmd ./.env.local nodemon --delay 1 --inspect=5858 build/index.js",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
     "build": "tsc --listEmittedFiles",
@@ -53,6 +53,7 @@
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",
     "debug": "^2.3.3",
+    "env-cmd": "^5.1.0",
     "express": "^4.15.2",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
