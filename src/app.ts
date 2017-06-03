@@ -3,6 +3,7 @@ import * as errorHandler from 'errorhandler';
 import * as express from 'express';
 import * as methodOverride from 'method-override';
 import * as appInsights from 'applicationinsights';
+import * as cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 
 import { handleTokens, initTokens } from './tokenHandler';
@@ -20,6 +21,7 @@ export async function createApp(cfg: any) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(methodOverride());
+  app.options('*', cors());
 
   // Setup Application Insights
   const insights = appInsights
