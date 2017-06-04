@@ -21,6 +21,7 @@ export async function createApp(cfg: any) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(methodOverride());
+  app.use(cors());
   app.options('*', cors());
 
   // Setup Application Insights
