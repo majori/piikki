@@ -112,10 +112,10 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   popd
 )
 
-:: 4. Run Gulp task
+:: 4. Compile Typescript
 IF EXIST "%DEPLOYMENT_TARGET%\tsconfig.json" (
  pushd "%DEPLOYMENT_TARGET%"
- call .\node_modules\.bin\tsc
+ call :ExecuteCmd !NPM_CMD! run build
  IF !ERRORLEVEL! NEQ 0 goto error
  popd
 )

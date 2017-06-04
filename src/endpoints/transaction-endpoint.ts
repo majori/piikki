@@ -1,63 +1,60 @@
-import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
 
-import { IExtendedRequest } from '../app';
-
 import * as transCore from '../core/transaction-core';
 import {
-    createJsonRoute,
-    validateTransactionAmount,
-    validateGroupName,
-    validateUsername,
-    validateTimestamp,
+  createJsonRoute,
+  validateTransactionAmount,
+  validateGroupName,
+  validateUsername,
+  validateTimestamp,
 } from './endpoint-utils';
 
-interface ITransactionDto {
-    username: string;
-    amount: number;
-    groupName: string;
-    comment: string;
-}
+import { IExtendedRequest } from '../models/http';
+import { ITransactionDto } from '../models/transaction';
 
 const _endpoint = {
-    makeTransaction: async (req: IExtendedRequest) => {
-        let transactions = req.body;
+  makeTransaction: async (req: IExtendedRequest) => {
+    let transactions = req.body;
 
-        // Allow body to have one or multiple transactions
-        if (!_.isArray(transactions) && _.isObject(transactions)) {
-            transactions = [ transactions ];
-        }
+    // Allow body to have one or multiple transactions
+    if (!_.isArray(transactions) && _.isObject(transactions)) {
+      transactions = [transactions];
+    }
 
-        // TODO: If only one transaction fails, tell about the succeed ones
-        return Promise.all(_.map(transactions, (trx: ITransactionDto) => {
+    // TODO: If only one transaction fails, tell about the succeed ones
+    return Promise.all(_.map(transactions, (trx: ITransactionDto) => {
 
-            // If request comes from group specific token, use token related group name
-            trx.groupName = (req.piikki.groupAccess.group.name) ?
-                req.piikki.groupAccess.group.name :
-                trx.groupName;
+      // If request comes from group specific token, use token related group name
+      trx.groupName = (req.piikki.groupAccess.group.name) ?
+        req.piikki.groupAccess.group.name :
+        trx.groupName;
 
-            const username = validateUsername(trx.username);
-            const amount = validateTransactionAmount(trx.amount);
-            const groupName = validateGroupName(trx.groupName);
+      const transaction = {
+        username: validateUsername(trx.username),
+        amount: validateTransactionAmount(trx.amount),
+        groupName: validateGroupName(trx.groupName),
+        comment: trx.comment,
+        tokenId: req.piikki.token.id,
+      };
 
-            return transCore.makeTransaction(username, groupName, amount, req.piikki.token.id, trx.comment);
-        }));
-    },
+      return transCore.makeTransaction(transaction);
+    }));
+  },
 
-    getUserTransactions: async (req: IExtendedRequest) => {
-        const username = validateUsername(req.params.username);
-        const timestamp = validateTimestamp(req.query.timestamp);
+  getUserTransactions: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.params.username);
+    const timestamp = validateTimestamp(req.query.timestamp);
 
-        return transCore.getUserTransactions(username, timestamp);
-    },
+    return transCore.getUserTransactions(username, timestamp);
+  },
 
-    getGroupTransactions: async (req: IExtendedRequest) => {
-        const groupName = validateGroupName(req.params.groupName);
-        const timestamp = validateTimestamp(req.query.timestamp);
+  getGroupTransactions: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(req.params.groupName);
+    const timestamp = validateTimestamp(req.query.timestamp);
 
-        return transCore.getGroupTransactions(groupName, timestamp);
-    },
+    return transCore.getGroupTransactions(groupName, timestamp);
+  },
 };
 
 // Wrap endpoint to produce JSON route

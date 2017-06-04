@@ -3,9 +3,13 @@ const path = require('path');
 
 let cfg = {};
 
-cfg.buildDir = `${__dirname}/build`;
-cfg.sourceDir = `${__dirname}/src`;
-cfg.migrationDir = `${__dirname}/migrations`;
+cfg.dir = {
+  source: path.join(__dirname, 'src'),
+  build: path.join(__dirname, 'build'),
+  migrations: path.join(__dirname, 'migrations'),
+  library: path.join(__dirname, 'lib'),
+  documents: path.join(__dirname, 'docs'),
+};
 
 // ## Environment configs
 //
@@ -22,23 +26,26 @@ cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 // ### Database configs
 //
 let dbConnection = {
-    server: process.env.PIIKKI_DATABASE_HOSTNAME,
+  server: process.env.PIIKKI_DATABASE_HOSTNAME,
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
-    options: {
-	    port: process.env.PIIKKI_DATABASE_PORT || 1433,
-	    database: process.env.PIIKKI_DATABASE_NAME,
-        encrypt: true,
-    }
+  options: {
+    port: process.env.PIIKKI_DATABASE_PORT || 1433,
+    database: process.env.PIIKKI_DATABASE_NAME,
+    encrypt: true,
+  }
 };
 
 cfg.db = {
     client: process.env.PIIKKI_DATABASE_CLIENT || 'mssql',
     connection: dbConnection,
     migrations: {
-        disableTransactions: true,
-        tableName: 'knex_migrations',
+      disableTransactions: true,
+      tableName: 'knex_migrations',
     },
+    seeds: {
+      directory: './seeds/development'
+    }
 };
 
 module.exports = cfg;

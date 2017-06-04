@@ -1,51 +1,51 @@
-import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
-import { IExtendedRequest } from '../app';
 import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
-import { IDatabaseGroup, IDatabaseUser } from '../database';
-import { createJsonRoute, validateGroupName, validateUsername} from './endpoint-utils';
+import { createJsonRoute, validateGroupName, validateUsername } from './endpoint-utils';
+
+import { IDatabaseGroup, IDatabaseUser } from '../models/database';
+import { IExtendedRequest } from '../models/http';
 
 const _endpoint = {
-    createGroup: async (req: IExtendedRequest) => {
-        const groupName = validateGroupName(req.body.groupName);
+  createGroup: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(req.body.groupName);
 
-        return groupCore.createGroup(groupName);
-    },
+    return groupCore.createGroup(groupName);
+  },
 
-    addMember: async (req: IExtendedRequest) => {
-        const username = validateUsername(req.body.username);
-        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+  addMember: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.body.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        return groupCore.addUserToGroup(username, groupName);
-    },
+    return groupCore.addUserToGroup(username, groupName);
+  },
 
-    removeMember: async (req: IExtendedRequest) => {
-        const username = validateUsername(req.body.username);
-        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+  removeMember: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.body.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        return groupCore.removeUserFromGroup(username, groupName);
-    },
+    return groupCore.removeUserFromGroup(username, groupName);
+  },
 
-    getGroups: async (req: IExtendedRequest) => {
-        return groupCore.getGroups();
-    },
+  getGroups: async (req: IExtendedRequest) => {
+    return groupCore.getGroups();
+  },
 
-    getGroupMembers: async (req: IExtendedRequest) => {
-        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-        await groupCore.groupExists(groupName);
+  getGroupMembers: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    await groupCore.groupExists(groupName);
 
-        return groupCore.getUsersFromGroup(groupName);
-    },
+    return groupCore.getUsersFromGroup(groupName);
+  },
 
-    getGroupMember: async (req: IExtendedRequest) => {
-        const username = validateUsername(req.params.username);
-        const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+  getGroupMember: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
 
-        const result = await groupCore.userIsInGroup(username, groupName);
-        return groupCore.getUserFromGroup(result.group.name, result.user.username);
-    },
+    const result = await groupCore.userIsInGroup(username, groupName);
+    return groupCore.getUserFromGroup(result.group.name, result.user.username);
+  },
 };
 
 // Wrap endpoint to produce JSON route
