@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "start:dev": "env-cmd ./.env.local.json nodemon --delay 1 --inspect=5858 build/index.js",
+    "start:dev": "env-cmd ./.env.local.js nodemon --delay 1 --inspect=5858 build/index.js",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
     "build": "tsc --listEmittedFiles",
