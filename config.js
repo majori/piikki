@@ -23,6 +23,8 @@ cfg.appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 cfg.hostname = process.env.PIIKKI_HTTP_HOSTNAME || 'localhost';
 cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 
+cfg.cors = {};
+
 // ### Database configs
 //
 let dbConnection = {
