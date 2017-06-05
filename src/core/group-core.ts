@@ -80,6 +80,12 @@ export function getGroups(): QueryBuilder {
     .select('name');
 }
 
+export function getGroup(groupName: string): QueryBuilder {
+  return getGroups()
+    .where({ name: groupName })
+    .first();
+}
+
 export async function addUserToGroup(username: string, groupName: string) {
   const result = await userIsNotInGroup(username, groupName);
 

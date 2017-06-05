@@ -59,6 +59,7 @@ function _restrictedTokenRoutes() {
   // Apply common routes
   restrictedR.use(_commonRoutes());
 
+  restrictedR.get('/getMe', groupEndpoint.getCurrentGroup);
   restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
