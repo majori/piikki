@@ -53,8 +53,6 @@ const _endpoint = {
     if (groupName) {
       return groupCore.getGroup(groupName);
     }
-
-    return;
   },
 };
 

@@ -64,6 +64,9 @@ function _restrictedTokenRoutes() {
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
+  restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
+  restrictedR.get('/group/transactions/:username', transactionEndpoint.getUserTransactionsFromGroup);
+  restrictedR.get('/group/saldo', transactionEndpoint.getGroupSaldo);
 
   return restrictedR;
 }

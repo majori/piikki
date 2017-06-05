@@ -35,7 +35,7 @@
     "@types/debug": "0.0.29",
     "@types/errorhandler": "0.0.30",
     "@types/express": "^4.0.34",
-    "@types/knex": "0.0.35",
+    "@types/knex": "0.0.53",
     "@types/lodash": "^4.14.63",
     "@types/method-override": "0.0.29",
     "@types/node": "^6.0.48",

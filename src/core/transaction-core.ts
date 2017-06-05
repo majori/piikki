@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { QueryBuilder } from 'knex';
 
 import { NotFoundError } from '../errors';
 import { knex } from '../database';
@@ -76,6 +77,28 @@ export async function getGroupTransactions(groupName: string, sinceTimestamp?: m
 // Get transactions of the single member in group
 export async function getUserTransactionsFromGroup(username: string, groupName: string, sinceDate?: moment.Moment) {
   return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceDate);
+}
+
+export async function getGroupSaldo(groupName: string, date: moment.Moment) {
+  return knex
+    .with('T1', (qb: QueryBuilder) => {
+      qb
+        .select('user_id')
+        .max('timestamp as latest_transaction')
+        .from('transactions')
+        .innerJoin('groups', 'transactions.group_id', 'groups.id')
+        .where('timestamp', '<', date.format('YYYY-MM-DD'))
+        .andWhere('groups.name', '=', groupName)
+        .groupBy('user_id');
+    })
+    .sum('new_saldo as saldo')
+    .from('T1')
+    .innerJoin('transactions', (qb: QueryBuilder) => {
+      qb
+        .on('T1.user_id', '=', 'transactions.user_id')
+        .andOn('T1.latest_transaction', '=', 'transactions.timestamp');
+    })
+    .first();
 }
 
 async function _getTransactions(filterObject: ITransactionFilter, filterTimestamp?: moment.Moment) {

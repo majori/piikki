@@ -13,6 +13,8 @@ import {
 import { IExtendedRequest } from '../models/http';
 import { ITransactionDto } from '../models/transaction';
 
+import { ValidationError } from '../errors';
+
 const _endpoint = {
   makeTransaction: async (req: IExtendedRequest) => {
     let transactions = req.body;
@@ -50,10 +52,40 @@ const _endpoint = {
   },
 
   getGroupTransactions: async (req: IExtendedRequest) => {
-    const groupName = validateGroupName(req.params.groupName);
+    const groupName = validateGroupName(
+      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
+    );
     const timestamp = validateTimestamp(req.query.timestamp);
 
     return transCore.getGroupTransactions(groupName, timestamp);
+  },
+
+  getUserTransactionsFromGroup: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(
+      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
+    );
+    const timestamp = validateTimestamp(req.query.timestamp);
+
+    return transCore.getUserTransactionsFromGroup(username, groupName, timestamp);
+  },
+
+  getGroupSaldo: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(
+      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
+    );
+    const timestamp = validateTimestamp(req.query.timestamp);
+
+    if (timestamp) {
+      const response = await transCore.getGroupSaldo(groupName, timestamp);
+
+      response.groupName = groupName;
+      response.saldo = _.defaultTo(response.saldo, 0); // In case of null, default to 0
+
+      return response;
+    } else {
+      throw new ValidationError(`Timestamp "${timestamp}" is invalid`);
+    }
   },
 };
 
