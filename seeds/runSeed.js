@@ -96,7 +96,7 @@ module.exports = (knex, Promise, data) => {
     .then(() => knex.raw(_.join(
       [
         'SET IDENTITY_INSERT transactions ON;',
-        'INSERT INTO transactions (id, user_id, group_id, token_id, old_saldo, new_saldo) VALUES ',
+        'INSERT INTO transactions (id, user_id, group_id, token_id, timestamp, old_saldo, new_saldo) VALUES ',
         _.chain(data.transactions)
           .map((transaction, i) =>
             `(
@@ -104,6 +104,7 @@ module.exports = (knex, Promise, data) => {
               ${_.findIndex(data.users, ['username', transaction.username])},
               ${_.findIndex(data.groups, ['groupName', transaction.groupName])},
               ${_.findIndex(data.tokens, ['token', transaction.token])},
+              CAST(N'${transaction.timestamp}' AS DateTime),
               ${transaction.oldSaldo},
               ${transaction.newSaldo}
             )`

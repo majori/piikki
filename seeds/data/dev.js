@@ -53,7 +53,7 @@ const transactions = _.map(userSaldos, saldo => ({
   username: saldo.username,
   groupName: saldo.groupName,
   token: tokens[_.random(1)].token,
-  timestamp: moment().subtract(_.random(15), 'days').format('YYYY-MM-DD HH:mm:ss.SSS'),
+  timestamp: moment().subtract(_.random(15), 'days').format('YYYY-MM-DD HH:mm:ss'),
   oldSaldo: 0,
   newSaldo: saldo.saldo
 }));
