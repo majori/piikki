@@ -4,4 +4,4 @@ build/
 .vs/
 
 npm-debug.log.*
-.env.local.json
+.env.local.js
