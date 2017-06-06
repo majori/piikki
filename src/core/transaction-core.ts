@@ -105,11 +105,12 @@ export async function getGroupSaldo(groupName: string, from: moment.Moment): Pro
     .first();
 }
 
+// Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
 export async function getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to: moment.Moment) {
   return knex
     .select(
       'timestamp',
-      knex.raw('SUM(new_saldo - old_saldo) as saldochange'),
+      knex.raw('SUM(new_saldo - old_saldo) as saldo_change'),
     )
     .from('transactions')
     .join('groups', { 'groups.id': 'transactions.group_id'})
@@ -119,21 +120,27 @@ export async function getDeltaDailyGroupSaldosSince(groupName: string, from: mom
     .groupBy('transactions.timestamp');
 }
 
+// Get absolute saldo for each day between [from] -> [to]
 export async function getDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
   const toMoment = to ? to : moment();
+
+  // Calculate absolute saldo of the first day
   const startSaldo = (await getGroupSaldo(groupName, from)).saldo || 0;
+
+  // How much change happened in each day
   const deltaSaldos = _.chain(await getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
     .map((transaction: any) => _.update(transaction, 'timestamp', (x: string) => moment(x)))
     .groupBy((transaction: any) => transaction.timestamp.format(DATE_FORMAT))
     .mapValues((transactions: any) =>
-      _.reduce(transactions, (total, transaction: any) => total + transaction.saldochange, 0),
+      _.reduce(transactions, (total, transaction: any) => total + transaction.saldo_change, 0),
     )
     .value();
 
   const time = moment(from).add(1, 'day');
-  const saldos = [{ timestamp: from.format(DATE_FORMAT), saldo: startSaldo }];
+  const saldos = [{ timestamp: from.format(DATE_FORMAT), saldo: startSaldo }]; // Init the first day with saldo
   let currentSaldo = startSaldo;
 
+  // Loop over each day until [to] date is passed
   while (time.isBefore(toMoment.endOf('day'))) {
     currentSaldo = currentSaldo + (deltaSaldos[time.format(DATE_FORMAT)] || 0);
 
