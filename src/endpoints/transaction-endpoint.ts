@@ -76,17 +76,22 @@ const _endpoint = {
     );
     const timestamp = validateTimestamp(req.query.timestamp);
 
-    if (timestamp) {
-      const response = await transCore.getGroupSaldo(groupName, timestamp);
+    const result = await transCore.getGroupSaldo(groupName, timestamp);
 
-      response.groupName = groupName;
-      response.saldo = _.defaultTo(response.saldo, 0); // In case of null, default to 0
-
-      return response;
-    } else {
-      throw new ValidationError(`Timestamp "${timestamp}" is invalid`);
-    }
+    return {
+      groupName,
+      saldo: result.saldo || 0,
+    };
   },
+
+  getDailyGroupSaldos: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(
+      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
+    );
+    const timestamp = validateTimestamp(req.query.timestamp);
+
+    return transCore.getDailyGroupSaldosSince(groupName, timestamp);
+  }
 };
 
 // Wrap endpoint to produce JSON route

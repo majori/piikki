@@ -67,6 +67,7 @@ function _restrictedTokenRoutes() {
   restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
   restrictedR.get('/group/transactions/:username', transactionEndpoint.getUserTransactionsFromGroup);
   restrictedR.get('/group/saldo', transactionEndpoint.getGroupSaldo);
+  restrictedR.get('/group/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
 
   return restrictedR;
 }
@@ -110,6 +111,8 @@ function _globalTokenRoutes() {
   globalR.get('/groups/:groupName/members', groupEndpoint.getGroupMembers);
   globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
   globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
+  globalR.get('/group/:groupName/saldo', transactionEndpoint.getGroupSaldo);
+  globalR.get('/group/:groupName/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
   globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
   globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
   globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
