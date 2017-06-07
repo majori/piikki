@@ -145,7 +145,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
     currentSaldo = currentSaldo + (deltaSaldos[time.format(DATE_FORMAT)] || 0);
 
     saldos.push({
-      timestamp: time.format(DATE_FORMAT),
+      timestamp: time.startOf('day').format(),
       saldo: currentSaldo,
     });
     time.add(1, 'day');
