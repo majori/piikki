@@ -137,7 +137,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
     .value();
 
   const time = moment(from).add(1, 'day');
-  const saldos = [{ timestamp: from.format(DATE_FORMAT), saldo: startSaldo }]; // Init the first day with saldo
+  const saldos = [{ timestamp: from.startOf('day').format(), saldo: startSaldo }]; // Init the first day with saldo
   let currentSaldo = startSaldo;
 
   // Loop over each day until [to] date is passed
