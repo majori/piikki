@@ -2,25 +2,25 @@ const faker = require('faker');
 const _ = require('lodash');
 const moment = require('moment');
 
-const USER_AMOUNT = 80;
+const USER_AMOUNT = 100;
 
-const users = _.times(USER_AMOUNT, () => ({
-  username: faker.internet.userName(),
+const users = _.times(USER_AMOUNT, (i) => ({
+  username: `user${i}`,
   password: '1234'
 }));
 
 const groups = _.times(5, (i) => ({ groupName: `group${i}` }));
 
 const userSaldos = _.concat(
-  _.times(_.round(USER_AMOUNT * 0.6), () => ({
-    username: _.sample(users).username,
-    groupName: `group${_.random(3)}`,
+  _.map(_.sampleSize(users, USER_AMOUNT * 0.6), (user) => ({
+    username: user.username,
+    groupName: `group${_.random(1)}`,
     saldo: _.random(-10, 10)
   })),
-  _.times(_.round(USER_AMOUNT * 0.1), () => ({
-    username: _.sample(users).username,
-    groupName: `group${_.random(3)}`,
-    saldo: _.random(-2, 2)
+  _.map(_.sampleSize(users, USER_AMOUNT * 0.6), (user) => ({
+    username: user.username,
+    groupName: `group${_.random(2,3)}`,
+    saldo: _.random(-20, 20)
   }))
 );
 
