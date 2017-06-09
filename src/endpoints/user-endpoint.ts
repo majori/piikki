@@ -29,7 +29,7 @@ const _endpoint = {
     const user = validateUser(req.body);
 
     const authenticated = await userCore.authenticateUser(user);
-    return { authenticated };
+    return { username: user.username, authenticated };
   },
 
   deleteUser: async (req: IExtendedRequest) => {
