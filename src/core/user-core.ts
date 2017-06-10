@@ -78,9 +78,16 @@ export async function deleteUser(username: string) {
 
 // Compare raw password with the hashed one
 export async function authenticateUser(user: IUserDto) {
-  const row = await userExists(user.username);
-
-  return await bcrypt.compare(user.password, row.password);
+  try {
+    const row = await userExists(user.username);
+    return await bcrypt.compare(user.password, row.password);
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return false;
+    } else {
+      throw err;
+    }
+  }
 }
 
 // Checks if user is in database
