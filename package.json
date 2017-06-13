@@ -1,16 +1,15 @@
 {
   "name": "piikki",
   "version": "0.3.2",
-  "description": "Advance payment system for Spinni",
+  "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "start:dev": "env-cmd ./.env.local.js nodemon --delay 1 --inspect=5858 build/index.js",
+    "dev": "env-cmd ./.env.local.js nodemon --exec ts-node --inspect=5858 src/index.ts",
     "migrate": "knex migrate:latest",
     "seed": "env-cmd ./.env.local.js knex seed:run",
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
-    "dev": "concurrently \"npm run build:watch\" \"npm run start:dev\"",
     "test": "mocha test/**/*_spec.js"
   },
   "repository": {
@@ -63,6 +62,7 @@
     "lodash": "^4.17.4",
     "method-override": "^2.3.7",
     "moment": "^2.18.1",
-    "mssql": "^3.3.0"
+    "mssql": "^3.3.0",
+    "ts-node": "^3.0.6"
   }
 }
