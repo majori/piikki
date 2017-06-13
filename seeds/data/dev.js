@@ -1,28 +1,14 @@
-const faker = require('faker');
 const _ = require('lodash');
 const moment = require('moment');
 
-const USER_AMOUNT = 100;
+const USER_AMOUNT = 50;
 
 const users = _.times(USER_AMOUNT, (i) => ({
   username: `user${i}`,
   password: '1234'
 }));
 
-const groups = _.times(5, (i) => ({ groupName: `group${i}` }));
-
-const userSaldos = _.concat(
-  _.map(_.sampleSize(users, USER_AMOUNT * 0.6), (user) => ({
-    username: user.username,
-    groupName: `group${_.random(1)}`,
-    saldo: _.random(-10, 10)
-  })),
-  _.map(_.sampleSize(users, USER_AMOUNT * 0.6), (user) => ({
-    username: user.username,
-    groupName: `group${_.random(2,3)}`,
-    saldo: _.random(-20, 20)
-  }))
-);
+const groups = _.times(4, (i) => ({ groupName: `group${i}` }));
 
 const tokens = [
   {
@@ -49,14 +35,43 @@ const tokenGroupAccess = [
   }
 ];
 
-const transactions = _.map(userSaldos, saldo => ({
-  username: saldo.username,
-  groupName: saldo.groupName,
-  token: tokens[_.random(1)].token,
-  timestamp: moment().subtract(_.random(15), 'days').format('YYYY-MM-DD HH:mm:ss'),
-  oldSaldo: 0,
-  newSaldo: saldo.saldo
-}));
+const userSaldos = [];
+
+const transactions = _.flatMap(users, user => {
+  const quantity = _.times(_.random(1,20), () => _.random(-10, 10));
+  const groupName = _.sample(groups, 2).groupName;
+  const saldos = [];
+
+  const finalSaldo = _.reduce(quantity, (current, value) => {
+    const newSaldo = current + value;
+    saldos.push({
+      username: user.username,
+      token: tokens[_.random(1)].token,
+      groupName,
+      oldSaldo: current,
+      newSaldo
+    })
+
+    return current + value;
+  }, 0);
+
+  userSaldos.push({
+    username: user.username,
+    groupName,
+    saldo: finalSaldo
+  });
+
+  const time = moment();
+  return _.chain(saldos)
+    .reverse()
+    .map(saldo => _.set(saldo, 'timestamp', time
+        .subtract(_.random(1,24), 'hours')
+        .subtract(_.random(60), 'minutes')
+        .format('YYYY-MM-DD HH:mm:ss')
+      )
+    )
+    .value();
+});
 
 module.exports = {
   users,
