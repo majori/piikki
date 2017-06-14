@@ -2,7 +2,6 @@ import { createApp } from './app';
 import * as appInsights from 'applicationinsights';
 
 const cfg: any = require('../config'); // tslint:disable-line
-const debug = Debug('piikki:express');
 
 async function startServer() {
   const app = await createApp(cfg);
