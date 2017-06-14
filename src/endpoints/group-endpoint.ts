@@ -47,11 +47,11 @@ const _endpoint = {
     return groupCore.getUserFromGroup(result.group.name, result.user.username);
   },
 
-  getCurrentGroup: (req: IExtendedRequest) => {
+  getCurrentGroup: async (req: IExtendedRequest) => {
     const groupName = req.piikki.groupAccess.group.name;
 
     if (groupName) {
-      return groupCore.getGroup(groupName);
+      return await groupCore.getGroup(groupName);
     }
   },
 };

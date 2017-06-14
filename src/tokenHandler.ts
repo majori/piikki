@@ -69,15 +69,6 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
     // Request didn't have a proper token
   } else {
-
-    // Set status to unauthorized
-    res.status(401);
-
-    // Track unauthorized request if the request is not from azure ping service
-    if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
-      appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
-    }
-
     throw new AuthorizationError();
   }
 }
