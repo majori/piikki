@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import * as Debug from 'debug';
 
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
@@ -7,8 +6,6 @@ import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
 import { IExtendedRequest } from './models/http';
-
-const debug = Debug('piikki:router');
 
 export function initApiRoutes() {
   const mainRouter = Router();
@@ -45,7 +42,6 @@ function _restrictedTokenRoutes() {
     if (!req.piikki.groupAccess.all) {
       next();
     } else {
-      debug('Denied access to restricted routes');
       res.status(403).json({
         ok: false,
         error: {
@@ -81,7 +77,6 @@ function _globalTokenRoutes() {
     if (req.piikki.groupAccess.all) {
       next();
     } else {
-      debug('Denied access to global routes');
       res.status(403).json({
         ok: false,
         error: {
@@ -95,7 +90,6 @@ function _globalTokenRoutes() {
   // If client targets some group, insert the group name to request
   // so endpoint functions can look the group name from the same place
   globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
-    if (name) { debug(`Found group name parameter in url: ${name}`); }
     req.piikki.groupAccess.group.name = name;
     next();
   });
@@ -129,7 +123,6 @@ function _adminTokenRoutes() {
     if (req.piikki.admin.isAdmin) {
       next();
     } else {
-      debug('Denied access to admin routes');
       res.status(403).json({
         ok: false,
         error: {

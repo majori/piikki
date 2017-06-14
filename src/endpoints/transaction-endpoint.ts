@@ -91,7 +91,7 @@ const _endpoint = {
     const timestamp = validateTimestamp(req.query.timestamp);
 
     return transCore.getDailyGroupSaldosSince(groupName, timestamp);
-  }
+  },
 };
 
 // Wrap endpoint to produce JSON route

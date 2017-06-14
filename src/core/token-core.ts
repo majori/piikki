@@ -1,6 +1,5 @@
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
-import * as Debug from 'debug';
 
 import { knex } from '../database';
 import { groupExists, getGroups } from './group-core';
@@ -8,8 +7,6 @@ import { updateTokens } from '../tokenHandler';
 
 import { QueryBuilder } from 'knex';
 import { IDatabaseGroup } from '../models/database';
-
-const debug = Debug('piikki:token-core');
 
 export async function createRestrictedToken(groupName: string, comment?: string) {
 
@@ -25,7 +22,6 @@ export async function createRestrictedToken(groupName: string, comment?: string)
     .from('token_group_access')
     .insert({ token_id: id[0], group_id: group.id });
 
-  debug('Created restricted token', token);
   updateTokens(); // Inform token handler about new token
 
   return token;
@@ -38,7 +34,6 @@ export async function createGlobalToken(comment?: string) {
     .from('tokens')
     .insert({ token, role: 'global', comment });
 
-  debug('Created global token', token);
   updateTokens(); // Inform token handler about new token
 
   return token;
@@ -51,7 +46,6 @@ export async function createAdminToken(comment?: string) {
     .from('tokens')
     .insert({ token, role: 'admin', comment });
 
-  debug('Created admin token', token);
   updateTokens(); // Inform token handler about new token
   return token;
 }
