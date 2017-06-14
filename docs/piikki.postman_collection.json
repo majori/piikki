@@ -30,7 +30,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"comment\": \"<comment-here>\"\n}"
+							"raw": "{\n  \"comment\": \"<comment-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -55,7 +55,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"groupName\": \"<groupname-here>\",\n\t\"comment\": \"<comment-here>\"\n}"
+							"raw": "{\n  \"groupName\": \"<groupname-here>\",\n  \"comment\": \"<comment-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -80,7 +80,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"comment\": \"<comment-here>\"\n}"
+							"raw": "{\n  \"comment\": \"<comment-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -105,7 +105,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"token\": \"<token-here>\"\n}"
+							"raw": "{\n  \"token\": \"<token-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -130,7 +130,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"newPassword\": \"<new-password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"newPassword\": \"<new-password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -201,7 +201,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -226,7 +226,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -251,7 +251,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -276,7 +276,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"oldPassword\": \"<password-here>\",\n\t\"newPassword\": \"<new-password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"oldPassword\": \"<password-here>\",\n  \"newPassword\": \"<new-password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -301,7 +301,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"oldUsername\": \"<username-here>\",\n\t\"newUsername\": \"<new-username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"oldUsername\": \"<username-here>\",\n  \"newUsername\": \"<new-username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -386,7 +386,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"groupName\": \"<group-name-here>\"\n}"
+							"raw": "{\n  \"groupName\": \"<group-name-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -411,7 +411,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -436,7 +436,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -461,7 +461,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"groupName\": \"<groupname-here>\",\n  \"amount\": 5\n}"
 						},
 						"description": ""
 					},
@@ -470,7 +470,30 @@
 				{
 					"name": "Get group transactions",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/group/{{groupname}}",
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/group/{{groupname}}?from=\"2017-06-10\"",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"global",
+								"transactions",
+								"group",
+								"{{groupname}}"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "\"2017-06-10\"",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -486,7 +509,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"groupName\": \"<groupname-here>\",\n  \"amount\": 5\n}"
 						},
 						"description": ""
 					},
@@ -495,7 +518,30 @@
 				{
 					"name": "Get user transactions",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/user/{{username}}",
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/user/{{username}}?from=\"2017-06-10\"",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"global",
+								"transactions",
+								"user",
+								"{{username}}"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "\"2017-06-10\"",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -511,7 +557,94 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"groupName\": \"<groupname-here>\",\n  \"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group saldo",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo?timestamp=2017-05-13",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"global",
+								"group",
+								"{{groupname}}",
+								"saldo"
+							],
+							"query": [
+								{
+									"key": "timestamp",
+									"value": "2017-05-13",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get daily group saldo since",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo/daily?timestamp=2017-05-11",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"global",
+								"group",
+								"{{groupname}}",
+								"saldo",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "timestamp",
+									"value": "2017-05-11",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -542,7 +675,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -567,7 +700,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -592,7 +725,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"oldPassword\": \"<password-here>\",\n\t\"newPassword\": \"<new-password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"oldPassword\": \"<password-here>\",\n  \"newPassword\": \"<new-password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -617,7 +750,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"oldUsername\": \"<username-here>\",\n\t\"newUsername\": \"<new-username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"oldUsername\": \"<username-here>\",\n  \"newUsername\": \"<new-username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -637,7 +770,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -657,7 +790,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"password\": \"<password-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -682,7 +815,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -707,7 +840,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\"\n}"
+							"raw": "{\n  \"username\": \"<username-here>\"\n}"
 						},
 						"description": ""
 					},
@@ -732,7 +865,177 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\": \"<username-here>\",\n\t\"groupName\": \"<groupname-here>\",\n\t\"amount\": 5\n}"
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"amount\": 5\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group transactions",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions?from=\"2017-06-10\"",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"restricted",
+								"group",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "\"2017-06-10\"",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get user transactions from group",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions/{{username}}?from=\"2017-06-10\"",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"restricted",
+								"group",
+								"transactions",
+								"{{username}}"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "\"2017-06-10\"",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get group saldo",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo?timestamp=2017-06-06",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"restricted",
+								"group",
+								"saldo"
+							],
+							"query": [
+								{
+									"key": "timestamp",
+									"value": "2017-06-06",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get daily group saldo since",
+					"request": {
+						"url": {
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo/daily?timestamp=2017-05-11",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{piikki_domain}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"restricted",
+								"group",
+								"saldo",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "timestamp",
+									"value": "2017-05-11",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
 						},
 						"description": ""
 					},

@@ -46,18 +46,18 @@ const _endpoint = {
 
   getUserTransactions: async (req: IExtendedRequest) => {
     const username = validateUsername(req.params.username);
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
 
-    return transCore.getUserTransactions(username, timestamp);
+    return transCore.getUserTransactions(username, from);
   },
 
   getGroupTransactions: async (req: IExtendedRequest) => {
     const groupName = validateGroupName(
       req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
     );
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
 
-    return transCore.getGroupTransactions(groupName, timestamp);
+    return transCore.getGroupTransactions(groupName, from);
   },
 
   getUserTransactionsFromGroup: async (req: IExtendedRequest) => {
@@ -65,9 +65,9 @@ const _endpoint = {
     const groupName = validateGroupName(
       req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
     );
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
 
-    return transCore.getUserTransactionsFromGroup(username, groupName, timestamp);
+    return transCore.getUserTransactionsFromGroup(username, groupName, from);
   },
 
   getGroupSaldo: async (req: IExtendedRequest) => {

@@ -67,18 +67,19 @@ export async function userHaveSaldo(username: string, groupName: string) {
 }
 
 // Get user's all transactions
-export async function getUserTransactions(username: string, sinceTimestamp?: moment.Moment) {
-  return _getTransactions({ 'users.username': username }, sinceTimestamp);
+export async function getUserTransactions(username: string, from?: moment.Moment, to?: moment.Moment) {
+  return _getTransactions({ 'users.username': username }, from);
 }
 
 // Get all group's member transactions
-export async function getGroupTransactions(groupName: string, sinceTimestamp?: moment.Moment) {
-  return _getTransactions({ 'groups.name': groupName }, sinceTimestamp);
+export async function getGroupTransactions(groupName: string, from?: moment.Moment, to?: moment.Moment) {
+  return _getTransactions({ 'groups.name': groupName }, from);
 }
 
 // Get transactions of the single member in group
-export async function getUserTransactionsFromGroup(username: string, groupName: string, sinceDate?: moment.Moment) {
-  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, sinceDate);
+// tslint:disable-next-line:max-line-length
+export async function getUserTransactionsFromGroup(username: string, groupName: string, from?: moment.Moment, to?: moment.Moment) {
+  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, from);
 }
 
 // Returns group's absolute saldo in given date
