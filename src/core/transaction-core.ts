@@ -7,8 +7,6 @@ import { knex } from '../database';
 import { IDatabaseTransaction } from '../models/database';
 import { ITransactionDto, ITransactionFilter } from '../models/transaction';
 
-const DATE_FORMAT = 'YYYY-MM-DD';
-
 export async function makeTransaction(newTrx: ITransactionDto) {
   const userSaldo = await userHaveSaldo(newTrx.username, newTrx.groupName);
 
@@ -84,7 +82,7 @@ export async function getUserTransactionsFromGroup(username: string, groupName: 
 
 // Returns group's absolute saldo in given date
 export async function getGroupSaldo(groupName: string, from: moment.Moment): Promise<{ saldo: number | null }> {
-  const date = moment(from).add(1, 'day').format(DATE_FORMAT);
+  const date = moment(from).endOf('day').format();
   return knex
     .with('T1', (qb: QueryBuilder) => {
       qb
@@ -107,7 +105,7 @@ export async function getGroupSaldo(groupName: string, from: moment.Moment): Pro
 }
 
 // Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
-export async function getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to: moment.Moment) {
+export async function getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
   return knex
     .select(
       'timestamp',
@@ -116,37 +114,38 @@ export async function getDeltaDailyGroupSaldosSince(groupName: string, from: mom
     .from('transactions')
     .join('groups', { 'groups.id': 'transactions.group_id'})
     .where('groups.name', '=', groupName)
-    .andWhere('transactions.timestamp', '>=', from.format(DATE_FORMAT))
-    .andWhere('transactions.timestamp', '<=', moment(to).add(1, 'day').format(DATE_FORMAT))
+    .andWhere('transactions.timestamp', '>=', moment(from).startOf('day').format())
+    .andWhere('transactions.timestamp', '<=', moment(to).endOf('day').format())
     .groupBy('transactions.timestamp');
 }
 
 // Get absolute saldo for each day between [from] -> [to]
 export async function getDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
-  const toMoment = to ? to : moment();
+  const toMoment = to ? to : moment().utc();
 
   // Calculate absolute saldo of the first day
   const startSaldo = (await getGroupSaldo(groupName, from)).saldo || 0;
 
   // How much change happened in each day
   const deltaSaldos = _.chain(await getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
-    .map((transaction: any) => _.update(transaction, 'timestamp', (x: string) => moment(x)))
-    .groupBy((transaction: any) => transaction.timestamp.format(DATE_FORMAT))
+    .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date).utc()))
+    .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
     .mapValues((transactions: any) =>
       _.reduce(transactions, (total, transaction: any) => total + transaction.saldo_change, 0),
     )
     .value();
 
-  const time = moment(from).add(1, 'day');
-  const saldos = [{ timestamp: from.startOf('day').format(), saldo: startSaldo }]; // Init the first day with saldo
+  const time = moment(from).startOf('day');
+  const saldos = [{ timestamp: time.format(), saldo: startSaldo }]; // Init the first day with saldo
   let currentSaldo = startSaldo;
+  time.add(1, 'day');
 
   // Loop over each day until [to] date is passed
   while (time.isBefore(toMoment.endOf('day'))) {
-    currentSaldo = currentSaldo + (deltaSaldos[time.format(DATE_FORMAT)] || 0);
+    currentSaldo = currentSaldo + (deltaSaldos[time.format('YYYY-MM-DD')] || 0);
 
     saldos.push({
-      timestamp: time.startOf('day').format(),
+      timestamp: time.format(),
       saldo: currentSaldo,
     });
     time.add(1, 'day');
@@ -175,14 +174,14 @@ async function _getTransactions(filterObject: ITransactionFilter, from?: moment.
     query.where(
       'transactions.timestamp',
       '>',
-      from.format('YYYY-MM-DD HH:mm:ss.SSS'),
+      from.format(),
     );
   }
 
   query.where(
     'transactions.timestamp',
     '<',
-    _.defaultTo(to, moment()).format('YYYY-MM-DD HH:mm:ss.SSS'),
+    _.defaultTo(to, moment().utc()).format(),
   );
 
   const results: IDatabaseTransaction[] = await query;

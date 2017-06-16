@@ -2,13 +2,15 @@ const _ = require('lodash');
 const moment = require('moment');
 
 const USER_AMOUNT = 50;
+const GROUP_AMOUNT = 3;
+const MAX_TRANSACTION_AMOUNT = 20;
 
 const users = _.times(USER_AMOUNT, (i) => ({
   username: `user${i}`,
   password: '1234'
 }));
 
-const groups = _.times(4, (i) => ({ groupName: `group${i}` }));
+const groups = _.times(GROUP_AMOUNT, (i) => ({ groupName: `group${i}` }));
 
 const tokens = [
   {
@@ -30,7 +32,7 @@ const tokens = [
 
 const tokenGroupAccess = [
   {
-    groupName: 'group1',
+    groupName: _.first(groups).groupName,
     token: 'restricted_token'
   }
 ];
@@ -38,8 +40,8 @@ const tokenGroupAccess = [
 const userSaldos = [];
 
 const transactions = _.flatMap(users, user => {
-  const quantity = _.times(_.random(1,20), () => _.random(-10, 10));
-  const groupName = _.sample(groups, 2).groupName;
+  const quantity = _.times(_.random(1, MAX_TRANSACTION_AMOUNT), () => _.random(-10, 10));
+  const groupName = _.sample(_.initial(groups)).groupName;
   const saldos = [];
 
   const finalSaldo = _.reduce(quantity, (current, value) => {
@@ -61,13 +63,13 @@ const transactions = _.flatMap(users, user => {
     saldo: finalSaldo
   });
 
-  const time = moment();
+  const time = moment().utc();
   return _.chain(saldos)
     .reverse()
     .map(saldo => _.set(saldo, 'timestamp', time
         .subtract(_.random(1,24), 'hours')
         .subtract(_.random(60), 'minutes')
-        .format('YYYY-MM-DD HH:mm:ss')
+        .format()
       )
     )
     .value();

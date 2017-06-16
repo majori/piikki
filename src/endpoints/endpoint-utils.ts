@@ -98,7 +98,7 @@ export function validateGroupName(name: any): string {
 export function validateTimestamp(timestamp: any) {
   const parsed = moment(timestamp);
   if (parsed.isValid()) {
-    return parsed;
+    return parsed.utc();
   } else {
     throw new ValidationError(`Timestamp "${timestamp}" is invalid`);
   }

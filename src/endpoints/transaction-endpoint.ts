@@ -76,12 +76,13 @@ const _endpoint = {
     const groupName = validateGroupName(
       req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
     );
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
 
-    const result = await transCore.getGroupSaldo(groupName, timestamp);
+    const result = await transCore.getGroupSaldo(groupName, from);
 
     return {
       groupName,
+      timestamp: from.format('YYYY-MM-DD'),
       saldo: result.saldo || 0,
     };
   },
@@ -90,9 +91,9 @@ const _endpoint = {
     const groupName = validateGroupName(
       req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
     );
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
 
-    return transCore.getDailyGroupSaldosSince(groupName, timestamp);
+    return transCore.getDailyGroupSaldosSince(groupName, from);
   },
 };
 
