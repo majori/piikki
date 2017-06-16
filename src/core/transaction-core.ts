@@ -136,7 +136,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
     .value();
 
   const time = moment(from).startOf('day');
-  const saldos = [{ timestamp: time.format(), saldo: startSaldo }]; // Init the first day with saldo
+  const saldos = [{ timestamp: time.format('YYYY-MM-DD'), saldo: startSaldo }]; // Init the first day with saldo
   let currentSaldo = startSaldo;
   time.add(1, 'day');
 
@@ -145,7 +145,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
     currentSaldo = currentSaldo + (deltaSaldos[time.format('YYYY-MM-DD')] || 0);
 
     saldos.push({
-      timestamp: time.format(),
+      timestamp: time.format('YYYY-MM-DD'),
       saldo: currentSaldo,
     });
     time.add(1, 'day');
