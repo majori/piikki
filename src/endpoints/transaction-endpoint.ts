@@ -25,7 +25,7 @@ const _endpoint = {
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    return Promise.all(_.map(transactions, (trx: ITransactionDto) => {
+    const results = await Promise.all(_.map(transactions, (trx: ITransactionDto) => {
 
       // If request comes from group specific token, use token related group name
       trx.groupName = (req.piikki.groupAccess.group.name) ?
@@ -42,6 +42,8 @@ const _endpoint = {
 
       return transCore.makeTransaction(transaction);
     }));
+
+    return (_.size(results) === 1) ? _.first(results) : results;
   },
 
   getUserTransactions: async (req: IExtendedRequest) => {
