@@ -133,6 +133,7 @@ function _adminTokenRoutes() {
     }
   });
 
+  adminR.get('/tokens', adminEndpoint.getTokens);
   adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
   adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
   adminR.post('/tokens/admin', adminEndpoint.createAdminToken);

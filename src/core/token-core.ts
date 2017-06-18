@@ -82,11 +82,12 @@ export async function initializeTokens() {
 function _getTokens(): QueryBuilder {
   return knex
     .select(
-    'tokens.id',
-    'tokens.token',
-    'tokens.role',
-    'groups.name AS group_name',
-    'tokens.comment')
+      'tokens.id',
+      'tokens.token',
+      'tokens.role',
+      'groups.name AS group_name',
+      'tokens.comment'
+    )
     .from('tokens')
     .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
     .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
