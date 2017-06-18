@@ -66,18 +66,18 @@ export async function userHaveSaldo(username: string, groupName: string) {
 
 // Get user's all transactions
 export async function getUserTransactions(username: string, from?: moment.Moment, to?: moment.Moment) {
-  return _getTransactions({ 'users.username': username }, from);
+  return _getTransactions({ 'users.username': username }, from, to);
 }
 
 // Get all group's member transactions
 export async function getGroupTransactions(groupName: string, from?: moment.Moment, to?: moment.Moment) {
-  return _getTransactions({ 'groups.name': groupName }, from);
+  return _getTransactions({ 'groups.name': groupName }, from, to);
 }
 
 // Get transactions of the single member in group
 // tslint:disable-next-line:max-line-length
 export async function getUserTransactionsFromGroup(username: string, groupName: string, from?: moment.Moment, to?: moment.Moment) {
-  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, from);
+  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, from, to);
 }
 
 // Returns group's absolute saldo in given date
@@ -181,7 +181,7 @@ async function _getTransactions(filterObject: ITransactionFilter, from?: moment.
   query.where(
     'transactions.timestamp',
     '<',
-    _.defaultTo(to, moment().utc()).format(),
+    moment(to).utc().format(),
   );
 
   const results: IDatabaseTransaction[] = await query;
