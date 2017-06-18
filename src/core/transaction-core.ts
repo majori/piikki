@@ -104,21 +104,6 @@ export async function getGroupSaldo(groupName: string, from: moment.Moment): Pro
     .first();
 }
 
-// Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
-export async function getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
-  return knex
-    .select(
-      'timestamp',
-      knex.raw('SUM(new_saldo - old_saldo) as saldo_change'),
-    )
-    .from('transactions')
-    .join('groups', { 'groups.id': 'transactions.group_id'})
-    .where('groups.name', '=', groupName)
-    .andWhere('transactions.timestamp', '>=', moment(from).startOf('day').format())
-    .andWhere('transactions.timestamp', '<=', moment(to).endOf('day').format())
-    .groupBy('transactions.timestamp');
-}
-
 // Get absolute saldo for each day between [from] -> [to]
 export async function getDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
   const toMoment = to ? to : moment().utc();
@@ -127,7 +112,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
   const startSaldo = (await getGroupSaldo(groupName, from)).saldo || 0;
 
   // How much change happened in each day
-  const deltaSaldos = _.chain(await getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
+  const deltaSaldos = _.chain(await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
     .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date).utc()))
     .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
     .mapValues((transactions: any) =>
@@ -152,6 +137,21 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
   }
 
   return saldos;
+}
+
+// Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
+export async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
+  return knex
+    .select(
+      'timestamp',
+      knex.raw('SUM(new_saldo - old_saldo) as saldo_change'),
+    )
+    .from('transactions')
+    .join('groups', { 'groups.id': 'transactions.group_id'})
+    .where('groups.name', '=', groupName)
+    .andWhere('transactions.timestamp', '>=', moment(from).startOf('day').format())
+    .andWhere('transactions.timestamp', '<=', moment(to).endOf('day').format())
+    .groupBy('transactions.timestamp');
 }
 
 async function _getTransactions(filterObject: ITransactionFilter, from?: moment.Moment, to?: moment.Moment) {
