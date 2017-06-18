@@ -82,8 +82,11 @@ export async function authenticateUser(user: IUserDto) {
     const row = await userExists(user.username);
     return await bcrypt.compare(user.password, row.password);
   } catch (err) {
+    // If user was not found, just response with failed authentication
     if (err instanceof NotFoundError) {
       return false;
+
+    // Some other error occured, pass the exception
     } else {
       throw err;
     }

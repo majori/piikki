@@ -9,6 +9,7 @@ This github project only includes server backend and api of the Piikki pre-payme
 **Clients currently under development:**
 - [RFID-reader](https://github.com/juilijoel/piikki-client-rfid) by [juilijoel](https://github.com/juilijoel)
 - [Telegram bot](https://github.com/majori/piikki-client-tg) by [majori](https://github.com/majori)
+- [Web UI](https://github.com/majori/piikki-client-web) by [majori](https://github.com/majori)
 
 If you are interested of making your own Piikki client and use our hosted backend service, please contact the [author](https://github.com/majori) to aquire your very own token!
 
