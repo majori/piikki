@@ -3,6 +3,7 @@ build/
 .vscode/
 .vs/
 
+.DS_Store
 npm-debug.log.*
 package-lock.json
 .env.local.js
