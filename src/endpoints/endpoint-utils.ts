@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import appInsights = require('applicationinsights');
+import * as appInsights from 'applicationinsights';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { ValidationError } from '../errors';
@@ -34,19 +34,18 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
 }
 
 // Check if username and password is valid
-export function validateUser(user: IUserDto) {
+export function validateUser(user: IUserDto): IUserDto {
   if (!_.isObject(user)) {
     throw new ValidationError('Invalid user object');
   }
 
-  try {
-    validatePassword(user.password);
-    validateUsername(user.username);
-  } catch (err) {
-    throw err;
-  }
+  const password = validatePassword(user.password);
+  const username = validateUsername(user.username);
 
-  return user;
+  return {
+    username,
+    password,
+  };
 }
 
 // Check if username is valid
@@ -96,10 +95,14 @@ export function validateGroupName(name: any): string {
 }
 
 export function validateTimestamp(timestamp: any) {
+  if (_.isUndefined(timestamp)) {
+    throw new ValidationError(`Timestamp was undefined`);
+  }
+
   const parsed = moment(timestamp);
-  if (parsed.isValid()) {
-    return parsed.utc();
-  } else {
+  if (!parsed.isValid()) {
     throw new ValidationError(`Timestamp "${timestamp}" is invalid`);
   }
+
+  return parsed.utc();
 }
