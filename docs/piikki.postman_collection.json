@@ -12,6 +12,31 @@
 			"description": "",
 			"item": [
 				{
+					"name": "Get tokens",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/admin/tokens/global",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{admin_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"comment\": \"<comment-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Create global token",
 					"request": {
 						"url": "{{protocol}}://{{piikki_domain}}/api/v1/admin/tokens/global",
@@ -258,6 +283,56 @@
 					"response": []
 				},
 				{
+					"name": "Create alternative login",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/members/{{username}}/authenticate/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate with alternative login copy",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/members/{{username}}/authenticate",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{global_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Reset password",
 					"request": {
 						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/users/reset/password",
@@ -471,7 +546,7 @@
 					"name": "Get group transactions",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/group/{{groupname}}?from=\"2017-06-10\"",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/group/{{groupname}}?from=2017-06-15T14:42:00&#43;03:00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -487,11 +562,16 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "\"2017-06-10\"",
+									"value": "2017-06-15T14:42:00",
 									"equals": true,
 									"description": ""
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							],
+							"hash": "43;03:00",
 							"variable": []
 						},
 						"method": "GET",
@@ -519,7 +599,7 @@
 					"name": "Get user transactions",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/user/{{username}}?from=\"2017-06-10\"",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/transactions/user/{{username}}?from=2017-06-10T14:42:00&#43;03:00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -535,11 +615,16 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "\"2017-06-10\"",
+									"value": "2017-06-10T14:42:00",
 									"equals": true,
 									"description": ""
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							],
+							"hash": "43;03:00",
 							"variable": []
 						},
 						"method": "GET",
@@ -567,7 +652,7 @@
 					"name": "Get group saldo",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo?timestamp=2017-05-13",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo?from=2017-06-10T14:42:00&#43;03:00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -582,12 +667,17 @@
 							],
 							"query": [
 								{
-									"key": "timestamp",
-									"value": "2017-05-13",
+									"key": "from",
+									"value": "2017-06-10T14:42:00",
 									"equals": true,
 									"description": ""
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							],
+							"hash": "43;03:00",
 							"variable": []
 						},
 						"method": "GET",
@@ -610,7 +700,7 @@
 					"name": "Get daily group saldo since",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo/daily?timestamp=2017-05-11",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/saldo/daily?from=2017-06-10T14:42:00&#43;03:00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -626,12 +716,17 @@
 							],
 							"query": [
 								{
-									"key": "timestamp",
-									"value": "2017-05-11",
+									"key": "from",
+									"value": "2017-06-10T14:42:00",
 									"equals": true,
 									"description": ""
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							],
+							"hash": "43;03:00",
 							"variable": []
 						},
 						"method": "GET",
@@ -701,6 +796,56 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"username\": \"<username-here>\",\n  \"password\": \"<password-here>\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create alternative login",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}/authenticate/create",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate with alternative login",
+					"request": {
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}/authenticate",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{restricted_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
 						},
 						"description": ""
 					},
@@ -875,7 +1020,7 @@
 					"name": "Get group transactions",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions?from=\"2017-06-10\"",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions?from=2017-06-10T14:42:00&#43;03:00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -890,11 +1035,16 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "\"2017-06-10\"",
+									"value": "2017-06-10T14:42:00",
 									"equals": true,
 									"description": ""
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							],
+							"hash": "43;03:00",
 							"variable": []
 						},
 						"method": "GET",
@@ -917,7 +1067,7 @@
 					"name": "Get user transactions from group",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions/{{username}}?from=\"2017-06-10\"",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/transactions/{{username}}?from=2017-06-10T08%3A02%3A17-05%3A00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -933,7 +1083,7 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "\"2017-06-10\"",
+									"value": "2017-06-10T08%3A02%3A17-05%3A00",
 									"equals": true,
 									"description": ""
 								}
@@ -960,7 +1110,7 @@
 					"name": "Get group saldo",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo?timestamp=2017-06-06",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo?from=2017-06-01T08%3A02%3A17-05%3A00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -974,8 +1124,8 @@
 							],
 							"query": [
 								{
-									"key": "timestamp",
-									"value": "2017-06-06",
+									"key": "from",
+									"value": "2017-06-01T08%3A02%3A17-05%3A00",
 									"equals": true,
 									"description": ""
 								}
@@ -1002,7 +1152,7 @@
 					"name": "Get daily group saldo since",
 					"request": {
 						"url": {
-							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo/daily?timestamp=2017-05-11",
+							"raw": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/saldo/daily?from=2017-06-01T08%3A02%3A17-05%3A00",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{piikki_domain}}"
@@ -1017,8 +1167,8 @@
 							],
 							"query": [
 								{
-									"key": "timestamp",
-									"value": "2017-05-11",
+									"key": "from",
+									"value": "2017-06-01T08%3A02%3A17-05%3A00",
 									"equals": true,
 									"description": ""
 								}
