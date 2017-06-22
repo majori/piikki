@@ -55,21 +55,16 @@ const _endpoint = {
   },
 
   getGroupTransactions: async (req: IExtendedRequest) => {
-    const groupName = validateGroupName(
-      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
-    );
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
-
 
     return transCore.getGroupTransactions(groupName, from, to);
   },
 
   getUserTransactionsFromGroup: async (req: IExtendedRequest) => {
     const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(
-      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
-    );
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
 
@@ -77,9 +72,7 @@ const _endpoint = {
   },
 
   getGroupSaldo: async (req: IExtendedRequest) => {
-    const groupName = validateGroupName(
-      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
-    );
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
 
     const result = await transCore.getGroupSaldo(groupName, from);
@@ -92,9 +85,7 @@ const _endpoint = {
   },
 
   getDailyGroupSaldos: async (req: IExtendedRequest) => {
-    const groupName = validateGroupName(
-      req.piikki.groupAccess.all ? req.params.groupName : req.piikki.groupAccess.group.name
-    );
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
 

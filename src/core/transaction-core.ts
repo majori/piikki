@@ -140,7 +140,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
 }
 
 // Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
-export async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
+async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
   return knex
     .select(
       'timestamp',
