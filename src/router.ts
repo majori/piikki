@@ -56,8 +56,12 @@ function _restrictedTokenRoutes() {
   restrictedR.use(_commonRoutes());
 
   restrictedR.get('/group', groupEndpoint.getCurrentGroup);
+
   restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
+  restrictedR.post('/group/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
+  restrictedR.post('/group/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
+
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
   restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
@@ -100,14 +104,20 @@ function _globalTokenRoutes() {
   globalR.get('/users', userEndpoint.getUsers);
   globalR.get('/users/:username', userEndpoint.getUser);
   globalR.delete('/users', userEndpoint.deleteUser);
+
   globalR.get('/groups', groupEndpoint.getGroups);
   globalR.post('/groups/create', groupEndpoint.createGroup);
+
   globalR.get('/groups/:groupName/members', groupEndpoint.getGroupMembers);
   globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
+  globalR.post('/group/:groupName/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
+  globalR.post('/group/:groupName/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
+
   globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
   globalR.get('/group/:groupName/saldo', transactionEndpoint.getGroupSaldo);
   globalR.get('/group/:groupName/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
   globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
+
   globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
   globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
 

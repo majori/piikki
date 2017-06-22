@@ -8,3 +8,11 @@ export interface IUserWithSaldo {
   groupName: string;
   saldo: number;
 }
+
+export interface IUserAlternativeLoginDto {
+  username: string;
+  groupName: string;
+  tokenId: number;
+  key: string;
+  type?: number;
+}

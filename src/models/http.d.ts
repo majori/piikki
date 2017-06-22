@@ -12,7 +12,7 @@ export interface IExtendedRequest extends Request {
     groupAccess: {
       all: boolean;
       group: {
-        name: string | null;
+        name: string;
       },
     },
     admin: {

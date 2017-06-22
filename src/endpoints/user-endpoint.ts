@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import * as userCore from '../core/user-core';
-import { ConflictError } from '../errors';
+import { ConflictError, ValidationError } from '../errors';
 import { createJsonRoute, validateUser, validateUsername, validateGroupName, validatePassword } from './endpoint-utils';
 
 import { IExtendedRequest } from '../models/http';
@@ -32,6 +32,49 @@ const _endpoint = {
     return { username: user.username, authenticated };
   },
 
+  alternativeAuthenticateUser: async (req: IExtendedRequest) => {
+    const type = req.body.type;
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const key = req.body.key;
+
+    if (!key) {
+      throw new ValidationError('Missing "key" attribute');
+    }
+
+    const found = await userCore.getAlternativeLogin({
+      username,
+      key,
+      type,
+      groupName,
+      tokenId: req.piikki.token.id,
+    });
+    return {
+      authenticated: !_.isEmpty(found),
+    };
+  },
+
+  createAlternativeLogin: async (req: IExtendedRequest) => {
+    const type = req.body.type;
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const key = req.body.key;
+
+    if (!key) {
+      throw new ValidationError('Missing "key" attribute');
+    }
+
+    await userCore.createAlternativeLogin({
+      username,
+      key,
+      type,
+      groupName,
+      tokenId: req.piikki.token.id,
+    });
+
+    return { username, groupName };
+  },
+
   deleteUser: async (req: IExtendedRequest) => {
     const username = validateUsername(req.body.username);
 
@@ -45,7 +88,7 @@ const _endpoint = {
     });
     const newPassword = validatePassword(req.body.newPassword);
 
-    return userCore.resetPassword(user, newPassword)
+    return userCore.resetPassword(user, newPassword);
   },
 
   forceResetPassword: async (req: IExtendedRequest) => {
