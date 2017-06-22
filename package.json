@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "env-cmd ./.env.local.js nodemon --exec ts-node --inspect=5858 src/index.ts",
+    "lint": "tslint -p tsconfig.json",
     "migrate": "knex migrate:latest",
-    "seed": "env-cmd ./.env.local.js knex seed:run",
+    "seed": "knex seed:run",
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
     "test": "mocha test/**/*_spec.js"

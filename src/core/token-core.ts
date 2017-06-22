@@ -86,7 +86,7 @@ function _getTokens(): QueryBuilder {
       'tokens.token',
       'tokens.role',
       'groups.name AS group_name',
-      'tokens.comment'
+      'tokens.comment',
     )
     .from('tokens')
     .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
