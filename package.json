@@ -11,7 +11,7 @@
     "seed": "knex seed:run",
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
-    "test": "env-cmd ./.env.test.js mocha test/**/*_spec.ts"
+    "test": "mocha test/**/*_spec.ts"
   },
   "repository": {
     "type": "git",

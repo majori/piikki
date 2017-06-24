@@ -13,7 +13,7 @@ import * as  groupCore from '../src/core/group-core';
 
 describe('Users, groups & transactions', () => {
 
-  const USER = helper.user;
+  const USER = _.clone(helper.user);
   const GROUP = 'new_group';
 
   before(helper.clearDbAndRunSeed);
@@ -43,7 +43,7 @@ describe('Users, groups & transactions', () => {
 
   it('not create a user with existing name', async () => {
     try {
-      await userCore.createUser(_.pick(USER, ['username', 'password']))
+      await userCore.createUser(USER);
     } catch (err) {
       expect(err).to.have.property('name', 'ConflictError');
     }
@@ -55,7 +55,7 @@ describe('Users, groups & transactions', () => {
   });
 
   it('not authenticate user with wrong password', async () => {
-    const auth = await userCore.authenticateUser(_.assign(USER, { password: 'wrong' }));
+    const auth = await userCore.authenticateUser({ username: USER.username, password: 'wrong' });
     expect(auth).to.equal(false);
   });
 

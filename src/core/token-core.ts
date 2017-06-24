@@ -40,7 +40,7 @@ export async function createGlobalToken(comment?: string) {
 }
 
 export async function createAdminToken(comment?: string) {
-  const token = _generateBase64Token(64);
+  const token = await _generateBase64Token(64);
 
   await knex
     .from('tokens')
@@ -51,7 +51,7 @@ export async function createAdminToken(comment?: string) {
 }
 
 export async function getTokens(): Promise<IDatabaseToken[]> {
-  return await _getTokens();
+  return _getTokens();
 }
 
 export async function getToken(groupName: string) {

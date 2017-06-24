@@ -4,7 +4,9 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
+import * as seed from '../seeds/data/test';
 import * as helper from './helpers';
+
 const cfg = require('../config');
 
 import { createApp } from '../src/app';
@@ -29,13 +31,15 @@ function expectError(err: any, res: ChaiHttp.Response) {
 
 describe('API', () => {
 
-  const USER = helper.user;
+  const USER = _.clone(helper.user);
   const USER_2 = { username: 'otherUser', password: 'hackme' };
-  const GROUP = helper.group;
+  const GROUP = _.clone(helper.group);
+
+  const ADMIN_TOKEN = helper.adminToken;
   const GLOBAL_TOKEN = helper.globalToken;
   const RESTRICTED_TOKEN = helper.restrictedToken;
 
-  let HEADERS;
+  const PREFIX = '/api/v1';
   let API: Express;
 
   // Clear tables and migrate to latest
@@ -46,16 +50,9 @@ describe('API', () => {
 
   describe('Restricted', () => {
 
-    const PREFIX = '/api/v1/restricted';
-
-    before((done) => {
-      HEADERS = { Authorization: RESTRICTED_TOKEN };
-      done();
-    });
-
     it('create new user [POST /users/create]', (done) => {
       request(API)
-      .post(`${PREFIX}/users/create`)
+      .post(`${PREFIX}/restricted/users/create`)
       .set('Authorization', RESTRICTED_TOKEN)
       .send(USER_2)
       .end((err: any, res) => {
@@ -70,7 +67,7 @@ describe('API', () => {
       // With right password
       .then(() => {
         request(API)
-        .post(`${PREFIX}/users/authenticate`)
+        .post(`${PREFIX}/restricted/users/authenticate`)
         .set('Authorization', RESTRICTED_TOKEN)
         .send(USER)
         .end((err: any, res) => {
@@ -83,9 +80,22 @@ describe('API', () => {
       // With wrong password
       .then(() => {
         request(API)
-        .post(`${PREFIX}/users/authenticate`)
+        .post(`${PREFIX}/restricted/users/authenticate`)
         .set('Authorization', RESTRICTED_TOKEN)
-        .send(_.assign(USER, { password: 'wrong_password' }))
+        .send({ username: USER.username, password: 'wrong_password' })
+        .end((err: any, res) => {
+          expectOk(err, res);
+          expect(res.body.result.authenticated).to.be.false;
+          return Promise.resolve();
+        });
+      })
+
+      // With wrong username
+      .then(() => {
+        request(API)
+        .post(`${PREFIX}/restricted/users/authenticate`)
+        .set('Authorization', RESTRICTED_TOKEN)
+        .send({ username: 'wrong_username', password: USER.password })
         .end((err: any, res) => {
           expectOk(err, res);
           expect(res.body.result.authenticated).to.be.false;
@@ -99,16 +109,92 @@ describe('API', () => {
     it('create group');
   });
 
-  describe('Errors', () => {
-    it('bad authentication', (done) => {
+  describe('Admin', () => {
+    it('create a restricted token', (done) => {
       request(API)
-      .post('/api/v1/global/users/authenticate')
-      .set('Authorization', GLOBAL_TOKEN)
-      .send(_.assign(USER, { username: 'bad_username' }))
+      .post(`${PREFIX}/admin/tokens/restricted`)
+      .set('Authorization', ADMIN_TOKEN)
+      .send({ groupName: GROUP.groupName, comment: 'Test token'})
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result.authenticated).to.equal(false);
+        expect(res.body.result).to.be.string;
         done();
+      });
+    });
+
+    it('create a global token', (done) => {
+      request(API)
+      .post(`${PREFIX}/admin/tokens/global`)
+      .set('Authorization', ADMIN_TOKEN)
+      .send({ comment: 'Test token' })
+      .end((err: any, res) => {
+        expectOk(err, res);
+        expect(res.body.result).to.be.string;
+        done();
+      });
+    });
+
+    it('create a admin token', (done) => {
+      request(API)
+      .post(`${PREFIX}/admin/tokens/admin`)
+      .set('Authorization', ADMIN_TOKEN)
+      .send({ comment: 'Test token' })
+      .end((err: any, res) => {
+        expectOk(err, res);
+        expect(res.body.result).to.be.string;
+        done();
+      });
+    });
+
+    it('get tokens', (done) => {
+      request(API)
+      .get(`${PREFIX}/admin/tokens`)
+      .set('Authorization', ADMIN_TOKEN)
+      .end((err: any, res) => {
+        expectOk(err, res);
+        expect(res.body.result).to.have.length(seed.tokens.length + 3);
+        done();
+      });
+    });
+
+    it('delete token', (done) => {
+      Promise.resolve()
+      .then(() => {
+        return new Promise((resolve, reject) => {
+          request(API)
+          .get(`${PREFIX}/admin/tokens`)
+          .set('Authorization', ADMIN_TOKEN)
+          .end((err: any, res) => {
+            expectOk(err, res);
+            const token: any = _.last(res.body.result);
+
+            resolve(token.token);
+          });
+        });
+      })
+
+      .then((token) => {
+        return new Promise((resolve, reject) => {
+          request(API)
+          .del(`${PREFIX}/admin/tokens`)
+          .set('Authorization', ADMIN_TOKEN)
+          .send({ token })
+          .end((err: any, res) => {
+            expectOk(err, res);
+            resolve();
+          });
+        });
+      })
+
+      .then(() => {
+        request(API)
+        .get(`${PREFIX}/admin/tokens`)
+        .set('Authorization', ADMIN_TOKEN)
+        .end((err: any, res) => {
+          expectOk(err, res);
+          expect(res.body.result).to.have.length(seed.tokens.length + 2);
+          done();
+        });
       });
     });
   });

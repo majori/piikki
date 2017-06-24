@@ -8,8 +8,10 @@ import * as seed from '../seeds/data/test';
 
 const cfg: IConfig = require('../config');
 
-export const user = _.clone(seed.users[0]);
-export const group = _.clone(seed.groups[0]);
+export const user = seed.users[0];
+export const group = seed.groups[0];
+
+export const adminToken = 'admin_token';
 export const globalToken = 'global_token';
 export const restrictedToken = 'restricted_token';
 

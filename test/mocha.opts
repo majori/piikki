@@ -1,3 +1,4 @@
 --require test/common.js
 --async-only
 --compilers ts:ts-node/register
+--no-timeouts
