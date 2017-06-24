@@ -3,37 +3,15 @@ import * as _ from 'lodash';
 
 import { knex } from '../src/database';
 import { IConfig } from '../src/models/config';
-import * as tokenCore from '../src/core/token-core';
-import * as groupCore from '../src/core/group-core';
-import * as userCore from '../src/core/user-core';
+
+import * as seed from '../seeds/data/test';
 
 const cfg: IConfig = require('../config');
 
-export const tables = [
-  'alternative_login',
-  'transactions',
-  'user_saldos',
-  'token_group_access',
-  'users',
-  'groups',
-  'tokens',
-  'knex_migrations'
-];
-
-export const user = { username: 'user0', password: '1234', saldo: 0 };
-export const group = { name: 'testGroup' };
+export const user = _.clone(seed.users[0]);
+export const group = _.clone(seed.groups[0]);
 export const globalToken = 'global_token';
 export const restrictedToken = 'restricted_token';
-
-export const routes = [
-    { route: '/users', method: 'get' },
-    { route: `/users/${user.username}`, method: 'get' },
-    { route: '/users/create', method: 'post' },
-    { route: '/users/authenticate', method: 'post' },
-    { route: '/users', method: 'del' },
-    { route: '/transaction', method: 'post' },
-    { route: '/groups', method: 'post' }
-];
 
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();
@@ -51,8 +29,12 @@ export const runSeed = async () => knex.seed.run({
   directory: path.join(cfg.dir.seeds, 'test'),
 });
 
-export const clearDbAndRunSeed = async () => {
+export const clearDb = async () => {
   await migrateAllDown();
   await migrateLatest();
+};
+
+export const clearDbAndRunSeed = async () => {
+  await clearDb();
   await runSeed();
 };
