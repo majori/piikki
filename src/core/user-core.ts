@@ -67,7 +67,9 @@ export async function createUser(user: IUserDto) {
     password: hash,
   });
 
-  appInsights.client.trackEvent('User create', { username: user.username });
+  if (appInsights.client) {
+    appInsights.client.trackEvent('User create', { username: user.username });
+  }
   return user.username;
 }
 

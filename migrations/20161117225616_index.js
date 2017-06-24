@@ -97,10 +97,10 @@ exports.up = (knex, Promise) => {
 };
 
 exports.down = (knex, Promise) => Promise.all([
-    knex.schema.dropTable('user_saldos'),
-    knex.schema.dropTable('transactions'),
-    knex.schema.dropTable('token_group_access'),
-    knex.schema.dropTable('users'),
-    knex.schema.dropTable('groups'),
-    knex.schema.dropTable('tokens')
+    knex.schema.dropTableIfExists('user_saldos'),
+    knex.schema.dropTableIfExists('transactions'),
+    knex.schema.dropTableIfExists('token_group_access'),
+    knex.schema.dropTableIfExists('users'),
+    knex.schema.dropTableIfExists('groups'),
+    knex.schema.dropTableIfExists('tokens')
 ]);

@@ -5,6 +5,7 @@ export interface IConfig {
     migrations: string;
     library: string;
     documents: string;
+    seeds: string;
   };
 
   env: 'production' | 'development' | 'test';
