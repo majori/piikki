@@ -103,10 +103,41 @@ describe('API', () => {
         });
       });
     });
+
+    it('create alternative login');
+    it('authenticate with alternative login');
+    it('reset password');
+    it('reset username');
+    it('get group members');
+    it('get group member');
+    it('add member to group');
+    it('remove member from group');
+    it('make transaction');
+    it('get group transactions');
+    it('get user transactions from group');
+    it('get group saldo');
   });
 
   describe('Global', () => {
+    it('get users');
+    it('get user');
+    it('delete user');
+    it('authenticate user');
+    it('create alternative login for user');
+    it('authenticate with alternative login');
+    it('reset password');
+    it('reset username');
+    it('get groups');
+    it('get group members');
+    it('get group member');
     it('create group');
+    it('add member to group');
+    it('remove member from group');
+    it('make transaction');
+    it('get group transactions');
+    it('get user transactions');
+    it('get group saldo');
+    it('get daily group saldo since');
   });
 
   describe('Admin', () => {
@@ -197,5 +228,7 @@ describe('API', () => {
         });
       });
     });
+
+    it('force reset password');
   });
 });
