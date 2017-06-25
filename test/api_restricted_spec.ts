@@ -13,9 +13,6 @@ const cfg: IConfig = require('../config'); // tslint:disable-line
 
 import { createApp } from '../src/app';
 
-const UNAUTHORIZED = 401;
-const BAD_REQUEST = 400;
-
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
 
@@ -108,7 +105,7 @@ describe('Restricted API', () => {
       .send({ key: right_key })
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result.authenticated).to.equal(true);
+        expect(res.body.result.authenticated).to.be.true;
         resolve();
       });
     })
@@ -121,7 +118,7 @@ describe('Restricted API', () => {
       .send({ key: 'wrong_key' })
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result.authenticated).to.equal(false);
+        expect(res.body.result.authenticated).to.be.false;
         resolve();
       });
     }))
@@ -134,7 +131,7 @@ describe('Restricted API', () => {
       .send({ key: right_key })
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result.authenticated).to.equal(false);
+        expect(res.body.result.authenticated).to.be.false;
         done();
       });
     });

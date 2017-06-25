@@ -13,9 +13,6 @@ const cfg: IConfig = require('../config'); // tslint:disable-line
 
 import { createApp } from '../src/app';
 
-const UNAUTHORIZED = 401;
-const BAD_REQUEST = 400;
-
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
 
