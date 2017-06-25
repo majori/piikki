@@ -9,7 +9,6 @@ import { Response, NextFunction } from 'express';
 import { IExtendedRequest } from './models/http';
 import { IDatabaseToken } from './models/database';
 
-// If environment is not production, use development token
 let registeredTokens: IDatabaseToken[] = [];
 
 export async function initTokens() {
@@ -21,15 +20,14 @@ export async function initTokens() {
     // There is no tokens in the database, make new ones
     if (_.isEmpty(tokens)) {
       await createAdminToken('Created on initialize');
+    } else {
+      await updateTokens(tokens);
     }
-
-    await updateTokens();
   }
 }
 
 // Authorize request by token found in "Authorization" header
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
-
   const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
   if (!_.isUndefined(token)) {
 
@@ -74,9 +72,6 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 }
 
 // Fetch current tokens from database
-export function updateTokens() {
-  getTokens()
-    .then((tokens) => {
-      registeredTokens = tokens;
-    });
+export async function updateTokens(newTokens?: IDatabaseToken[]) {
+  registeredTokens = (newTokens) ? newTokens : await getTokens();
 }
