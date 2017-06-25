@@ -15,6 +15,10 @@ export const adminToken = 'admin_token';
 export const globalToken = 'global_token';
 export const restrictedToken = 'restricted_token';
 
+export async function clearTable(tableName: string) {
+  return knex(tableName).del();
+}
+
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();
   if (version !== 'none') {

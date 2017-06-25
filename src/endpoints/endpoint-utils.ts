@@ -94,6 +94,12 @@ export function validateGroupName(name: any): string {
   return name;
 }
 
+export function validateAlternativeLoginKey(key: any): any {
+  if (_.isUndefined(key))  { throw new ValidationError('Key was undefined'); }
+
+  return key;
+}
+
 export function validateTimestamp(timestamp: any) {
   if (_.isUndefined(timestamp)) {
     throw new ValidationError(`Timestamp was undefined`);

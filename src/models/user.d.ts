@@ -13,6 +13,6 @@ export interface IUserAlternativeLoginDto {
   username: string;
   groupName: string;
   tokenId: number;
-  key: string;
+  key: any;
   type?: number;
 }

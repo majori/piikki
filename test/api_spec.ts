@@ -4,10 +4,11 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
+import { IConfig } from '../src/models/config';
 import * as seed from '../seeds/data/test';
 import * as helper from './helpers';
 
-const cfg = require('../config');
+const cfg: IConfig = require('../config'); // tslint:disable-line
 
 import { createApp } from '../src/app';
 
@@ -40,18 +41,18 @@ describe('API', () => {
   const RESTRICTED_TOKEN = helper.restrictedToken;
 
   const PREFIX = '/api/v1';
-  let API: Express;
+  let API: ChaiHttp.Agent;
 
   // Clear tables and migrate to latest
   before(async () => {
       await helper.clearDbAndRunSeed();
-      API = await createApp(cfg);
+      API = request(await createApp(cfg));
   });
 
   describe('Restricted', () => {
 
     it('create new user [POST /users/create]', (done) => {
-      request(API)
+      API
       .post(`${PREFIX}/restricted/users/create`)
       .set('Authorization', RESTRICTED_TOKEN)
       .send(USER_2)
@@ -66,7 +67,7 @@ describe('API', () => {
 
       // With right password
       .then(() => {
-        request(API)
+        API
         .post(`${PREFIX}/restricted/users/authenticate`)
         .set('Authorization', RESTRICTED_TOKEN)
         .send(USER)
@@ -79,7 +80,7 @@ describe('API', () => {
 
       // With wrong password
       .then(() => {
-        request(API)
+        API
         .post(`${PREFIX}/restricted/users/authenticate`)
         .set('Authorization', RESTRICTED_TOKEN)
         .send({ username: USER.username, password: 'wrong_password' })
@@ -92,7 +93,7 @@ describe('API', () => {
 
       // With wrong username
       .then(() => {
-        request(API)
+        API
         .post(`${PREFIX}/restricted/users/authenticate`)
         .set('Authorization', RESTRICTED_TOKEN)
         .send({ username: 'wrong_username', password: USER.password })
@@ -104,8 +105,63 @@ describe('API', () => {
       });
     });
 
-    it('create alternative login');
-    it('authenticate with alternative login');
+    it('create alternative login [POST /group/members/:username/authenticate/create]', (done) => {
+      const key = 'some_kind_of_id';
+
+      API
+      .post(`${PREFIX}/restricted/group/members/${USER.username}/authenticate/create`)
+      .set('Authorization', RESTRICTED_TOKEN)
+      .send({ key })
+      .end((err: any, res) => {
+        expectOk(err, res);
+        expect(res.body.result.key).to.equal(key);
+        done();
+      });
+    });
+
+    it('authenticate with alternative login [POST group/members/:username/authenticate]', (done) => {
+      const right_key = 'some_kind_of_id';
+
+      // Right username with right key
+      new Promise((resolve, reject) => {
+        API
+        .post(`${PREFIX}/restricted/group/members/${USER.username}/authenticate`)
+        .set('Authorization', RESTRICTED_TOKEN)
+        .send({ key: right_key })
+        .end((err: any, res) => {
+          expectOk(err, res);
+          expect(res.body.result.authenticated).to.equal(true);
+          resolve();
+        });
+      })
+
+      // Right username with wrong key
+      .then(() => new Promise((resolve, reject) => {
+        API
+        .post(`${PREFIX}/restricted/group/members/${USER.username}/authenticate`)
+        .set('Authorization', RESTRICTED_TOKEN)
+        .send({ key: 'wrong_key' })
+        .end((err: any, res) => {
+          expectOk(err, res);
+          expect(res.body.result.authenticated).to.equal(false);
+          resolve();
+        });
+      }))
+
+      // Wrong username with right key
+      .then(() => {
+        API
+        .post(`${PREFIX}/restricted/group/members/wrong_user/authenticate`)
+        .set('Authorization', RESTRICTED_TOKEN)
+        .send({ key: right_key })
+        .end((err: any, res) => {
+          expectOk(err, res);
+          expect(res.body.result.authenticated).to.equal(false);
+          done();
+        });
+      });
+    });
+
     it('reset password');
     it('reset username');
     it('get group members');
@@ -142,7 +198,7 @@ describe('API', () => {
 
   describe('Admin', () => {
     it('create a restricted token', (done) => {
-      request(API)
+      API
       .post(`${PREFIX}/admin/tokens/restricted`)
       .set('Authorization', ADMIN_TOKEN)
       .send({ groupName: GROUP.groupName, comment: 'Test token'})
@@ -154,7 +210,7 @@ describe('API', () => {
     });
 
     it('create a global token', (done) => {
-      request(API)
+      API
       .post(`${PREFIX}/admin/tokens/global`)
       .set('Authorization', ADMIN_TOKEN)
       .send({ comment: 'Test token' })
@@ -166,7 +222,7 @@ describe('API', () => {
     });
 
     it('create a admin token', (done) => {
-      request(API)
+      API
       .post(`${PREFIX}/admin/tokens/admin`)
       .set('Authorization', ADMIN_TOKEN)
       .send({ comment: 'Test token' })
@@ -178,7 +234,7 @@ describe('API', () => {
     });
 
     it('get tokens', (done) => {
-      request(API)
+      API
       .get(`${PREFIX}/admin/tokens`)
       .set('Authorization', ADMIN_TOKEN)
       .end((err: any, res) => {
@@ -192,7 +248,7 @@ describe('API', () => {
       Promise.resolve()
       .then(() => {
         return new Promise((resolve, reject) => {
-          request(API)
+          API
           .get(`${PREFIX}/admin/tokens`)
           .set('Authorization', ADMIN_TOKEN)
           .end((err: any, res) => {
@@ -206,7 +262,7 @@ describe('API', () => {
 
       .then((token) => {
         return new Promise((resolve, reject) => {
-          request(API)
+          API
           .del(`${PREFIX}/admin/tokens`)
           .set('Authorization', ADMIN_TOKEN)
           .send({ token })
@@ -218,7 +274,7 @@ describe('API', () => {
       })
 
       .then(() => {
-        request(API)
+        API
         .get(`${PREFIX}/admin/tokens`)
         .set('Authorization', ADMIN_TOKEN)
         .end((err: any, res) => {

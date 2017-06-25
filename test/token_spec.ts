@@ -30,12 +30,15 @@ describe('Tokens', () => {
     });
   });
 
-  it('create a new token (restricted and global)', async () => {
+  it('create a new token', async () => {
     const restricted = await tokenCore.createRestrictedToken(GROUP, 'Organization A');
     expect(restricted).to.be.string;
 
     const global = await tokenCore.createGlobalToken('For my buddy Bob');
     expect(global).to.be.string;
+
+    const admin = await tokenCore.createAdminToken('For the allmighty');
+    expect(admin).to.be.string;
   });
 
 });

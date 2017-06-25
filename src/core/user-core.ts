@@ -110,13 +110,14 @@ export async function userExists(username: string) {
 export async function userNotExists(username: string) {
   try {
     await userExists(username);
+    throw new ConflictError(`User ${username} already exists`);
   } catch (err) {
     if (err instanceof NotFoundError) {
       return true;
+    } else {
+      throw err;
     }
   }
-
-  throw new ConflictError(`User ${username} already exists`);
 }
 
 // Resets user's password
@@ -189,7 +190,7 @@ export async function getAlternativeLogin(login: IUserAlternativeLoginDto): Prom
 }
 
 export async function createAlternativeLogin(login: IUserAlternativeLoginDto) {
-  const hash = _hashString(login.key);
+  const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
   const group = await groupExists(login.groupName);
 
