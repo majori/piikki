@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import * as path from 'path';
 import * as _ from 'lodash';
 
@@ -44,3 +45,18 @@ export const clearDbAndRunSeed = async () => {
   await clearDb();
   await runSeed();
 };
+
+export function expectOk(err: any, res: ChaiHttp.Response) {
+  expect(err).to.be.null;
+  expect(res).to.be.json;
+  expect(res).to.have.status(200);
+  expect(res.body).to.have.property('ok', true);
+  expect(res.body).to.have.property('result');
+}
+
+export function expectError(err: any, res: ChaiHttp.Response) {
+  expect(err).not.to.be.null;
+  expect(res).to.be.json;
+  expect(res.body).to.have.property('ok', false);
+  expect(res.body).to.have.property('message');
+}
