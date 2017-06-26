@@ -1,11 +1,7 @@
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
-const fs = require('fs');
 
 module.exports = (knex, Promise, data) => {
-
-  // Write the data to file
-  fs.writeFileSync(`${__dirname}/${Date.now()}_data.json`, JSON.stringify(data, null, 1), 'utf8');
 
   // Deletes ALL existing entries
   return knex('token_group_access').del()
