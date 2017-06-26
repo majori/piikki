@@ -2,7 +2,7 @@ const moment = require('moment');
 
 const time = moment().utc();
 
-module.exports = {
+const data = {
   users: [
     {
       username: 'testUser1',
@@ -40,11 +40,6 @@ module.exports = {
       username: 'testUser3',
       groupName: 'group2',
       saldo: 5
-    },
-    {
-      username: 'testUser3',
-      groupName: 'group2',
-      saldo: -5
     }
   ],
   tokens: [
@@ -104,4 +99,16 @@ module.exports = {
       timestamp: time.format()
     }
   ]
-}
+};
+
+const meta = {
+  membersInGroup: {
+    group1: 2,
+    group2: 2,
+  }
+};
+
+module.exports = {
+  data,
+  meta,
+};

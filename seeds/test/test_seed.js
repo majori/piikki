@@ -1,4 +1,4 @@
 const runSeed = require('../runSeed')
-const data = require('../data/test');
+const seed = require('../data/test');
 
-exports.seed = (knex, Promise) => runSeed(knex, Promise, data);
+exports.seed = (knex, Promise) => runSeed(knex, Promise, seed.data);

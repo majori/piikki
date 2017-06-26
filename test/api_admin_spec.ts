@@ -68,7 +68,7 @@ describe('Admin API', () => {
     .set('Authorization', helper.adminToken)
     .end((err: any, res) => {
       expectOk(err, res);
-      expect(res.body.result).to.have.length(seed.tokens.length + 3);
+      expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
       done();
     });
   });
@@ -82,7 +82,7 @@ describe('Admin API', () => {
       .set('Authorization', helper.adminToken)
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result).to.have.length(seed.tokens.length + 3);
+        expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
         const token: any = _.last(res.body.result);
         resolve(token.token);
       });
@@ -109,7 +109,7 @@ describe('Admin API', () => {
       .set('Authorization', helper.adminToken)
       .end((err: any, res) => {
         expectOk(err, res);
-        expect(res.body.result).to.have.length(seed.tokens.length + 2);
+        expect(res.body.result).to.have.length(seed.data.tokens.length + 2);
         done();
       });
     });

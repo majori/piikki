@@ -98,7 +98,7 @@ export async function authenticateUser(user: IUserDto) {
 
 // Checks if user is in database
 export async function userExists(username: string) {
-  const row: IDatabaseUser = await knex.from('users').where({ username }).first();
+  const row: IDatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
   if (row) {
     return row;

@@ -1,3 +1,4 @@
+/* tslint:disable:no-unused-expression */
 import { expect } from 'chai';
 import * as path from 'path';
 import * as _ from 'lodash';
@@ -9,8 +10,8 @@ import * as seed from '../seeds/data/test';
 
 const cfg: IConfig = require('../config');
 
-export const user = seed.users[0];
-export const group = seed.groups[0];
+export const user = seed.data.users[0];
+export const group = seed.data.groups[0];
 
 export const adminToken = 'admin_token';
 export const globalToken = 'global_token';
@@ -58,5 +59,7 @@ export function expectError(err: any, res: ChaiHttp.Response) {
   expect(err).not.to.be.null;
   expect(res).to.be.json;
   expect(res.body).to.have.property('ok', false);
-  expect(res.body).to.have.property('message');
+  expect(res.body).to.have.property('error');
+  expect(res.body.error).to.have.property('type');
+  expect(res.body.error).to.have.property('message');
 }
