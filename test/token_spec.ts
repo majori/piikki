@@ -14,19 +14,19 @@ import * as seed from '../seeds/data/test';
 
 describe('Tokens', () => {
 
-  const GROUP = seed.groups[0].groupName;
+  const GROUP = seed.data.groups[0].groupName;
 
   before(helper.clearDbAndRunSeed);
 
   it('get existing tokens from database', async () => {
     const tokens = await tokenCore.getTokens();
 
-    expect(tokens).to.have.length(seed.tokens.length);
+    expect(tokens).to.have.length(seed.data.tokens.length);
 
     _.forEach(tokens, (token, i) => {
       expect(token).to.have.property('token');
-      expect(token).to.have.property('role', seed.tokens[i].role);
-      expect(token).to.have.property('comment', seed.tokens[i].comment);
+      expect(token).to.have.property('role', seed.data.tokens[i].role);
+      expect(token).to.have.property('comment', seed.data.tokens[i].comment);
     });
   });
 

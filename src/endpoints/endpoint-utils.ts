@@ -27,7 +27,12 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
 
     } catch (err) {
       appInsights.client.trackException(err);
-      console.error(err);
+
+      // TODO: Do not use console.error
+      if (!(process.env.NODE_ENV === 'test')) {
+        console.error(err);
+      }
+
       next(err);
     }
   };
