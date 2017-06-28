@@ -1,9 +1,9 @@
 /* tslint:disable max-classes-per-file */
-
 import { Request, Response, NextFunction } from 'express';
 import { STATUS_CODES } from 'http';
 import { IExtendedRequest } from './models/http';
 import * as appInsights from 'applicationinsights';
+import * as _ from 'lodash';
 
 export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
   const status = err.status ? err.status : 500;
@@ -19,18 +19,20 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
   // Set response status
   res.status(status);
 
-  // Track error response
-  appInsights.client.trackRequestSync(
-    req,
-    res,
-    (Date.now() - req.insights.startTime),
-    {
-      type: err.name,
-      status: err.status || 'Unknown',
-      message: err.message,
-      stack: JSON.stringify(err.stack),
-    },
-  );
+  // Track error response, ignore if request is from Azure ping service
+  if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
+    appInsights.client.trackRequestSync(
+      req,
+      res,
+      (Date.now() - req.insights.startTime),
+      {
+        type: err.name,
+        status: err.status || 'Unknown',
+        message: err.message,
+        stack: JSON.stringify(err.stack),
+      },
+    );
+  }
 
   res.send(response);
 };

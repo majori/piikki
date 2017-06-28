@@ -3,5 +3,8 @@ build/
 .vscode/
 .vs/
 
+.DS_Store
 npm-debug.log.*
-.env.local.json
+package-lock.json
+.env.*.js
+!.env.example.js

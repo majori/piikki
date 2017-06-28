@@ -13,15 +13,17 @@ import swagger from './swagger';
 
 import { IDatabaseToken } from './models/database';
 import { IExtendedRequest } from './models/http';
+import { IConfig } from './models/config';
 
-export async function createApp(cfg: any) {
+export async function createApp(cfg: IConfig) {
   const app = express();
 
   // 3rd party middleware
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(methodOverride());
-  app.options('*', cors());
+  app.use(cors(cfg.cors));
+  app.options('*', cors(cfg.cors));
 
   // Setup Application Insights
   const insights = appInsights

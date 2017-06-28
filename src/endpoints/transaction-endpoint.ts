@@ -13,6 +13,8 @@ import {
 import { IExtendedRequest } from '../models/http';
 import { ITransactionDto } from '../models/transaction';
 
+import { ValidationError } from '../errors';
+
 const _endpoint = {
   makeTransaction: async (req: IExtendedRequest) => {
     let transactions = req.body;
@@ -23,7 +25,7 @@ const _endpoint = {
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    return Promise.all(_.map(transactions, (trx: ITransactionDto) => {
+    const results = await Promise.all(_.map(transactions, (trx: ITransactionDto) => {
 
       // If request comes from group specific token, use token related group name
       trx.groupName = (req.piikki.groupAccess.group.name) ?
@@ -40,20 +42,54 @@ const _endpoint = {
 
       return transCore.makeTransaction(transaction);
     }));
+
+    return (_.size(results) === 1) ? _.first(results) : results;
   },
 
   getUserTransactions: async (req: IExtendedRequest) => {
     const username = validateUsername(req.params.username);
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const from = validateTimestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
 
-    return transCore.getUserTransactions(username, timestamp);
+    return transCore.getUserTransactions(username, from, to);
   },
 
   getGroupTransactions: async (req: IExtendedRequest) => {
-    const groupName = validateGroupName(req.params.groupName);
-    const timestamp = validateTimestamp(req.query.timestamp);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const from = validateTimestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
 
-    return transCore.getGroupTransactions(groupName, timestamp);
+    return transCore.getGroupTransactions(groupName, from, to);
+  },
+
+  getUserTransactionsFromGroup: async (req: IExtendedRequest) => {
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const from = validateTimestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+
+    return transCore.getUserTransactionsFromGroup(username, groupName, from, to);
+  },
+
+  getGroupSaldo: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const from = validateTimestamp(req.query.from);
+
+    const result = await transCore.getGroupSaldo(groupName, from);
+
+    return {
+      groupName,
+      timestamp: from.format('YYYY-MM-DD'),
+      saldo: result.saldo || 0,
+    };
+  },
+
+  getDailyGroupSaldos: async (req: IExtendedRequest) => {
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const from = validateTimestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+
+    return transCore.getDailyGroupSaldosSince(groupName, from, to);
   },
 };
 

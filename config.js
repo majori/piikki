@@ -7,6 +7,7 @@ cfg.dir = {
   source: path.join(__dirname, 'src'),
   build: path.join(__dirname, 'build'),
   migrations: path.join(__dirname, 'migrations'),
+  seeds: path.join(__dirname, 'seeds'),
   library: path.join(__dirname, 'lib'),
   documents: path.join(__dirname, 'docs'),
 };
@@ -22,6 +23,8 @@ cfg.appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 //
 cfg.hostname = process.env.PIIKKI_HTTP_HOSTNAME || 'localhost';
 cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
+
+cfg.cors = {};
 
 // ### Database configs
 //

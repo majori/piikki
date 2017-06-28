@@ -35,3 +35,10 @@ export interface IDatabaseToken {
   group_name: string;
   comment?: string;
 }
+
+export interface IDatabaseAlternativeLogin {
+  username: string;
+  group_name: string;
+  type: number | null;
+  hashed_key: string;
+}

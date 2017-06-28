@@ -19,7 +19,9 @@ export async function createGroup(groupName: string) {
   await knex.from('groups').insert({ name: groupName });
   await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
-  appInsights.client.trackEvent('Group create', { groupName });
+  if (appInsights.client) {
+    appInsights.client.trackEvent('Group create', { groupName });
+  }
   return groupName;
 }
 
@@ -78,6 +80,12 @@ export function getGroups(): QueryBuilder {
   return knex
     .from('groups')
     .select('name');
+}
+
+export function getGroup(groupName: string): QueryBuilder {
+  return getGroups()
+    .where({ name: groupName })
+    .first();
 }
 
 export async function addUserToGroup(username: string, groupName: string) {

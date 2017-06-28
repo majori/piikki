@@ -1,8 +1,15 @@
 import * as _ from 'lodash';
 
 import * as userCore from '../core/user-core';
-import { ConflictError } from '../errors';
-import { createJsonRoute, validateUser, validateUsername, validateGroupName, validatePassword } from './endpoint-utils';
+import { ConflictError, ValidationError } from '../errors';
+import {
+  createJsonRoute,
+  validateUser,
+  validateUsername,
+  validateGroupName,
+  validatePassword,
+  validateAlternativeLoginKey,
+} from './endpoint-utils';
 
 import { IExtendedRequest } from '../models/http';
 import { IUserDto } from '../models/user';
@@ -29,7 +36,42 @@ const _endpoint = {
     const user = validateUser(req.body);
 
     const authenticated = await userCore.authenticateUser(user);
-    return { authenticated };
+    return { username: user.username, authenticated };
+  },
+
+  alternativeAuthenticateUser: async (req: IExtendedRequest) => {
+    const type = req.body.type;
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const key = validateAlternativeLoginKey(req.body.key);
+
+    const found = await userCore.getAlternativeLogin({
+      username,
+      key,
+      type,
+      groupName,
+      tokenId: req.piikki.token.id,
+    });
+    return {
+      authenticated: !_.isEmpty(found),
+    };
+  },
+
+  createAlternativeLogin: async (req: IExtendedRequest) => {
+    const type = req.body.type;
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const key = validateAlternativeLoginKey(req.body.key);
+
+    await userCore.createAlternativeLogin({
+      username,
+      key,
+      type,
+      groupName,
+      tokenId: req.piikki.token.id,
+    });
+
+    return { username, groupName, key };
   },
 
   deleteUser: async (req: IExtendedRequest) => {
@@ -45,7 +87,7 @@ const _endpoint = {
     });
     const newPassword = validatePassword(req.body.newPassword);
 
-    return userCore.resetPassword(user, newPassword)
+    return userCore.resetPassword(user, newPassword);
   },
 
   forceResetPassword: async (req: IExtendedRequest) => {

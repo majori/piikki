@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import * as Debug from 'debug';
 
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
@@ -7,8 +6,6 @@ import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
 import { IExtendedRequest } from './models/http';
-
-const debug = Debug('piikki:router');
 
 export function initApiRoutes() {
   const mainRouter = Router();
@@ -45,7 +42,6 @@ function _restrictedTokenRoutes() {
     if (!req.piikki.groupAccess.all) {
       next();
     } else {
-      debug('Denied access to restricted routes');
       res.status(403).json({
         ok: false,
         error: {
@@ -59,10 +55,19 @@ function _restrictedTokenRoutes() {
   // Apply common routes
   restrictedR.use(_commonRoutes());
 
+  restrictedR.get('/group', groupEndpoint.getCurrentGroup);
+
   restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
+  restrictedR.post('/group/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
+  restrictedR.post('/group/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
+
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
+  restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
+  restrictedR.get('/group/transactions/:username', transactionEndpoint.getUserTransactionsFromGroup);
+  restrictedR.get('/group/saldo', transactionEndpoint.getGroupSaldo);
+  restrictedR.get('/group/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
 
   return restrictedR;
 }
@@ -76,7 +81,6 @@ function _globalTokenRoutes() {
     if (req.piikki.groupAccess.all) {
       next();
     } else {
-      debug('Denied access to global routes');
       res.status(403).json({
         ok: false,
         error: {
@@ -90,7 +94,6 @@ function _globalTokenRoutes() {
   // If client targets some group, insert the group name to request
   // so endpoint functions can look the group name from the same place
   globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
-    if (name) { debug(`Found group name parameter in url: ${name}`); }
     req.piikki.groupAccess.group.name = name;
     next();
   });
@@ -101,12 +104,20 @@ function _globalTokenRoutes() {
   globalR.get('/users', userEndpoint.getUsers);
   globalR.get('/users/:username', userEndpoint.getUser);
   globalR.delete('/users', userEndpoint.deleteUser);
+
   globalR.get('/groups', groupEndpoint.getGroups);
   globalR.post('/groups/create', groupEndpoint.createGroup);
+
   globalR.get('/groups/:groupName/members', groupEndpoint.getGroupMembers);
   globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
+  globalR.post('/group/:groupName/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
+  globalR.post('/group/:groupName/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
+
   globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
+  globalR.get('/group/:groupName/saldo', transactionEndpoint.getGroupSaldo);
+  globalR.get('/group/:groupName/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
   globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
+
   globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
   globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
 
@@ -122,7 +133,6 @@ function _adminTokenRoutes() {
     if (req.piikki.admin.isAdmin) {
       next();
     } else {
-      debug('Denied access to admin routes');
       res.status(403).json({
         ok: false,
         error: {
@@ -133,6 +143,7 @@ function _adminTokenRoutes() {
     }
   });
 
+  adminR.get('/tokens', adminEndpoint.getTokens);
   adminR.post('/tokens/global', adminEndpoint.createGlobalToken);
   adminR.post('/tokens/restricted', adminEndpoint.createRestrictedToken);
   adminR.post('/tokens/admin', adminEndpoint.createAdminToken);

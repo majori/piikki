@@ -46,6 +46,14 @@ const _endpoint = {
     const result = await groupCore.userIsInGroup(username, groupName);
     return groupCore.getUserFromGroup(result.group.name, result.user.username);
   },
+
+  getCurrentGroup: async (req: IExtendedRequest) => {
+    const groupName = req.piikki.groupAccess.group.name;
+
+    if (groupName) {
+      return await groupCore.getGroup(groupName);
+    }
+  },
 };
 
 // Wrap endpoint to produce JSON route

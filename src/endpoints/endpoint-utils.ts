@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import appInsights = require('applicationinsights');
+import * as appInsights from 'applicationinsights';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { ValidationError } from '../errors';
@@ -27,26 +27,30 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
 
     } catch (err) {
       appInsights.client.trackException(err);
-      console.error(err);
+
+      // TODO: Do not use console.error
+      if (!(process.env.NODE_ENV === 'test')) {
+        console.error(err);
+      }
+
       next(err);
     }
   };
 }
 
 // Check if username and password is valid
-export function validateUser(user: IUserDto) {
+export function validateUser(user: IUserDto): IUserDto {
   if (!_.isObject(user)) {
     throw new ValidationError('Invalid user object');
   }
 
-  try {
-    validatePassword(user.password);
-    validateUsername(user.username);
-  } catch (err) {
-    throw err;
-  }
+  const password = validatePassword(user.password);
+  const username = validateUsername(user.username);
 
-  return user;
+  return {
+    username,
+    password,
+  };
 }
 
 // Check if username is valid
@@ -95,11 +99,21 @@ export function validateGroupName(name: any): string {
   return name;
 }
 
+export function validateAlternativeLoginKey(key: any): any {
+  if (_.isUndefined(key))  { throw new ValidationError('Key was undefined'); }
+
+  return key;
+}
+
 export function validateTimestamp(timestamp: any) {
-  if (timestamp) {
-    const parsed = moment(timestamp);
-    return (parsed.isValid()) ? parsed : undefined;
-  } else {
-    return undefined;
+  if (_.isUndefined(timestamp)) {
+    throw new ValidationError(`Timestamp was undefined`);
   }
+
+  const parsed = moment(timestamp);
+  if (!parsed.isValid()) {
+    throw new ValidationError(`Timestamp "${timestamp}" is invalid`);
+  }
+
+  return parsed.utc();
 }

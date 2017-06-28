@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as Debug from 'debug';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
 import appInsights = require('applicationinsights');
@@ -10,9 +9,6 @@ import { Response, NextFunction } from 'express';
 import { IExtendedRequest } from './models/http';
 import { IDatabaseToken } from './models/database';
 
-const debug = Debug('piikki:tokenHandler');
-
-// If environment is not production, use development token
 let registeredTokens: IDatabaseToken[] = [];
 
 export async function initTokens() {
@@ -20,24 +16,18 @@ export async function initTokens() {
   // Fetch tokens from database if no tokens registered
   if (_.isEmpty(registeredTokens)) {
     const tokens = await getTokens();
-        // There is no tokens in the database, make new ones
+
+    // There is no tokens in the database, make new ones
     if (_.isEmpty(tokens)) {
-      debug('No tokens in database, creating an admin token');
-
       await createAdminToken('Created on initialize');
-
     } else {
-      debug('Registered tokens:', tokens);
+      await updateTokens(tokens);
     }
-
-    await updateTokens();
   }
 }
 
 // Authorize request by token found in "Authorization" header
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
-
-  debug(`Handling token ${req.get('Authorization')}`);
   const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
   if (!_.isUndefined(token)) {
 
@@ -54,18 +44,14 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
     // Set up global group access
     if (token.role === 'global') {
-      debug('Token had global access');
       req.piikki.groupAccess.all = true;
 
       // Set up admin level access
     } else if (token.role === 'admin') {
-      debug('Token had admin access');
       req.piikki.admin.isAdmin = true;
 
       // Set up restricted group access
     } else {
-      debug(`Token had restricted access to group "${token.group_name}"`);
-
       // Get group name from token
       req.piikki.groupAccess.group.name = token.group_name;
     }
@@ -81,23 +67,11 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
     // Request didn't have a proper token
   } else {
-
-    // Set status to unauthorized
-    res.status(401);
-
-    // Track unauthorized request if the request is not from azure ping service
-    if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
-      appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
-    }
-
     throw new AuthorizationError();
   }
 }
 
 // Fetch current tokens from database
-export function updateTokens() {
-  getTokens()
-    .then((tokens) => {
-      registeredTokens = tokens;
-    });
+export async function updateTokens(newTokens?: IDatabaseToken[]) {
+  registeredTokens = (newTokens) ? newTokens : await getTokens();
 }

@@ -31,6 +31,8 @@ const _endpoint = {
     return tokenCore.deleteToken(token);
   },
 
+  getTokens: async (req: IExtendedRequest) => tokenCore.getTokens(),
+
 };
 
 // Wrap endpoint to produce JSON route

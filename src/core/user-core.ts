@@ -1,14 +1,15 @@
 import * as bcrypt from 'bcrypt';
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
+import * as crypto from 'crypto';
 
 import { ConflictError, NotFoundError } from '../errors';
 import { knex} from '../database';
 import { groupExists } from './group-core';
 import * as appInsights from 'applicationinsights';
 
-import { IDatabaseUser, IDatabaseGroup } from '../models/database';
-import { IUserDto, IUserWithSaldo } from '../models/user';
+import { IDatabaseUser, IDatabaseGroup, IDatabaseAlternativeLogin } from '../models/database';
+import { IUserDto, IUserWithSaldo, IUserAlternativeLoginDto } from '../models/user';
 
 export const SALT_ROUNDS = 6;
 
@@ -66,7 +67,9 @@ export async function createUser(user: IUserDto) {
     password: hash,
   });
 
-  appInsights.client.trackEvent('User create', { username: user.username });
+  if (appInsights.client) {
+    appInsights.client.trackEvent('User create', { username: user.username });
+  }
   return user.username;
 }
 
@@ -78,14 +81,24 @@ export async function deleteUser(username: string) {
 
 // Compare raw password with the hashed one
 export async function authenticateUser(user: IUserDto) {
-  const row = await userExists(user.username);
+  try {
+    const row = await userExists(user.username);
+    return await bcrypt.compare(user.password, row.password);
+  } catch (err) {
+    // If user was not found, just response with failed authentication
+    if (err instanceof NotFoundError) {
+      return false;
 
-  return await bcrypt.compare(user.password, row.password);
+    // Some other error occured, pass the exception
+    } else {
+      throw err;
+    }
+  }
 }
 
 // Checks if user is in database
 export async function userExists(username: string) {
-  const row: IDatabaseUser = await knex.from('users').where({ username }).first();
+  const row: IDatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
   if (row) {
     return row;
@@ -97,15 +110,18 @@ export async function userExists(username: string) {
 export async function userNotExists(username: string) {
   try {
     await userExists(username);
+    throw new ConflictError(`User ${username} already exists`);
   } catch (err) {
     if (err instanceof NotFoundError) {
       return true;
+    } else {
+      throw err;
     }
   }
-
-  throw new ConflictError(`User ${username} already exists`);
 }
 
+// Resets user's password
+// Does require old password
 export async function resetPassword(user: IUserDto, newPassword: string) {
   const isSame = await authenticateUser(user);
 
@@ -136,8 +152,9 @@ export async function forceResetPassword(username: string, password: string) {
   return;
 }
 
+// Reset user's username
 export async function resetUsername(oldUsername: string, newUsername: string) {
-  await userExists(oldUsername);
+  await userExists(oldUsername); // Check if old user exists
   await userNotExists(newUsername); // Check if new username doesn't exists
   await knex
     .from('users')
@@ -147,8 +164,48 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
   return { username: newUsername };
 }
 
+export async function getAlternativeLogin(login: IUserAlternativeLoginDto): Promise<IDatabaseAlternativeLogin> {
+  const hash = _hashString(login.key);
+
+  const query = knex
+    .select(
+      'users.username',
+      'groups.name as group_name',
+      'alternative_login.hashed_key',
+      'alternative_login.type',
+    )
+    .from('alternative_login')
+    .join('users', { 'alternative_login.user_id': 'users.id' })
+    .join('groups', { 'alternative_login.group_id': 'groups.id' })
+    .join('tokens', { 'alternative_login.token_id': 'tokens.id' })
+    .where({ 'users.username': login.username })
+    .where({ 'groups.name': login.groupName })
+    .where({ 'alternative_login.hashed_key': hash });
+
+  if (login.type) {
+    query.where({ 'alternative_login.type': login.type });
+  }
+
+  return await query;
+}
+
+export async function createAlternativeLogin(login: IUserAlternativeLoginDto) {
+  const hash = _hashString(_.toString(login.key));
+  const user = await userExists(login.username);
+  const group = await groupExists(login.groupName);
+
+  return knex('alternative_login')
+    .insert({
+      user_id: user.id,
+      group_id: group.id,
+      token_id: login.tokenId,
+      type: login.type,
+      hashed_key: hash,
+    });
+}
+
 // Get all users in group
-export function _getUsersWithSaldos(): QueryBuilder {
+function _getUsersWithSaldos(): QueryBuilder {
   return knex
     .from('users')
     .leftJoin('user_saldos', { 'user_saldos.user_id': 'users.id' })
@@ -157,6 +214,12 @@ export function _getUsersWithSaldos(): QueryBuilder {
     .where({ 'users.active': true });
 }
 
+// Hash passwords
 async function _hashPassword(password: string) {
   return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+// Hash non-passwords
+function _hashString(str: string) {
+  return crypto.createHash('sha256').update(str).digest('hex');
 }

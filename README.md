@@ -1,4 +1,7 @@
 ![Piikki Logo](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki-logo-title.png)
+------
+
+[![Build Status](https://travis-ci.org/majori/piikki.svg?branch=development)](https://travis-ci.org/majori/piikki)
 
 _Piikki_ is a pre-payment system for small societies such as university clubs and non-profit organizations. Its purpose is to replace the classic tab-paper-sheet taped on the fridge door and offer users an easy way to check off refreshments and keep book of their own tab saldo.
 
@@ -9,6 +12,7 @@ This github project only includes server backend and api of the Piikki pre-payme
 **Clients currently under development:**
 - [RFID-reader](https://github.com/juilijoel/piikki-client-rfid) by [juilijoel](https://github.com/juilijoel)
 - [Telegram bot](https://github.com/majori/piikki-client-tg) by [majori](https://github.com/majori)
+- [Web UI](https://github.com/majori/piikki-client-web) by [majori](https://github.com/majori)
 
 If you are interested of making your own Piikki client and use our hosted backend service, please contact the [author](https://github.com/majori) to aquire your very own token!
 
