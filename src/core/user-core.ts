@@ -3,7 +3,7 @@ import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
 
-import { ConflictError, NotFoundError } from '../errors';
+import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import { knex} from '../database';
 import { groupExists } from './group-core';
 import * as appInsights from 'applicationinsights';
@@ -97,7 +97,10 @@ export async function authenticateUser(user: IUserDto) {
 }
 
 // Checks if user is in database
-export async function userExists(username: string) {
+export async function userExists(username?: string) {
+  if (_.isUndefined(username)) {
+    throw new ValidationError(`Username was undefined`);
+  }
   const row: IDatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
   if (row) {
@@ -178,15 +181,15 @@ export async function getAlternativeLogin(login: IUserAlternativeLoginDto): Prom
     .join('users', { 'alternative_login.user_id': 'users.id' })
     .join('groups', { 'alternative_login.group_id': 'groups.id' })
     .join('tokens', { 'alternative_login.token_id': 'tokens.id' })
-    .where({ 'users.username': login.username })
     .where({ 'groups.name': login.groupName })
-    .where({ 'alternative_login.hashed_key': hash });
+    .where({ 'alternative_login.hashed_key': hash })
+    .where({ 'alternative_login.type': login.type || null });
 
-  if (login.type) {
-    query.where({ 'alternative_login.type': login.type });
+  if (login.username) {
+    query.where({ 'users.username': login.username });
   }
 
-  return await query;
+  return await query.first();
 }
 
 export async function createAlternativeLogin(login: IUserAlternativeLoginDto) {
@@ -199,7 +202,7 @@ export async function createAlternativeLogin(login: IUserAlternativeLoginDto) {
       user_id: user.id,
       group_id: group.id,
       token_id: login.tokenId,
-      type: login.type,
+      type: login.type || null,
       hashed_key: hash,
     });
 }

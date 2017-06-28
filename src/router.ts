@@ -26,6 +26,8 @@ function _commonRoutes() {
 
   commonR.post('/users/create', userEndpoint.createUser);
   commonR.post('/users/authenticate', userEndpoint.authenticateUser);
+  commonR.post('/users/authenticate/alternative', userEndpoint.alternativeAuthenticateUser);
+  commonR.post('/users/authenticate/alternative/create', userEndpoint.createAlternativeLogin);
   commonR.put('/users/reset/username', userEndpoint.resetUsername);
   commonR.put('/users/reset/password', userEndpoint.resetPassword);
   commonR.post('/transaction', transactionEndpoint.makeTransaction);
@@ -59,8 +61,6 @@ function _restrictedTokenRoutes() {
 
   restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
-  restrictedR.post('/group/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
-  restrictedR.post('/group/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
 
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
@@ -110,8 +110,6 @@ function _globalTokenRoutes() {
 
   globalR.get('/groups/:groupName/members', groupEndpoint.getGroupMembers);
   globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
-  globalR.post('/group/:groupName/members/:username/authenticate', userEndpoint.alternativeAuthenticateUser);
-  globalR.post('/group/:groupName/members/:username/authenticate/create', userEndpoint.createAlternativeLogin);
 
   globalR.post('/groups/:groupName/addMember', groupEndpoint.addMember);
   globalR.get('/group/:groupName/saldo', transactionEndpoint.getGroupSaldo);

@@ -14,7 +14,7 @@
 				{
 					"name": "Get tokens",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/admin/tokens/global",
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/admin/tokens",
 						"method": "GET",
 						"header": [
 							{
@@ -30,7 +30,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"comment\": \"<comment-here>\"\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -285,7 +285,7 @@
 				{
 					"name": "Create alternative login",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/members/{{username}}/authenticate/create",
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/users/authenticate/alternative/create",
 						"method": "POST",
 						"header": [
 							{
@@ -301,7 +301,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+							"raw": "{\n\t\"type\": 2,\n\t\"key\": \"IDENTIFIER\",\n\t\"username\": \"user1\",\n\t\"groupName\": \"group1\"\n}"
 						},
 						"description": ""
 					},
@@ -310,7 +310,7 @@
 				{
 					"name": "Authenticate with alternative login copy",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/group/{{groupname}}/members/{{username}}/authenticate",
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/global/users/authenticate/alternative",
 						"method": "POST",
 						"header": [
 							{
@@ -326,7 +326,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+							"raw": "{\n\t\"key\": \"IDENTIFIER\",\n\t\"groupName\": \"group1\"\n}"
 						},
 						"description": ""
 					},
@@ -804,7 +804,7 @@
 				{
 					"name": "Create alternative login",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}/authenticate/create",
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/users/authenticate/alternative/create",
 						"method": "POST",
 						"header": [
 							{
@@ -820,7 +820,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+							"raw": "{\n\t\"key\": \"IDENTIFIER\",\n\t\"username\": \"user1\"\n}"
 						},
 						"description": ""
 					},
@@ -829,7 +829,7 @@
 				{
 					"name": "Authenticate with alternative login",
 					"request": {
-						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/group/members/{{username}}/authenticate",
+						"url": "{{protocol}}://{{piikki_domain}}/api/v1/restricted/users/authenticate/alternative",
 						"method": "POST",
 						"header": [
 							{
@@ -845,7 +845,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": 1,\n  \"key\": \"IDENTIFIER\"\n}"
+							"raw": "{\n  \"key\": \"IDENTIFIER\"\n}"
 						},
 						"description": ""
 					},

@@ -41,26 +41,32 @@ const _endpoint = {
 
   alternativeAuthenticateUser: async (req: IExtendedRequest) => {
     const type = req.body.type;
-    const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const groupName = validateGroupName(
+      (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
+    );
     const key = validateAlternativeLoginKey(req.body.key);
 
     const found = await userCore.getAlternativeLogin({
-      username,
       key,
       type,
       groupName,
       tokenId: req.piikki.token.id,
     });
-    return {
-      authenticated: !_.isEmpty(found),
-    };
+    return _.isEmpty(found) ?
+      { authenticated: false } :
+      {
+        authenticated: true,
+        username: found.username,
+        groupName,
+      };
   },
 
   createAlternativeLogin: async (req: IExtendedRequest) => {
     const type = req.body.type;
-    const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const username = validateUsername(req.body.username);
+    const groupName = validateGroupName(
+      (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
+    );
     const key = validateAlternativeLoginKey(req.body.key);
 
     await userCore.createAlternativeLogin({
@@ -71,7 +77,7 @@ const _endpoint = {
       tokenId: req.piikki.token.id,
     });
 
-    return { username, groupName, key };
+    return { type, key, username, groupName  };
   },
 
   deleteUser: async (req: IExtendedRequest) => {

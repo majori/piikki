@@ -10,9 +10,9 @@ export interface IUserWithSaldo {
 }
 
 export interface IUserAlternativeLoginDto {
-  username: string;
+  key: any;
   groupName: string;
   tokenId: number;
-  key: any;
   type?: number;
+  username?: string;
 }
