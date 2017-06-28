@@ -28,7 +28,7 @@ export async function initTokens() {
 
 // Authorize request by token found in "Authorization" header
 export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
-  const token = _.find(registeredTokens, ['token', req.get('Authorization')]);
+  const token = _.find(registeredTokens, { token: req.get('Authorization') });
   if (!_.isUndefined(token)) {
 
     req.piikki = {
