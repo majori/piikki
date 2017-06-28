@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
@@ -48,7 +48,7 @@
     "nodemon": "^1.11.0",
     "ts-node": "^3.0.6",
     "tslint": "^5.4.3",
-    "typescript": "^2.4.0"
+    "typescript": "^2.4.1"
   },
   "dependencies": {
     "applicationinsights": "^0.19.0",

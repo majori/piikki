@@ -65,9 +65,9 @@ describe('Global API', () => {
 
   it('create alternative login for user', (done) => {
     API
-    .post(`${PREFIX}/group/${GROUP.groupName}/members/${USER.username}/authenticate/create`)
+    .post(`${PREFIX}/users/authenticate/alternative/create`)
     .set('Authorization', helper.globalToken)
-    .send({ key: ALTERNATIVE_KEY })
+    .send({ key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username })
     .end((err: any, res) => {
       expectOk(err, res);
       expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
@@ -79,9 +79,9 @@ describe('Global API', () => {
     // Right username with right key
     new Promise((resolve, reject) => {
       API
-      .post(`${PREFIX}/group/${GROUP.groupName}/members/${USER.username}/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.globalToken)
-      .send({ key: ALTERNATIVE_KEY })
+      .send({ key: ALTERNATIVE_KEY, groupName: GROUP.groupName })
       .end((err: any, res) => {
         expectOk(err, res);
         expect(res.body.result.authenticated).to.be.true;
@@ -92,9 +92,9 @@ describe('Global API', () => {
     // Right username with wrong key
     .then(() => new Promise((resolve, reject) => {
       API
-      .post(`${PREFIX}/group/${GROUP.groupName}/members/${USER.username}/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.globalToken)
-      .send({ key: 'wrong_key' })
+      .send({ key: 'wrong_key', groupName: GROUP.groupName })
       .end((err: any, res) => {
         expectOk(err, res);
         expect(res.body.result.authenticated).to.be.false;
@@ -105,9 +105,9 @@ describe('Global API', () => {
     // Wrong username with right key
     .then(() => {
       API
-      .post(`${PREFIX}/group/${GROUP.groupName}/members/wrong_user/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.globalToken)
-      .send({ key: ALTERNATIVE_KEY })
+      .send({ type: 2, key: ALTERNATIVE_KEY, groupName: GROUP.groupName })
       .end((err: any, res) => {
         expectOk(err, res);
         expect(res.body.result.authenticated).to.be.false;

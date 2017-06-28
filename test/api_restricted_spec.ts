@@ -84,9 +84,9 @@ describe('Restricted API', () => {
     const key = 'some_kind_of_id';
 
     API
-    .post(`${PREFIX}/group/members/${USER.username}/authenticate/create`)
+    .post(`${PREFIX}/users/authenticate/alternative/create`)
     .set('Authorization', helper.restrictedToken)
-    .send({ key })
+    .send({ key, username: USER.username })
     .end((err: any, res) => {
       expectOk(err, res);
       expect(res.body.result.key).to.equal(key);
@@ -100,7 +100,7 @@ describe('Restricted API', () => {
     // Right username with right key
     new Promise((resolve, reject) => {
       API
-      .post(`${PREFIX}/group/members/${USER.username}/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.restrictedToken)
       .send({ key: right_key })
       .end((err: any, res) => {
@@ -113,7 +113,7 @@ describe('Restricted API', () => {
     // Right username with wrong key
     .then(() => new Promise((resolve, reject) => {
       API
-      .post(`${PREFIX}/group/members/${USER.username}/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.restrictedToken)
       .send({ key: 'wrong_key' })
       .end((err: any, res) => {
@@ -123,12 +123,12 @@ describe('Restricted API', () => {
       });
     }))
 
-    // Wrong username with right key
+    // Wrong username with right type
     .then(() => {
       API
-      .post(`${PREFIX}/group/members/wrong_user/authenticate`)
+      .post(`${PREFIX}/users/authenticate/alternative`)
       .set('Authorization', helper.restrictedToken)
-      .send({ key: right_key })
+      .send({ key: right_key, type: 10 })
       .end((err: any, res) => {
         expectOk(err, res);
         expect(res.body.result.authenticated).to.be.false;
