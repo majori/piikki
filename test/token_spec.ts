@@ -4,7 +4,7 @@ import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
 
 import * as helper from './helpers';
-import { IConfig } from '../src/models/config';
+import { Config } from '../src/models/config';
 
 import * as tokenCore from '../src/core/token-core';
 import * as groupCore from '../src/core/group-core';

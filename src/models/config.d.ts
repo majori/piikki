@@ -1,4 +1,4 @@
-export interface IConfig {
+export type Config = {
   dir: {
     source: string;
     build: string;

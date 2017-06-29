@@ -4,10 +4,10 @@ import { QueryBuilder, JoinClause } from 'knex';
 
 import { NotFoundError } from '../errors';
 import { knex } from '../database';
-import { IDatabaseTransaction } from '../models/database';
-import { ITransactionDto, ITransactionFilter } from '../models/transaction';
+import { DatabaseTransaction } from '../models/database';
+import { TransactionDto, TransactionFilter } from '../models/transaction';
 
-export async function makeTransaction(newTrx: ITransactionDto) {
+export async function makeTransaction(newTrx: TransactionDto) {
   const userSaldo = await userHaveSaldo(newTrx.username, newTrx.groupName);
 
   let newSaldo;
@@ -154,7 +154,7 @@ async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Mo
     .groupBy('transactions.timestamp');
 }
 
-async function _getTransactions(filterObject: ITransactionFilter, from?: moment.Moment, to?: moment.Moment) {
+async function _getTransactions(filterObject: TransactionFilter, from?: moment.Moment, to?: moment.Moment) {
   const query = knex
     .from('transactions')
     .select(
@@ -184,7 +184,7 @@ async function _getTransactions(filterObject: ITransactionFilter, from?: moment.
     moment(to).utc().format(),
   );
 
-  const results: IDatabaseTransaction[] = await query;
+  const results: DatabaseTransaction[] = await query;
 
   // Omit comment field if it is null
   return _.map(results, (row) => (row.comment) ? row : _.omit(row, ['comment']));

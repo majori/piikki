@@ -11,7 +11,7 @@ import {
 } from './endpoint-utils';
 
 import { IExtendedRequest } from '../models/http';
-import { ITransactionDto } from '../models/transaction';
+import { TransactionDto } from '../models/transaction';
 
 import { ValidationError } from '../errors';
 
@@ -25,7 +25,7 @@ const _endpoint = {
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    const results = await Promise.all(_.map(transactions, (trx: ITransactionDto) => {
+    const results = await Promise.all(_.map(transactions, (trx: TransactionDto) => {
 
       // If request comes from group specific token, use token related group name
       trx.groupName = (req.piikki.groupAccess.group.name) ?

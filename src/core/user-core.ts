@@ -8,7 +8,7 @@ import { knex} from '../database';
 import { groupExists } from './group-core';
 import * as appInsights from 'applicationinsights';
 
-import { IDatabaseUser, IDatabaseGroup, IDatabaseAlternativeLogin } from '../models/database';
+import { DatabaseUser, DatabaseGroup, IDatabaseAlternativeLogin } from '../models/database';
 import { IUserDto, IUserWithSaldo, IUserAlternativeLoginDto } from '../models/user';
 
 export const SALT_ROUNDS = 6;
@@ -101,7 +101,7 @@ export async function userExists(username?: string) {
   if (_.isUndefined(username)) {
     throw new ValidationError(`Username was undefined`);
   }
-  const row: IDatabaseUser = await knex.from('users').where({ username, active: true }).first();
+  const row: DatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
   if (row) {
     return row;

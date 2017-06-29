@@ -1,4 +1,4 @@
-export interface IDatabaseUser {
+export type DatabaseUser = {
   id: number;
   username: string;
   password: string;
@@ -6,7 +6,7 @@ export interface IDatabaseUser {
   active: boolean;
 }
 
-export interface IDatabaseTransaction {
+export type DatabaseTransaction = {
   id?: number;
   user_id: number;
   group_id: number;
@@ -16,12 +16,12 @@ export interface IDatabaseTransaction {
   comment: string | null;
 }
 
-export interface IDatabaseGroup {
+export type DatabaseGroup = {
   id: number;
   name: string;
 }
 
-export interface IDatabaseUserSaldo {
+export type DatabaseUserSaldo = {
   id: number;
   user_id: number;
   group_id: number;

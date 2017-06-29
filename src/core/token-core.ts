@@ -6,7 +6,7 @@ import { groupExists, getGroups } from './group-core';
 import { updateTokens } from '../tokenHandler';
 
 import { QueryBuilder } from 'knex';
-import { IDatabaseGroup, IDatabaseToken } from '../models/database';
+import { DatabaseGroup, IDatabaseToken } from '../models/database';
 
 export async function createRestrictedToken(groupName: string, comment?: string) {
 

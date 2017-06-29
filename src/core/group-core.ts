@@ -7,10 +7,10 @@ import { userExists } from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex } from '../database';
 
-import { IDatabaseGroup, IDatabaseUser, IDatabaseUserSaldo  } from '../models/database';
+import { DatabaseGroup, DatabaseUser, DatabaseUserSaldo  } from '../models/database';
 
 export async function createGroup(groupName: string) {
-  const records: IDatabaseGroup[] = await knex.from('groups').where({ name: groupName });
+  const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
 
   if (!_.isEmpty(records)) {
     throw new ConflictError(`Group ${groupName} already exists`);
@@ -26,7 +26,7 @@ export async function createGroup(groupName: string) {
 }
 
 export async function groupExists(groupName: string) {
-  const row: IDatabaseGroup = await knex('groups').where({ name: groupName }).first();
+  const row: DatabaseGroup = await knex('groups').where({ name: groupName }).first();
 
   if (row) {
     return row;
@@ -65,7 +65,7 @@ export function getUsersFromGroup(groupName: string): QueryBuilder {
 }
 
 export async function getUserFromGroup(groupName: string, username: string) {
-  const row: IDatabaseUser = await getUsersFromGroup(groupName)
+  const row: DatabaseUser = await getUsersFromGroup(groupName)
     .andWhere({ 'users.username': username })
     .first();
 
