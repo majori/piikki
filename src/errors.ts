@@ -19,8 +19,9 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
   // Set response status
   res.status(status);
 
-  // Track error response, ignore if request is from Azure ping service
-  if (!_.includes(['52.178.179.0'], req.connection.remoteAddress)) {
+  // Track error response
+  // Ignore if request is to root (most likely Azure ping service)
+  if (req.path !== '/' ) {
     appInsights.client.trackRequestSync(
       req,
       res,
