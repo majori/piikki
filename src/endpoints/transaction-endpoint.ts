@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Moment } from 'moment';
 
 import * as transCore from '../core/transaction-core';
@@ -11,7 +12,7 @@ import {
 } from './endpoint-utils';
 
 import { IExtendedRequest } from '../models/http';
-import { ITransactionDto } from '../models/transaction';
+import { TransactionDto } from '../models/transaction';
 
 import { ValidationError } from '../errors';
 
@@ -25,7 +26,7 @@ const _endpoint = {
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    const results = await Promise.all(_.map(transactions, (trx: ITransactionDto) => {
+    const results = await Promise.all(_.map(transactions, (trx: TransactionDto) => {
 
       // If request comes from group specific token, use token related group name
       trx.groupName = (req.piikki.groupAccess.group.name) ?
@@ -73,7 +74,8 @@ const _endpoint = {
 
   getGroupSaldo: async (req: IExtendedRequest) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-    const from = validateTimestamp(req.query.from);
+    // Default to present if from-date is not given
+    const from = req.query.from ? validateTimestamp(req.query.from) : moment();
 
     const result = await transCore.getGroupSaldo(groupName, from);
 

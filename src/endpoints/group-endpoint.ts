@@ -4,7 +4,7 @@ import * as groupCore from '../core/group-core';
 import * as userCore from '../core/user-core';
 import { createJsonRoute, validateGroupName, validateUsername } from './endpoint-utils';
 
-import { IDatabaseGroup, IDatabaseUser } from '../models/database';
+import { DatabaseGroup, DatabaseUser } from '../models/database';
 import { IExtendedRequest } from '../models/http';
 
 const _endpoint = {

@@ -4,12 +4,12 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { IConfig } from '../src/models/config';
+import { Config } from '../src/models/config';
 import * as seed from '../seeds/data/test';
 import * as helper from './helpers';
 import { expectOk, expectError } from './helpers';
 
-const cfg: IConfig = require('../config'); // tslint:disable-line
+const cfg: Config = require('../config'); // tslint:disable-line
 
 import { createApp } from '../src/app';
 

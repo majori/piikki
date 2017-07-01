@@ -1,4 +1,4 @@
-export interface ITransactionDto {
+export type TransactionDto = {
   username: string;
   groupName: string;
   amount: number;
@@ -6,7 +6,7 @@ export interface ITransactionDto {
   comment?: string;
 }
 
-export interface ITransactionFilter {
+export type TransactionFilter = {
   'users.username'?: string;
   'groups.name'?: string;
 }

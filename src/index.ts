@@ -1,11 +1,11 @@
 import * as appInsights from 'applicationinsights';
 import * as _ from 'lodash';
 import { createApp } from './app';
-import { IConfig } from './models/config';
+import { Config } from './models/config';
 
-const config: IConfig = require('../config'); // tslint:disable-line
+const config: Config = require('../config'); // tslint:disable-line
 
-async function startServer(cfg: IConfig) {
+async function startServer(cfg: Config) {
   const app = await createApp(cfg);
 
   // Start server

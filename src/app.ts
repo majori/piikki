@@ -13,9 +13,9 @@ import swagger from './swagger';
 
 import { IDatabaseToken } from './models/database';
 import { IExtendedRequest } from './models/http';
-import { IConfig } from './models/config';
+import { Config } from './models/config';
 
-export async function createApp(cfg: IConfig) {
+export async function createApp(cfg: Config) {
   const app = express();
 
   // 3rd party middleware

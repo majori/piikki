@@ -4,11 +4,11 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import { knex } from '../src/database';
-import { IConfig } from '../src/models/config';
+import { Config } from '../src/models/config';
 
 import * as seed from '../seeds/data/test';
 
-const cfg: IConfig = require('../config');
+const cfg: Config = require('../config');
 
 export const user = seed.data.users[0];
 export const group = seed.data.groups[0];
