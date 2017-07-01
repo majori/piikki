@@ -75,7 +75,7 @@ const _endpoint = {
   getGroupSaldo: async (req: IExtendedRequest) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     // Default to present if from-date is not given
-    const from = req.query.from ? validateTimestamp(req.query.from) : moment();
+    const from = req.query.from ? validateTimestamp(req.query.from) : moment().utc();
 
     const result = await transCore.getGroupSaldo(groupName, from);
 
