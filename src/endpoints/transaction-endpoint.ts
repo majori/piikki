@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Moment } from 'moment';
 
 import * as transCore from '../core/transaction-core';
@@ -73,7 +74,8 @@ const _endpoint = {
 
   getGroupSaldo: async (req: IExtendedRequest) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-    const from = validateTimestamp(req.query.from);
+    // Default to present if from-date is not given
+    const from = req.query.from ? validateTimestamp(req.query.from) : moment();
 
     const result = await transCore.getGroupSaldo(groupName, from);
 
