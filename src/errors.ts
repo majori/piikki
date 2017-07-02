@@ -25,7 +25,7 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
     appInsights.client.trackRequestSync(
       req,
       res,
-      (Date.now() - req.insights.startTime),
+      _.get(req, 'insights.startTime') ? (Date.now() - req.insights.startTime) : 0,
       {
         type: err.name,
         status: err.status || 'Unknown',
