@@ -7,9 +7,9 @@ import { AuthorizationError } from './errors';
 
 import { Response, NextFunction } from 'express';
 import { IExtendedRequest } from './models/http';
-import { IDatabaseToken } from './models/database';
+import { DatabaseToken } from './models/database';
 
-let registeredTokens: IDatabaseToken[] = [];
+let registeredTokens: DatabaseToken[] = [];
 
 export async function initTokens() {
 
@@ -72,6 +72,6 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 }
 
 // Fetch current tokens from database
-export async function updateTokens(newTokens?: IDatabaseToken[]) {
+export async function updateTokens(newTokens?: DatabaseToken[]) {
   registeredTokens = (newTokens) ? newTokens : await getTokens();
 }

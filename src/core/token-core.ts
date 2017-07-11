@@ -6,7 +6,7 @@ import { groupExists, getGroups } from './group-core';
 import { updateTokens } from '../tokenHandler';
 
 import { QueryBuilder } from 'knex';
-import { DatabaseGroup, IDatabaseToken } from '../models/database';
+import { DatabaseGroup, DatabaseToken } from '../models/database';
 
 export async function createRestrictedToken(groupName: string, comment?: string) {
 
@@ -50,7 +50,7 @@ export async function createAdminToken(comment?: string) {
   return token;
 }
 
-export async function getTokens(): Promise<IDatabaseToken[]> {
+export async function getTokens(): Promise<DatabaseToken[]> {
   return _getTokens();
 }
 

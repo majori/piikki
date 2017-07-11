@@ -28,7 +28,7 @@ export type DatabaseUserSaldo = {
   saldo: number;
 }
 
-export interface IDatabaseToken {
+export type DatabaseToken = {
   id: number;
   token: string;
   role: 'restricted' | 'global' | 'admin';
@@ -36,7 +36,7 @@ export interface IDatabaseToken {
   comment?: string;
 }
 
-export interface IDatabaseAlternativeLogin {
+export type DatabaseAlternativeLogin = {
   username: string;
   group_name: string;
   type: number | null;
