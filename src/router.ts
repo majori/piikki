@@ -28,6 +28,7 @@ function _commonRoutes() {
   commonR.post('/users/authenticate', userEndpoint.authenticateUser);
   commonR.post('/users/authenticate/alternative', userEndpoint.alternativeAuthenticateUser);
   commonR.post('/users/authenticate/alternative/create', userEndpoint.createAlternativeLogin);
+  commonR.get('/users/authenticate/alternative/count', userEndpoint.getAlternativeLoginCount);
   commonR.put('/users/reset/username', userEndpoint.resetUsername);
   commonR.put('/users/reset/password', userEndpoint.resetPassword);
   commonR.post('/transaction', transactionEndpoint.makeTransaction);
