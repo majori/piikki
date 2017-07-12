@@ -29,9 +29,9 @@
   "produces": [
     "application/json"
   ],
-  "security": {
-    "APIKeyHeader": []
-  },
+  "security": [{
+    "api_key": []
+  }],
   "paths": {
     "/restricted/users/create": {
       "post": {
@@ -366,7 +366,7 @@
                 "result": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/userWithSaldo"     
+                    "$ref": "#/definitions/userWithSaldo"
                   }
                 }
               }
@@ -867,7 +867,7 @@
                 "result": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/userWithSaldo"     
+                    "$ref": "#/definitions/userWithSaldo"
                   }
                 }
               }
@@ -1066,7 +1066,7 @@
         }
       }
     },
-    
+
     "user": {
       "properties": {
         "username": {
@@ -1090,7 +1090,7 @@
     }
   },
   "securityDefinitions": {
-    "APIKeyHeader": {
+    "api_key": {
       "type": "apiKey",
       "in": "header",
       "name": "Authorization"
