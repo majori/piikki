@@ -4,6 +4,7 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
+import { NotFoundError } from '../src/errors';
 import { Config } from '../src/models/config';
 import * as seed from '../seeds/data/test';
 import * as helper from './helpers';
@@ -16,170 +17,121 @@ import { createApp } from '../src/app';
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
 
-const PREFIX = '/api/v1/global';
-let API: ChaiHttp.Agent;
+const API = new helper.Api(cfg, 'global');
 
 describe('Global API', () => {
 
   before(async () => {
     await helper.clearDbAndRunSeed();
-    API = request(await createApp(cfg));
+    await API.start();
   });
 
-  it('get users', (done) => {
-    API
-    .get(`${PREFIX}/users`)
-    .set('Authorization', helper.globalToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).have.length(seed.data.users.length);
-      done();
-    });
+  it('get users', async () => {
+    const res = await API.get('/users');
+
+    expectOk(res);
+    expect(res.body.result).have.length(seed.data.users.length);
   });
 
-  it('get user', (done) => {
-    API
-    .get(`${PREFIX}/users/${USER.username}`)
-    .set('Authorization', helper.globalToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.have.property('username', USER.username);
-      expect(res.body.result).to.have.property('saldos');
-      done();
-    });
+  it('get user', async () => {
+    const res = await API.get(`/users/${USER.username}`);
+
+    expectOk(res);
+    expect(res.body.result).to.have.property('username', USER.username);
+    expect(res.body.result).to.have.property('saldos');
   });
 
-  it('authenticate user', (done) => {
-    API
-    .post(`${PREFIX}/users/authenticate`)
-    .set('Authorization', helper.globalToken)
-    .send(USER)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result.authenticated).to.be.true;
-      done();
-    });
+  it('authenticate user', async () => {
+    const res = await API.post(
+      '/users/authenticate',
+      USER,
+    );
+
+    expectOk(res);
+    expect(res.body.result.authenticated).to.be.true;
+
   });
 
   const ALTERNATIVE_KEY = 'some_kind_of_id';
 
-  it('create alternative login for user', (done) => {
-    API
-    .post(`${PREFIX}/users/authenticate/alternative/create`)
-    .set('Authorization', helper.globalToken)
-    .send({ key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username })
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
-      done();
-    });
-  });
+  it('create alternative login for user', async () => {
+    const res = await API.post(
+      '/users/authenticate/alternative/create',
+      { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
+    );
 
-  it('authenticate with alternative login', (done) => {
+    expectOk(res);
+    expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
+});
+
+  it('authenticate with alternative login', async () => {
     // Right username with right key
-    new Promise((resolve, reject) => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.globalToken)
-      .send({ key: ALTERNATIVE_KEY, groupName: GROUP.groupName })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.true;
-        resolve();
-      });
-    })
+    const res1 = await API.post(
+      '/users/authenticate/alternative',
+      { key: ALTERNATIVE_KEY, groupName: GROUP.groupName },
+    );
+
+    expectOk(res1);
+    expect(res1.body.result.authenticated).to.be.true;
 
     // Right username with wrong key
-    .then(() => new Promise((resolve, reject) => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.globalToken)
-      .send({ key: 'wrong_key', groupName: GROUP.groupName })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        resolve();
-      });
-    }))
+    const res2 = await API.post(
+      '/users/authenticate/alternative',
+      { key: 'wrong_key', groupName: GROUP.groupName },
+    );
+
+    expectOk(res2);
+    expect(res2.body.result.authenticated).to.be.false;
 
     // Wrong username with right key
-    .then(() => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.globalToken)
-      .send({ type: 2, key: ALTERNATIVE_KEY, groupName: GROUP.groupName })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        done();
-      });
-    });
+    const res3 = await API.post(
+      '/users/authenticate/alternative',
+      { type: 2, key: ALTERNATIVE_KEY, groupName: GROUP.groupName },
+    );
+
+    expectOk(res3);
+    expect(res3.body.result.authenticated).to.be.false;
   });
 
   it('reset password');
   it('reset username');
 
-  it('get groups', (done) => {
-    API
-    .get(`${PREFIX}/groups`)
-    .set('Authorization', helper.globalToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.have.length(seed.data.groups.length);
-      done();
-    });
+  it('get groups', async () => {
+    const res = await API.get('/groups');
+    expectOk(res);
+    expect(res.body.result).to.have.length(seed.data.groups.length);
   });
 
-  it('get group members', (done) => {
-    API
-    .get(`${PREFIX}/groups`)
-    .set('Authorization', helper.globalToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.have.length(seed.meta.membersInGroup[GROUP.groupName]);
-      done();
-    });
+  it('get group members', async () => {
+    const res = await API.get('/groups');
+    expectOk(res);
+    expect(res.body.result).to.have.length(seed.meta.membersInGroup[GROUP.groupName]);
   });
 
-  it('get group member', (done) => {
-    API
-    .get(`${PREFIX}/groups/${GROUP.groupName}/members/${USER.username}`)
-    .set('Authorization', helper.globalToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.have.property('username', USER.username);
-      expect(res.body.result).to.have.property('saldo');
-      done();
-    });
+  it('get group member', async () => {
+    const res = await API.get(`/groups/${GROUP.groupName}/members/${USER.username}`)
+    expectOk(res);
+    expect(res.body.result).to.have.property('username', USER.username);
+    expect(res.body.result).to.have.property('saldo');
   });
 
-  it('create group', (done) => {
+  it('create group', async () => {
     const newGroup = 'new_group';
 
     // Create new group
-    new Promise((resolve, reject) => {
-      API
-      .post(`${PREFIX}/groups/create`)
-      .set('Authorization', helper.globalToken)
-      .send({ groupName: newGroup })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result).to.equal(newGroup)
-        done();
-      });
-    })
+    const res1 = await API.post(
+      '/groups/create',
+      { groupName: newGroup },
+    );
+
+    expectOk(res1);
+    expect(res1.body.result).to.equal(newGroup);
 
     // Check the group exists
-    .then(() => {
-      API
-      .get(`${PREFIX}/groups`)
-      .set('Authorization', helper.globalToken)
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result).to.have.length(seed.data.groups.length + 1);
-        done();
-      });
-    })
+    const res2 = await API.get('/groups');
+
+    expectOk(res2);
+    expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
   });
 
   it('add member to group');
@@ -190,31 +142,17 @@ describe('Global API', () => {
   it('get group saldo');
   it('get daily group saldo since');
 
-  it('delete user', (done) => {
+  it('delete user', async () => {
 
     // Delete user
-    new Promise((resolve, reject) => {
-      API
-      .del(`${PREFIX}/users`)
-      .set('Authorization', helper.globalToken)
-      .send({ username: USER.username})
-      .end((err: any, res) => {
-        expectOk(err, res);
-        resolve();
-      });
-    })
+    const res1 = await API.del(
+      '/users',
+      { username: USER.username},
+    );
+
+    expectOk(res1);
 
     // Check if he does still exists
-    .then(() => {
-      API
-      .get(`${PREFIX}/users/${USER.username}`)
-      .set('Authorization', helper.globalToken)
-      .end((err: any, res) => {
-        expectError(err, res);
-        expect(res.body.error.type).to.equal('NotFoundError');
-        done();
-      });
-    });
+    expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;
   });
 });
-

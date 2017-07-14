@@ -11,130 +11,105 @@ import { expectOk, expectError } from './helpers';
 
 const cfg: Config = require('../config'); // tslint:disable-line
 
-import { createApp } from '../src/app';
-
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
 
-const PREFIX = '/api/v1/restricted';
-let API: ChaiHttp.Agent;
+const API = new helper.Api(cfg, 'restricted');
 
 describe('Restricted API', () => {
 
   before(async () => {
     await helper.clearDbAndRunSeed();
-    API = request(await createApp(cfg));
+    await API.start();
   });
 
-  it('create new user [POST /users/create]', (done) => {
-    API
-    .post(`${PREFIX}/users/create`)
-    .set('Authorization', helper.restrictedToken)
-    .send({ username: 'otherUser', password: 'hackme' })
-    .end((err: any, res) => {
-      expectOk(err, res);
-      done();
-    });
+  it('create new user [POST /users/create]', async () => {
+    const res = await API
+      .post(
+        '/users/create',
+        { username: 'otherUser', password: 'hackme' },
+      );
+
+    expectOk(res);
   });
 
-  it('authenticate user [POST /users/authenticate]', (done) => {
-    Promise.resolve()
+  it('authenticate user [POST /users/authenticate]', async () => {
 
     // With right password
-    .then(() => {
-      API
-      .post(`${PREFIX}/users/authenticate`)
-      .set('Authorization', helper.restrictedToken)
-      .send(USER)
-      .end((err: any, res) => {
-          expectOk(err, res);
-          expect(res.body.result.authenticated).to.be.true;
-          return Promise.resolve();
-      });
-    })
+    const res1 = await API
+      .post(
+        '/users/authenticate',
+        USER,
+      );
+
+    expectOk(res1);
+    expect(res1.body.result.authenticated).to.be.true;
 
     // With wrong password
-    .then(() => {
-      API
-      .post(`${PREFIX}/users/authenticate`)
-      .set('Authorization', helper.restrictedToken)
-      .send({ username: USER.username, password: 'wrong_password' })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        return Promise.resolve();
-      });
-    })
+    const res2 = await API
+      .post(
+        '/users/authenticate',
+        { username: USER.username, password: 'wrong_password' },
+      );
+
+    expectOk(res2);
+    expect(res2.body.result.authenticated).to.be.false;
 
     // With wrong username
-    .then(() => {
-      API
-      .post(`${PREFIX}/users/authenticate`)
-      .set('Authorization', helper.restrictedToken)
-      .send({ username: 'wrong_username', password: USER.password })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        done();
-      });
-    });
+    const res3 = await API
+      .post(
+        '/users/authenticate',
+        { username: 'wrong_username', password: USER.password },
+      );
+
+    expectOk(res3);
+    expect(res3.body.result.authenticated).to.be.false;
   });
 
-  it('create alternative login [POST /group/members/:username/authenticate/create]', (done) => {
+  it('create alternative login [POST /group/members/:username/authenticate/create]', async () => {
     const key = 'some_kind_of_id';
 
-    API
-    .post(`${PREFIX}/users/authenticate/alternative/create`)
-    .set('Authorization', helper.restrictedToken)
-    .send({ key, username: USER.username })
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result.key).to.equal(key);
-      done();
-    });
+    const res = await API
+      .post(
+        '/users/authenticate/alternative/create',
+        { key, username: USER.username },
+      );
+
+    expectOk(res);
+    expect(res.body.result.key).to.equal(key);
   });
 
-  it('authenticate with alternative login [POST group/members/:username/authenticate]', (done) => {
+  it('authenticate with alternative login [POST group/members/:username/authenticate]', async () => {
     const right_key = 'some_kind_of_id';
 
     // Right username with right key
-    new Promise((resolve, reject) => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.restrictedToken)
-      .send({ key: right_key })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.true;
-        resolve();
-      });
-    })
+    const res1 = await API
+      .post(
+        '/users/authenticate/alternative',
+        { key: right_key },
+      );
+    expectOk(res1);
+    expect(res1.body.result.authenticated).to.be.true;
 
     // Right username with wrong key
-    .then(() => new Promise((resolve, reject) => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.restrictedToken)
-      .send({ key: 'wrong_key' })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        resolve();
-      });
-    }))
+    const res2 = await API
+      .post(
+        '/users/authenticate/alternative',
+        { key: 'wrong_key' },
+      );
+
+    expectOk(res2);
+    expect(res2.body.result.authenticated).to.be.false;
 
     // Wrong username with right type
-    .then(() => {
-      API
-      .post(`${PREFIX}/users/authenticate/alternative`)
-      .set('Authorization', helper.restrictedToken)
-      .send({ key: right_key, type: 10 })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.false;
-        done();
-      });
-    });
+    const res3 = await API
+      .post(
+        '/users/authenticate/alternative',
+        { key: right_key, type: 10 },
+      );
+
+    expectOk(res3);
+    expect(res3.body.result.authenticated).to.be.false;
   });
 
   it('reset password');

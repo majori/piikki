@@ -7,155 +7,112 @@ import { Express } from 'express';
 import { Config } from '../src/models/config';
 import * as seed from '../seeds/data/test';
 import * as helper from './helpers';
-import { expectOk, expectError } from './helpers';
+import { expectOk } from './helpers';
 
 const cfg: Config = require('../config'); // tslint:disable-line
-
-import { createApp } from '../src/app';
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
 
-const PREFIX = '/api/v1/admin';
-let API: ChaiHttp.Agent;
+const API = new helper.Api(cfg, 'admin');
 
 describe('Admin API', () => {
 
   before(async () => {
     await helper.clearDbAndRunSeed();
-    API = request(await createApp(cfg));
+    await API.start();
   });
 
-  it('create a restricted token', (done) => {
-    API
-    .post(`${PREFIX}/tokens/restricted`)
-    .set('Authorization', helper.adminToken)
-    .send({ groupName: GROUP.groupName, comment: 'Test token'})
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.be.string;
-      done();
-    });
+  it('create a restricted token', async () => {
+    const res = await API.post(
+      '/tokens/restricted',
+      { groupName: GROUP.groupName, comment: 'Test token'},
+    );
+
+    expectOk(res);
+    expect(res.body.result).to.be.string;
   });
 
-  it('create a global token', (done) => {
-    API
-    .post(`${PREFIX}/tokens/global`)
-    .set('Authorization', helper.adminToken)
-    .send({ comment: 'Test token' })
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.be.string;
-      done();
-    });
+  it('create a global token', async () => {
+    const res = await API.post(
+      '/tokens/global',
+      { comment: 'Test token' },
+    );
+
+    expectOk(res);
+    expect(res.body.result).to.be.string;
   });
 
-  it('create a admin token', (done) => {
-    API
-    .post(`${PREFIX}/tokens/admin`)
-    .set('Authorization', helper.adminToken)
-    .send({ comment: 'Test token' })
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.be.string;
-      done();
-    });
+  it('create a admin token', async () => {
+    const res = await API.post(
+      '/tokens/admin',
+      { comment: 'Test token' },
+    );
+
+    expectOk(res);
+    expect(res.body.result).to.be.string;
   });
 
-  it('get tokens', (done) => {
-    API
-    .get(`${PREFIX}/tokens`)
-    .set('Authorization', helper.adminToken)
-    .end((err: any, res) => {
-      expectOk(err, res);
-      expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
-      done();
-    });
+  it('get tokens', async () => {
+    const res = await API.get('/tokens');
+
+    expectOk(res);
+    expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
   });
 
-  it('delete token', (done) => {
+  it('delete token', async () => {
 
     // Get one token
-    new Promise((resolve, reject) => {
-      API
-      .get(`${PREFIX}/tokens`)
-      .set('Authorization', helper.adminToken)
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
-        const token: any = _.last(res.body.result);
-        resolve(token.token);
-      });
-    })
+    const res1 = await API.get('/tokens');
+    expectOk(res1);
+
+    const lastToken: any = _.last(res1.body.result);
 
     // Delete the token
-    .then((token) => {
-      return new Promise((resolve, reject) => {
-        API
-        .del(`${PREFIX}/tokens`)
-        .set('Authorization', helper.adminToken)
-        .send({ token })
-        .end((err: any, res) => {
-          expectOk(err, res);
-          resolve();
-        });
-      });
-    })
+    const res2 = await API.del(
+      '/tokens',
+      { token: lastToken.token },
+    );
+
+    expectOk(res2);
 
     // Check that the token does not exist anymore
-    .then(() => {
-      API
-      .get(`${PREFIX}/tokens`)
-      .set('Authorization', helper.adminToken)
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result).to.have.length(seed.data.tokens.length + 2);
-        done();
-      });
-    });
+    const res3 = await API.get('/tokens');
+
+    expectOk(res3);
+    expect(res3.body.result).to.have.length(res1.body.result.length - 1);
   });
 
-  it('force reset password', (done) => {
+  it('force reset password', async () => {
     const newPassword = 'something_completely_new';
+    const API_RESTRICTED = new helper.Api(cfg, 'restricted');
+
+    await API_RESTRICTED.start();
 
     // Test with old password
-    new Promise((resolve, reject) => {
-      API
-      .post('/api/v1/restricted/users/authenticate')
-      .set('Authorization', helper.restrictedToken)
-      .send({ username: USER.username, password: USER.password })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.true;
-        done();
-      });
-    })
+    const res1 = await API_RESTRICTED.post(
+      '/users/authenticate',
+      { username: USER.username, password: USER.password },
+    );
+
+    expectOk(res1);
+    expect(res1.body.result.authenticated).to.be.true;
 
     // Do the force-reset
-    .then(() => {
-      return new Promise((resolve, reject) => {
-        API
-        .put(`${PREFIX}/users/force-reset/password`)
-        .set('Authorization', helper.adminToken)
-        .send({ username: USER.username, newPassword })
-        .end((err: any, res) => {
-          expectOk(err, res);
-          resolve();
-        });
-      });
-    })
+    const res2 = await API.put(
+      '/users/force-reset/password',
+      { username: USER.username, newPassword },
+    );
+
+    expectOk(res2);
 
     // Try to authenticate with the new password
-    .then(() => {
-      API
-      .post('/api/v1/restricted/users/authenticate')
-      .set('Authorization', helper.restrictedToken)
-      .send({ username: USER.username, password: newPassword })
-      .end((err: any, res) => {
-        expectOk(err, res);
-        expect(res.body.result.authenticated).to.be.true;
-        done();
-      });
-    })
+    const res3 = await API_RESTRICTED.post(
+      '/users/authenticate',
+      { username: USER.username, password: newPassword },
+    );
+
+    expectOk(res3);
+    expect(res3.body.result.authenticated).to.be.true;
   });
 });
