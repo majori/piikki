@@ -3,8 +3,8 @@ import * as moment from 'moment';
 import * as appInsights from 'applicationinsights';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { getTokenInfo } from '../tokenHandler';
 import { ValidationError } from '../errors';
-
 import { IExtendedRequest, EndpointFunction } from '../models/http';
 import { UserDto } from '../models/user';
 
@@ -20,13 +20,18 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
       res.status(200);
 
       // Track a succesful request
-      appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+      appInsights.client.trackRequestSync(
+        req,
+        res,
+        (Date.now() - req.insights.startTime),
+        getTokenInfo(req),
+      );
 
       // Send the response
       res.json(response);
 
     } catch (err) {
-      appInsights.client.trackException(err);
+      appInsights.client.trackException(err, getTokenInfo(req));
       next(err);
     }
   };
