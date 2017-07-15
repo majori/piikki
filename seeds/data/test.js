@@ -105,6 +105,17 @@ const meta = {
   membersInGroup: {
     group1: 2,
     group2: 2,
+  },
+  saldos: {
+    testUser1: {
+      group1: 10
+    },
+    testUser2: {
+      group1: -10
+    },
+    testUser3: {
+      group2: 5
+    },
   }
 };
 

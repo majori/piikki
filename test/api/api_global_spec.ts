@@ -4,15 +4,12 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { NotFoundError } from '../src/errors';
-import { Config } from '../src/models/config';
-import * as seed from '../seeds/data/test';
-import * as helper from './helpers';
-import { expectOk, expectError } from './helpers';
+import { NotFoundError } from '../../src/errors';
+import { Config } from '../../src/models/config';
+import * as seed from '../../seeds/data/test';
+import * as helper from '../helpers';
 
-const cfg: Config = require('../config'); // tslint:disable-line
-
-import { createApp } from '../src/app';
+const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
@@ -29,14 +26,14 @@ describe('Global API', () => {
   it('get users', async () => {
     const res = await API.get('/users');
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).have.length(seed.data.users.length);
   });
 
   it('get user', async () => {
     const res = await API.get(`/users/${USER.username}`);
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.have.property('username', USER.username);
     expect(res.body.result).to.have.property('saldos');
   });
@@ -47,7 +44,7 @@ describe('Global API', () => {
       USER,
     );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result.authenticated).to.be.true;
 
   });
@@ -60,7 +57,7 @@ describe('Global API', () => {
       { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
     );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
 });
 
@@ -71,7 +68,7 @@ describe('Global API', () => {
       { key: ALTERNATIVE_KEY, groupName: GROUP.groupName },
     );
 
-    expectOk(res1);
+    helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // Right username with wrong key
@@ -80,7 +77,7 @@ describe('Global API', () => {
       { key: 'wrong_key', groupName: GROUP.groupName },
     );
 
-    expectOk(res2);
+    helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
     // Wrong username with right key
@@ -89,7 +86,7 @@ describe('Global API', () => {
       { type: 2, key: ALTERNATIVE_KEY, groupName: GROUP.groupName },
     );
 
-    expectOk(res3);
+    helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
   });
 
@@ -98,19 +95,19 @@ describe('Global API', () => {
 
   it('get groups', async () => {
     const res = await API.get('/groups');
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.have.length(seed.data.groups.length);
   });
 
   it('get group members', async () => {
     const res = await API.get('/groups');
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.have.length(seed.meta.membersInGroup[GROUP.groupName]);
   });
 
   it('get group member', async () => {
     const res = await API.get(`/groups/${GROUP.groupName}/members/${USER.username}`)
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.have.property('username', USER.username);
     expect(res.body.result).to.have.property('saldo');
   });
@@ -124,13 +121,13 @@ describe('Global API', () => {
       { groupName: newGroup },
     );
 
-    expectOk(res1);
+    helper.expectOk(res1);
     expect(res1.body.result).to.equal(newGroup);
 
     // Check the group exists
     const res2 = await API.get('/groups');
 
-    expectOk(res2);
+    helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
   });
 
@@ -150,7 +147,7 @@ describe('Global API', () => {
       { username: USER.username},
     );
 
-    expectOk(res1);
+    helper.expectOk(res1);
 
     // Check if he does still exists
     expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;

@@ -4,12 +4,11 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { Config } from '../src/models/config';
-import * as seed from '../seeds/data/test';
-import * as helper from './helpers';
-import { expectOk } from './helpers';
+import { Config } from '../../src/models/config';
+import * as seed from '../../seeds/data/test';
+import * as helper from '../helpers';
 
-const cfg: Config = require('../config'); // tslint:disable-line
+const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
@@ -29,7 +28,7 @@ describe('Admin API', () => {
       { groupName: GROUP.groupName, comment: 'Test token'},
     );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.be.string;
   });
 
@@ -39,7 +38,7 @@ describe('Admin API', () => {
       { comment: 'Test token' },
     );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.be.string;
   });
 
@@ -49,14 +48,14 @@ describe('Admin API', () => {
       { comment: 'Test token' },
     );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.be.string;
   });
 
   it('get tokens', async () => {
     const res = await API.get('/tokens');
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
   });
 
@@ -64,7 +63,7 @@ describe('Admin API', () => {
 
     // Get one token
     const res1 = await API.get('/tokens');
-    expectOk(res1);
+    helper.expectOk(res1);
 
     const lastToken: any = _.last(res1.body.result);
 
@@ -74,12 +73,12 @@ describe('Admin API', () => {
       { token: lastToken.token },
     );
 
-    expectOk(res2);
+    helper.expectOk(res2);
 
     // Check that the token does not exist anymore
     const res3 = await API.get('/tokens');
 
-    expectOk(res3);
+    helper.expectOk(res3);
     expect(res3.body.result).to.have.length(res1.body.result.length - 1);
   });
 
@@ -95,7 +94,7 @@ describe('Admin API', () => {
       { username: USER.username, password: USER.password },
     );
 
-    expectOk(res1);
+    helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // Do the force-reset
@@ -104,7 +103,7 @@ describe('Admin API', () => {
       { username: USER.username, newPassword },
     );
 
-    expectOk(res2);
+    helper.expectOk(res2);
 
     // Try to authenticate with the new password
     const res3 = await API_RESTRICTED.post(
@@ -112,7 +111,7 @@ describe('Admin API', () => {
       { username: USER.username, password: newPassword },
     );
 
-    expectOk(res3);
+    helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.true;
   });
 });

@@ -4,12 +4,11 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { Config } from '../src/models/config';
-import * as seed from '../seeds/data/test';
-import * as helper from './helpers';
-import { expectOk, expectError } from './helpers';
+import { Config } from '../../src/models/config';
+import * as seed from '../../seeds/data/test';
+import * as helper from '../helpers';
 
-const cfg: Config = require('../config'); // tslint:disable-line
+const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
@@ -30,7 +29,7 @@ describe('Restricted API', () => {
         { username: 'otherUser', password: 'hackme' },
       );
 
-    expectOk(res);
+    helper.expectOk(res);
   });
 
   it('authenticate user [POST /users/authenticate]', async () => {
@@ -42,7 +41,7 @@ describe('Restricted API', () => {
         USER,
       );
 
-    expectOk(res1);
+    helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // With wrong password
@@ -52,7 +51,7 @@ describe('Restricted API', () => {
         { username: USER.username, password: 'wrong_password' },
       );
 
-    expectOk(res2);
+    helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
     // With wrong username
@@ -62,7 +61,7 @@ describe('Restricted API', () => {
         { username: 'wrong_username', password: USER.password },
       );
 
-    expectOk(res3);
+    helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
   });
 
@@ -75,7 +74,7 @@ describe('Restricted API', () => {
         { key, username: USER.username },
       );
 
-    expectOk(res);
+    helper.expectOk(res);
     expect(res.body.result.key).to.equal(key);
   });
 
@@ -88,7 +87,7 @@ describe('Restricted API', () => {
         '/users/authenticate/alternative',
         { key: right_key },
       );
-    expectOk(res1);
+    helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // Right username with wrong key
@@ -98,7 +97,7 @@ describe('Restricted API', () => {
         { key: 'wrong_key' },
       );
 
-    expectOk(res2);
+    helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
     // Wrong username with right type
@@ -108,7 +107,7 @@ describe('Restricted API', () => {
         { key: right_key, type: 10 },
       );
 
-    expectOk(res3);
+    helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
   });
 
