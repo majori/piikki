@@ -71,7 +71,7 @@ export async function updateTokens(newTokens?: DatabaseToken[]) {
 
 export function getTokenInfo(req: IExtendedRequest) {
   return {
-    token_role: _.get(req, 'piikki.token.role'),
-    token_comment: _.get(req, 'piikki.token.comment'),
+    token_role: _.get(req, 'piikki.token.role', ''),
+    token_comment: _.get(req, 'piikki.token.comment', ''),
   };
 }
