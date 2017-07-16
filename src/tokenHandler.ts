@@ -7,9 +7,9 @@ import { AuthorizationError } from './errors';
 
 import { Response, NextFunction } from 'express';
 import { IExtendedRequest } from './models/http';
-import { IDatabaseToken } from './models/database';
+import { DatabaseToken } from './models/database';
 
-let registeredTokens: IDatabaseToken[] = [];
+let registeredTokens: DatabaseToken[] = [];
 
 export async function initTokens() {
 
@@ -56,13 +56,6 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
       req.piikki.groupAccess.group.name = token.group_name;
     }
 
-    // Add token info to track requests
-    appInsights.client.commonProperties = {
-      token: token.token,
-      token_role: token.role,
-      token_comment: token.comment || '',
-    };
-
     next();
 
     // Request didn't have a proper token
@@ -72,6 +65,13 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 }
 
 // Fetch current tokens from database
-export async function updateTokens(newTokens?: IDatabaseToken[]) {
+export async function updateTokens(newTokens?: DatabaseToken[]) {
   registeredTokens = (newTokens) ? newTokens : await getTokens();
+}
+
+export function getTokenInfo(req: IExtendedRequest) {
+  return {
+    token_role: _.get(req, 'piikki.token.role', ''),
+    token_comment: _.get(req, 'piikki.token.comment', ''),
+  };
 }

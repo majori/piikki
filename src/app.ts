@@ -11,7 +11,7 @@ import { errorResponder } from './errors';
 import { initApiRoutes } from './router';
 import swagger from './swagger';
 
-import { IDatabaseToken } from './models/database';
+import { DatabaseToken } from './models/database';
 import { IExtendedRequest } from './models/http';
 import { Config } from './models/config';
 

@@ -11,8 +11,9 @@ import {
   validateAlternativeLoginKey,
 } from './endpoint-utils';
 
+import { DatabaseAlternativeLogin } from '../models/database';
 import { IExtendedRequest } from '../models/http';
-import { IUserDto } from '../models/user';
+import { UserDto } from '../models/user';
 
 const _endpoint = {
 
@@ -80,6 +81,20 @@ const _endpoint = {
     return { type, key, username, groupName  };
   },
 
+  getAlternativeLoginCount: async (req: IExtendedRequest) => {
+    const type = req.query.type;
+    const username = validateUsername(req.query.username);
+    const groupName = validateGroupName(
+      (req.piikki.groupAccess.all) ? req.query.groupName : req.piikki.groupAccess.group.name,
+    );
+
+    const rows: DatabaseAlternativeLogin[] = await userCore.getAlternativeLoginsForUser({ groupName, username, type });
+
+    return {
+      count: _.size(rows),
+    };
+  },
+
   deleteUser: async (req: IExtendedRequest) => {
     const username = validateUsername(req.body.username);
 
@@ -87,7 +102,7 @@ const _endpoint = {
   },
 
   resetPassword: async (req: IExtendedRequest) => {
-    const user: IUserDto = validateUser({
+    const user: UserDto = validateUser({
       username: req.body.username,
       password: req.body.oldPassword,
     });

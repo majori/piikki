@@ -3,10 +3,10 @@ import * as moment from 'moment';
 import * as appInsights from 'applicationinsights';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { getTokenInfo } from '../tokenHandler';
 import { ValidationError } from '../errors';
-
 import { IExtendedRequest, EndpointFunction } from '../models/http';
-import { IUserDto } from '../models/user';
+import { UserDto } from '../models/user';
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
@@ -20,26 +20,25 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
       res.status(200);
 
       // Track a succesful request
-      appInsights.client.trackRequestSync(req, res, (Date.now() - req.insights.startTime));
+      appInsights.client.trackRequestSync(
+        req,
+        res,
+        (Date.now() - req.insights.startTime),
+        getTokenInfo(req),
+      );
 
       // Send the response
       res.json(response);
 
     } catch (err) {
-      appInsights.client.trackException(err);
-
-      // TODO: Do not use console.error
-      if (!(process.env.NODE_ENV === 'test')) {
-        console.error(err);
-      }
-
+      appInsights.client.trackException(err, getTokenInfo(req));
       next(err);
     }
   };
 }
 
 // Check if username and password is valid
-export function validateUser(user: IUserDto): IUserDto {
+export function validateUser(user: UserDto): UserDto {
   if (!_.isObject(user)) {
     throw new ValidationError('Invalid user object');
   }

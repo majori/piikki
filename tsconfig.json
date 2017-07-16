@@ -4,7 +4,7 @@
         "module": "commonjs",
         "outDir": "build",
         "removeComments": true,
-        "sourceMap": true,
+        "inlineSourceMap": true,
         "strict": true,
         "allowJs": true
     },

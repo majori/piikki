@@ -1,4 +1,4 @@
-import { IDatabaseToken } from './database';
+import { DatabaseToken } from './database';
 import { Request, Response } from 'express';
 
 // Extend Express own request object with additional info
@@ -8,7 +8,7 @@ export interface IExtendedRequest extends Request {
   };
 
   piikki: {
-    token: IDatabaseToken;
+    token: DatabaseToken;
     groupAccess: {
       all: boolean;
       group: {

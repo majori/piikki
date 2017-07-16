@@ -3,18 +3,18 @@ import 'mocha';
 import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
 
-import * as helper from './helpers';
-import { Config } from '../src/models/config';
+import * as helper from '../helpers';
+import { Config } from '../../src/models/config';
 
-import * as tokenCore from '../src/core/token-core';
-import * as groupCore from '../src/core/group-core';
-import * as userCore from '../src/core/user-core';
+import * as tokenCore from '../../src/core/token-core';
+import * as groupCore from '../../src/core/group-core';
+import * as userCore from '../../src/core/user-core';
 
-import * as seed from '../seeds/data/test';
+import * as seed from '../../seeds/data/test';
 
 describe('Tokens', () => {
 
-  const GROUP = seed.data.groups[0].groupName;
+  const GROUPNAME = seed.data.groups[0].groupName;
 
   before(helper.clearDbAndRunSeed);
 
@@ -31,7 +31,7 @@ describe('Tokens', () => {
   });
 
   it('create a new token', async () => {
-    const restricted = await tokenCore.createRestrictedToken(GROUP, 'Organization A');
+    const restricted = await tokenCore.createRestrictedToken(GROUPNAME, 'Organization A');
     expect(restricted).to.be.string;
 
     const global = await tokenCore.createGlobalToken('For my buddy Bob');

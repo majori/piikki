@@ -1,9 +1,10 @@
 /* tslint:disable max-classes-per-file */
 import { Request, Response, NextFunction } from 'express';
 import { STATUS_CODES } from 'http';
-import { IExtendedRequest } from './models/http';
 import * as appInsights from 'applicationinsights';
 import * as _ from 'lodash';
+import { IExtendedRequest } from './models/http';
+import { getTokenInfo } from './tokenHandler';
 
 export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
   const status = err.status ? err.status : 500;
@@ -25,13 +26,9 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
     appInsights.client.trackRequestSync(
       req,
       res,
-      (Date.now() - req.insights.startTime),
-      {
-        type: err.name,
-        status: err.status || 'Unknown',
-        message: err.message,
-        stack: JSON.stringify(err.stack),
-      },
+      _.get(req, 'insights.startTime') ? (Date.now() - req.insights.startTime) : 0,
+      getTokenInfo(req),
+      err,
     );
   }
 

@@ -2,3 +2,4 @@
 --async-only
 --compilers ts:ts-node/register
 --no-timeouts
+--inspect=5858

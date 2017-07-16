@@ -8,18 +8,18 @@ import { knex} from '../database';
 import { groupExists } from './group-core';
 import * as appInsights from 'applicationinsights';
 
-import { DatabaseUser, DatabaseGroup, IDatabaseAlternativeLogin } from '../models/database';
-import { IUserDto, IUserWithSaldo, IUserAlternativeLoginDto } from '../models/user';
+import { DatabaseUser, DatabaseGroup, DatabaseAlternativeLogin } from '../models/database';
+import { UserDto, UserWithSaldo, AlternativeLoginDto, AlternativeLoginForUserDto } from '../models/user';
 
 export const SALT_ROUNDS = 6;
 
 // Get all users in group
 export async function getUsers() {
-  const results: IUserWithSaldo[] = await _getUsersWithSaldos();
+  const results: UserWithSaldo[] = await _getUsersWithSaldos();
 
   return _.chain(results)
     .groupBy((x) => x.username)
-    .map((x: IUserWithSaldo[], key: string) => _.reduce(x, (user: any, value: IUserWithSaldo) => {
+    .map((x: UserWithSaldo[], key: string) => _.reduce(x, (user: any, value: UserWithSaldo) => {
       if (value.groupName) {
         user.saldos[value.groupName] = value.saldo;
       }
@@ -54,7 +54,7 @@ export async function getUser(username: string) {
 }
 
 // Create new user
-export async function createUser(user: IUserDto) {
+export async function createUser(user: UserDto) {
   const results = await knex.from('users').where({ username: user.username });
 
   if (!_.isEmpty(results)) {
@@ -80,7 +80,7 @@ export async function deleteUser(username: string) {
 }
 
 // Compare raw password with the hashed one
-export async function authenticateUser(user: IUserDto) {
+export async function authenticateUser(user: UserDto) {
   try {
     const row = await userExists(user.username);
     return await bcrypt.compare(user.password, row.password);
@@ -125,7 +125,7 @@ export async function userNotExists(username: string) {
 
 // Resets user's password
 // Does require old password
-export async function resetPassword(user: IUserDto, newPassword: string) {
+export async function resetPassword(user: UserDto, newPassword: string) {
   const isSame = await authenticateUser(user);
 
   if (!isSame) {
@@ -167,7 +167,7 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
   return { username: newUsername };
 }
 
-export async function getAlternativeLogin(login: IUserAlternativeLoginDto): Promise<IDatabaseAlternativeLogin> {
+export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<DatabaseAlternativeLogin> {
   const hash = _hashString(login.key);
 
   const query = knex
@@ -192,7 +192,21 @@ export async function getAlternativeLogin(login: IUserAlternativeLoginDto): Prom
   return await query.first();
 }
 
-export async function createAlternativeLogin(login: IUserAlternativeLoginDto) {
+export async function getAlternativeLoginsForUser(login: AlternativeLoginForUserDto): Promise<QueryBuilder> {
+  const query = knex('alternative_login as login')
+    .join('users', { 'users.id': 'login.user_id'})
+    .join('groups', { 'groups.id': 'login.group_id'})
+    .where({ 'groups.name': login.groupName })
+    .andWhere({ 'users.username': login.username });
+
+  if (login.type) {
+    query.andWhere({ 'login.type': login.type });
+  }
+
+  return query;
+}
+
+export async function createAlternativeLogin(login: AlternativeLoginDto) {
   const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
   const group = await groupExists(login.groupName);
