@@ -2,7 +2,9 @@
 import 'mocha';
 import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import * as path from 'path';
+import * as BBPromise from 'bluebird';
 
 import * as helper from '../helpers';
 import * as seed from '../../seeds/data/test';
@@ -15,8 +17,6 @@ describe('Transactions', () => {
   const GROUP = _.clone(helper.group);
   const ORIGINAL_SALDO: number = seed.meta.saldos[USER.username][GROUP.groupName];
 
-  beforeEach(helper.clearDbAndRunSeed);
-
   async function makeTransaction(amount: number) {
     return transactionCore.makeTransaction({
       username: USER.username,
@@ -25,6 +25,18 @@ describe('Transactions', () => {
       tokenId: 1,
     });
   }
+
+  // Make symmetric transactions, so final saldo is the same as original saldo
+  async function makeMultipleTransactions(times: number) {
+    for (const index of _.times(times)) {
+      const amount = index + 1;
+      await makeTransaction(amount);
+      await BBPromise.delay(1); // Wait one millisecond so transactions can't have same
+      await makeTransaction(-amount);
+    }
+  }
+
+  beforeEach(helper.clearDbAndRunSeed);
 
   it('make a transaction', async () => {
     const amount = 10;
@@ -46,18 +58,25 @@ describe('Transactions', () => {
     expect(user2).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
   });
 
-  it.skip('can handle multiple requests atomically', async () => {
-    const trx = _.flatten(_.times(3, () => {
-      const amount = _.random(5, 20);
-      return [
-        makeTransaction(amount),
-        makeTransaction(-amount),
-      ];
-    }));
+  it('can handle fast transactions', async () => {
+    await makeMultipleTransactions(10);
 
-    const results = await Promise.all(trx);
-
+    // Final user saldo stays consistent
     const user = await userCore.getUser(USER.username);
     expect(user).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
+
+    // Transactions has to stay in chronological order
+    const transactions = await transactionCore.getUserTransactions(
+      USER.username,
+      moment().subtract(1, 'minute').utc(),
+      moment().add(1, 'minute').utc(),
+    );
+
+    _.reduce(
+      _.orderBy(transactions, ['timestamp', 'asc']),
+      (old: number, transaction: any) => {
+        expect(transaction.oldSaldo).to.equal(old);
+        return transaction.newSaldo;
+      }, 0);
   });
 });

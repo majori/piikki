@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/applicationinsights": "^0.15.33",
     "@types/bcrypt": "^1.0.0",
+    "@types/bluebird": "^3.5.8",
     "@types/body-parser": "0.0.33",
     "@types/chai": "^4.0.1",
     "@types/chai-as-promised": "0.0.31",
@@ -55,6 +56,7 @@
   "dependencies": {
     "applicationinsights": "^0.19.0",
     "bcrypt": "^1.0.2",
+    "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",
     "cors": "^2.8.3",
     "env-cmd": "^5.1.0",

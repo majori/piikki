@@ -8,59 +8,53 @@ import { DatabaseTransaction } from '../models/database';
 import { TransactionDto, TransactionFilter } from '../models/transaction';
 
 export async function makeTransaction(newTrx: TransactionDto) {
-  const userSaldo = await userHaveSaldo(newTrx.username, newTrx.groupName);
+  type QueryOutput = { 'user_id': string; 'group_id': string; saldo: number; };
 
-  let newSaldo;
-  await knex.transaction(async (trx) => {
-    try {
-      newSaldo = _.round(userSaldo.saldo + newTrx.amount, 2);
+  const amount = _.round(newTrx.amount, 2);
 
-      await trx
-        .table('user_saldos')
-        .where({ user_id: userSaldo.user_id, group_id: userSaldo.group_id })
-        .update({ saldo: newSaldo })
-        .transacting(trx);
+  if (amount === 0) {
+    return;
+  }
 
-      const transaction = {
-        new_saldo: newSaldo,
-        old_saldo: userSaldo.saldo,
-        group_id: userSaldo.group_id,
-        user_id: userSaldo.user_id,
-        token_id: newTrx.tokenId,
-      };
+  try {
+    const result: QueryOutput[] = await knex.raw(`
+      UPDATE S
+      SET S.[saldo] = S.[saldo] + ?
+      OUTPUT INSERTED.[saldo], INSERTED.[user_id], INSERTED.[group_id]
+      FROM [user_saldos] as S
+      INNER JOIN [users] as U
+        ON U.[id] = S.[user_id]
+      INNER JOIN [groups] AS G
+        ON G.[id] = S.[group_id]
+      WHERE U.[username] = ?
+        AND G.[name] = ?
+    `, [amount, newTrx.username, newTrx.groupName]);
 
-      await trx
-        .table('transactions')
-        .insert(
-        _.isString(newTrx.comment) ?
-          _.assign(transaction, { comment: newTrx.comment }) :
-          transaction,
-      )
-        .transacting(trx);
+    const newSaldo: QueryOutput | undefined = _.first(result);
 
-      await trx.commit();
-
-    } catch (err) {
-      trx.rollback();
+    if (_.isUndefined(newSaldo)) {
+      throw new NotFoundError(`User "${newTrx.username}" was not found in group "${newTrx.groupName}`);
     }
-  });
 
-  return { username: newTrx.username, saldo: newSaldo };
-}
+    const transaction = {
+      new_saldo: newSaldo.saldo,
+      old_saldo: newSaldo.saldo - amount,
+      group_id: newSaldo.group_id,
+      user_id: newSaldo.user_id,
+      token_id: newTrx.tokenId,
+    };
 
-export async function userHaveSaldo(username: string, groupName: string) {
-  const row = knex
-    .from('user_saldos')
-    .select('users.id AS user_id', 'groups.id AS group_id', 'user_saldos.saldo')
-    .join('users', { 'users.id': 'user_saldos.user_id' })
-    .join('groups', { 'groups.id': 'user_saldos.group_id' })
-    .where({ 'users.username': username, 'groups.name': groupName })
-    .first();
+    await knex
+      .table('transactions')
+      .insert(
+        _.isString(newTrx.comment) ?
+        _.assign(transaction, { comment: newTrx.comment }) :
+        transaction,
+      );
 
-  if (row) {
-    return row;
-  } else {
-    throw new NotFoundError(`User ${username} has no saldo in group ${groupName}`);
+    return { username: newTrx.username, saldo: newSaldo.saldo };
+  } catch (err) {
+    throw err;
   }
 }
 

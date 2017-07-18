@@ -62,34 +62,4 @@ describe('Users & groups', () => {
     const user = await groupCore.addUserToGroup(USER.username, GROUP);
     expect(user).to.be.string;
   });
-
-  it('make a transaction', async () => {
-    const amount = 10;
-
-    const trx1 = await transactionCore.makeTransaction({
-      username: USER.username,
-      groupName: GROUP,
-      amount,
-      tokenId: 1,
-    });
-
-    expect(trx1).to.have.property('username', USER.username);
-    expect(trx1).to.have.property('saldo', amount);
-
-    const user1 = await userCore.getUser(USER.username);
-    expect(user1).to.containSubset({ saldos: { [GROUP]: amount } });
-
-    const trx2 = await transactionCore.makeTransaction({
-      username: USER.username,
-      groupName: GROUP,
-      amount: -amount,
-      tokenId: 1,
-    });
-
-    expect(trx2).to.have.property('username', USER.username);
-    expect(trx2).to.have.property('saldo', 0);
-
-    const user2 = await userCore.getUser(USER.username);
-    expect(user2).to.containSubset({ saldos: { [GROUP]: 0 } });
-  });
 });
