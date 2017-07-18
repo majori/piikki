@@ -26,6 +26,7 @@ describe('Transactions', () => {
     });
   }
 
+  // Make symmetric transactions, so final saldo is the same as original saldo
   async function makeMultipleTransactions(times: number) {
     for (const index of _.times(times)) {
       const amount = index + 1;
@@ -57,16 +58,14 @@ describe('Transactions', () => {
     expect(user2).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
   });
 
-  it('final user saldo stays consistent', async () => {
-    await makeMultipleTransactions(20);
+  it('can handle fast transactions', async () => {
+    await makeMultipleTransactions(10);
 
+    // Final user saldo stays consistent
     const user = await userCore.getUser(USER.username);
     expect(user).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
-  });
 
-  it('transactions stays in chronological order', async () => {
-    await makeMultipleTransactions(20);
-
+    // Transactions has to stay in chronological order
     const transactions = await transactionCore.getUserTransactions(
       USER.username,
       moment().subtract(1, 'minute').utc(),
@@ -80,5 +79,4 @@ describe('Transactions', () => {
         return transaction.newSaldo;
       }, 0);
   });
-
 });
