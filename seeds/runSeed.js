@@ -5,6 +5,7 @@ module.exports = (knex, Promise, data) => {
 
   // Deletes ALL existing entries
   return knex('token_group_access').del()
+    .then(() => knex('alternative_login').del())
     .then(() => knex('transactions').del())
     .then(() => knex('user_saldos').del())
     .then(() => knex('tokens').del())

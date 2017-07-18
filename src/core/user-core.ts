@@ -224,10 +224,11 @@ export async function createAlternativeLogin(login: AlternativeLoginDto) {
 // Get all users in group
 function _getUsersWithSaldos(): QueryBuilder {
   return knex
+    .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
     .from('users')
     .leftJoin('user_saldos', { 'user_saldos.user_id': 'users.id' })
     .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })
-    .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
+    .orderBy('users.username')
     .where({ 'users.active': true });
 }
 
