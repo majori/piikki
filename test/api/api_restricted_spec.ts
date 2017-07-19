@@ -115,8 +115,35 @@ describe('Restricted API', () => {
   it('reset username');
   it('get group members');
   it('get group member');
-  it('add member to group');
-  it('remove member from group');
+  it('add member to group', async () => {
+    const res1 = await API.get('/group/members');
+    helper.expectOk(res1);
+    const memberCount = _.size(res1.body.result);
+
+    const res2 = await API.post('/group/addMember', {
+      username: seed.data.users[3].username,
+    });
+    helper.expectOk(res2);
+
+    const res3 = await API.get('/group/members');
+    helper.expectOk(res3);
+    expect(res3.body.result).to.have.length(memberCount + 1);
+  });
+
+  it('remove member from group', async () => {
+      const res1 = await API.get('/group/members');
+      helper.expectOk(res1);
+      const memberCount = _.size(res1.body.result);
+
+      const res2 = await API.del('/group/removeMember', {
+        username: seed.data.users[3].username,
+      });
+      helper.expectOk(res2);
+
+      const res3 = await API.get('/group/members');
+      helper.expectOk(res3);
+      expect(res3.body.result).to.have.length(memberCount - 1);
+  });
   it('make transaction');
   it('get group transactions');
   it('get user transactions from group');
