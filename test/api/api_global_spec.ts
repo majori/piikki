@@ -59,7 +59,7 @@ describe('Global API', () => {
 
     helper.expectOk(res);
     expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
-});
+  });
 
   it('authenticate with alternative login', async () => {
     // Right username with right key
@@ -88,6 +88,16 @@ describe('Global API', () => {
 
     helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
+  });
+
+  it('get alternative login count for user', async () => {
+    const res = await API.get('/users/authenticate/alternative/count', {
+      username: USER.username,
+      groupName: GROUP.groupName,
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result.count).to.equal(1);
   });
 
   it('reset password');
@@ -161,7 +171,17 @@ describe('Global API', () => {
       expect(res3.body.result).to.have.length(memberCount - 1);
   });
 
-  it('make transaction');
+  it('make transaction', async () => {
+    const res = await API.post('/transaction', {
+      username: USER.username,
+      groupName: GROUP.groupName,
+      amount: 1,
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + 1);
+  });
+
   it('get group transactions');
   it('get user transactions');
   it('get group saldo');

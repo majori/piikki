@@ -111,6 +111,16 @@ describe('Restricted API', () => {
     expect(res3.body.result.authenticated).to.be.false;
   });
 
+  it('get alternative login count for user', async () => {
+    const res = await API.get('/users/authenticate/alternative/count', {
+      username: USER.username,
+      groupName: GROUP.groupName,
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result.count).to.equal(1);
+  });
+
   it('reset password');
   it('reset username');
   it('get group members');
@@ -144,7 +154,16 @@ describe('Restricted API', () => {
       helper.expectOk(res3);
       expect(res3.body.result).to.have.length(memberCount - 1);
   });
-  it('make transaction');
+  it('make transaction', async () => {
+    const res = await API.post('/transaction', {
+      username: USER.username,
+      amount: 1,
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + 1);
+  });
+
   it('get group transactions');
   it('get user transactions from group');
   it('get group saldo');
