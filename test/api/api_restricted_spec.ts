@@ -121,10 +121,67 @@ describe('Restricted API', () => {
     expect(res.body.result.count).to.equal(1);
   });
 
-  it('reset password');
-  it('reset username');
-  it('get group members');
-  it('get group member');
+  it('reset password', async () => {
+    const newPassword = 'new_password';
+
+    helper.expectOk(await API.put('/users/reset/password', {
+      username: USER.username,
+      oldPassword: USER.password,
+      newPassword,
+    }));
+
+    expect(API.get('/users/authenticate', {
+      username: USER.username,
+      password: USER.password,
+    })).to.eventually.be.rejected;
+
+    helper.expectOk(await API.post('/users/authenticate', {
+      username: USER.username,
+      password: newPassword,
+    }));
+
+    // Reset password back to original
+    await API.put('/users/reset/password', {
+      username: USER.username,
+      oldPassword: newPassword,
+      newPassword: USER.password,
+    });
+  });
+
+  it('reset username', async () => {
+    const newUsername = 'new_username';
+
+    helper.expectOk(await API.put('/users/reset/username', {
+      oldUsername: USER.username,
+      newUsername,
+      password: USER.password,
+    }));
+
+    helper.expectOk(await API.get(`/group/members/${newUsername}`));
+    expect(API.get(`/group/members/${USER.username}`)).to.eventually.be.rejected;
+
+    // Reset username back to original
+    await API.put('/users/reset/username', {
+      oldUsername: newUsername,
+      newUsername: USER.username,
+      password: USER.password,
+    });
+  });
+
+
+  it('get group members', async () => {
+    const res = await API.get('/group/members');
+    helper.expectOk(res);
+    expect(res.body.result).to.have.length(seed.meta.membersInGroup[GROUP.groupName]);
+  });
+
+  it('get group member', async () => {
+    const res = await API.get(`/group/members/${USER.username}`);
+    helper.expectOk(res);
+    expect(res.body.result).to.have.property('username', USER.username);
+    expect(res.body.result).to.have.property('saldo');
+  });
+
   it('add member to group', async () => {
     const res1 = await API.get('/group/members');
     helper.expectOk(res1);
@@ -167,5 +224,6 @@ describe('Restricted API', () => {
   it('get group transactions');
   it('get user transactions from group');
   it('get group saldo');
+  it('get daily group saldo since');
 });
 
