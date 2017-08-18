@@ -11,6 +11,6 @@ ENV NODE_ENV production
 COPY . /usr/src/app
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 4000
 
 CMD [ "npm", "start" ]
