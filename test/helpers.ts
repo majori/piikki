@@ -65,14 +65,6 @@ export function expectOk(res: ChaiHttp.Response) {
   expect(res.body).to.have.property('result');
 }
 
-export function expectError(res: ChaiHttp.Response) {
-  expect(res).to.be.json;
-  expect(res.body).to.have.property('ok', false);
-  expect(res.body).to.have.property('error');
-  expect(res.body.error).to.have.property('type');
-  expect(res.body.error).to.have.property('message');
-}
-
 export class Api {
   private config: Config;
   private role: 'admin' | 'global' | 'restricted';

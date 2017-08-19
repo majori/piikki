@@ -21,4 +21,4 @@ export interface IExtendedRequest extends Request {
   };
 }
 
-export type EndpointFunction = (req: IExtendedRequest, res: Response) => Promise<any>;
+export type EndpointFunction = (req: IExtendedRequest) => Promise<any>;

@@ -13,7 +13,7 @@ import { UserDto } from '../models/user';
 export function createJsonRoute(func: EndpointFunction): RequestHandler {
   return async (req: IExtendedRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await func(req, res);
+      const result = await func(req);
       const response = { ok: true, result: result || {} };
 
       // Set status to OK

@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/majori/piikki.git"
   },
   "engines": {
-    "node": "8.1.4"
+    "node": "8.3.0"
   },
   "author": "Antti Kivimäki",
   "license": "MIT",
@@ -38,6 +38,7 @@
     "@types/cors": "^2.8.1",
     "@types/errorhandler": "0.0.30",
     "@types/express": "^4.0.34",
+    "@types/fs-extra": "^4.0.0",
     "@types/knex": "0.0.53",
     "@types/lodash": "^4.14.66",
     "@types/method-override": "0.0.29",
@@ -61,10 +62,12 @@
     "cors": "^2.8.3",
     "env-cmd": "^5.1.0",
     "express": "^4.15.2",
+    "fs-extra": "^4.0.1",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
     "method-override": "^2.3.7",
     "moment": "^2.18.1",
-    "mssql": "^3.3.0"
+    "mssql": "^3.3.0",
+    "swagger-ui-dist": "^3.1.5"
   }
 }
