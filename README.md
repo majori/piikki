@@ -26,7 +26,7 @@ _More coming soon..._
 
 # API
 
-[API Definition](https://piikki-backend-euw.azurewebsites.net/swagger/ui/)
+[API Definition](https://piikki.ddns.net/swagger/ui/)
 
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
