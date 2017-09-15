@@ -30,6 +30,3 @@ _More coming soon..._
 
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
-## Acknowledgements
-This project is supported by [Eatech](https://www.eatech.fi/)!
-
