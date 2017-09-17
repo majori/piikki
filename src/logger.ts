@@ -39,6 +39,8 @@ export class Logger extends Winston {
 
   private getRequestMetadata(req: Request) {
     return {
+      url: req.originalUrl,
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
       response_time: _.get(req, 'insights.startTime') ? (Date.now() - req.insights.startTime) : 0,
       token: getTokenInfo(req),
     };
