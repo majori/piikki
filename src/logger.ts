@@ -5,21 +5,33 @@ import { Response } from 'express';
 
 import { getTokenInfo } from './tokenHandler';
 import { IExtendedRequest as Request } from './models/http';
+import { Config } from './models/config';
+
+const config: Config = require('../config'); // tslint:disable-line
 
 export class Logger extends Winston {
 
   constructor(filePath: string) {
+    super();
+
     const fileName = path.basename(filePath);
-    super({
+
+    this.configure({
       transports: [
         new transports.Console({
           label: `piikki${fileName ? `-${fileName}` : ''}`,
           timestamp: true,
+          colorize: true,
         }),
       ],
     });
 
-    this.setLevelForTransports(process.env.LOG_LEVEL || 'info');
+    // Suppress console messages when testing
+    if (config.isTest) {
+      this.remove(transports.Console);
+    }
+
+    this.setLevelForTransports(config.logLevel);
   }
 
   public request(req: Request, res: Response) {

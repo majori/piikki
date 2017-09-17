@@ -50,4 +50,8 @@ cfg.db = {
     }
 };
 
+// ### Logger options
+//
+cfg.logLevel = process.env.LOG_LEVEL || 'info';
+
 module.exports = cfg;
