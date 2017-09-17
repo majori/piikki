@@ -1,10 +1,11 @@
 /* tslint:disable max-classes-per-file */
 import { Request, Response, NextFunction } from 'express';
 import { STATUS_CODES } from 'http';
-import * as appInsights from 'applicationinsights';
 import * as _ from 'lodash';
 import { IExtendedRequest } from './models/http';
-import { getTokenInfo } from './tokenHandler';
+import { Logger } from './logger';
+
+const logger = new Logger(__filename);
 
 export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
   const status = err.status ? err.status : 500;
@@ -20,17 +21,8 @@ export const errorResponder = (err: any, req: IExtendedRequest, res: Response, n
   // Set response status
   res.status(status);
 
-  // Track error response
-  // Ignore if request is to root (most likely Azure ping service)
-  if (req.path !== '/' ) {
-    appInsights.client.trackRequestSync(
-      req,
-      res,
-      _.get(req, 'insights.startTime') ? (Date.now() - req.insights.startTime) : 0,
-      getTokenInfo(req),
-      err,
-    );
-  }
+  // Log error request
+  logger.errorRequest(req, res, err);
 
   res.send(response);
 };

@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import { STATUS_CODES } from 'http';
-import appInsights = require('applicationinsights');
 import { getTokens, createAdminToken } from './core/token-core';
 import { AuthorizationError } from './errors';
 

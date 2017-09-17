@@ -6,10 +6,12 @@ import * as crypto from 'crypto';
 import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import { knex} from '../database';
 import { groupExists } from './group-core';
-import * as appInsights from 'applicationinsights';
 
 import { DatabaseUser, DatabaseGroup, DatabaseAlternativeLogin } from '../models/database';
 import { UserDto, UserWithSaldo, AlternativeLoginDto, AlternativeLoginForUserDto } from '../models/user';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 export const SALT_ROUNDS = 6;
 
@@ -67,15 +69,15 @@ export async function createUser(user: UserDto) {
     password: hash,
   });
 
-  if (appInsights.client) {
-    appInsights.client.trackEvent('User create', { username: user.username });
-  }
+  logger.info('User created', { username: user.username });
+
   return user.username;
 }
 
 // Puts user's "active" -status to false
 export async function deleteUser(username: string) {
   await knex.from('users').where({ username }).update({ active: false });
+  logger.info('User deleted', { username });
   return;
 }
 

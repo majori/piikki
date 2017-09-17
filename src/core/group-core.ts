@@ -1,13 +1,15 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
-import * as appInsights from 'applicationinsights';
 
 import { ConflictError, NotFoundError } from '../errors';
 import { userExists } from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex } from '../database';
+import { Logger } from '../logger';
 
 import { DatabaseGroup, DatabaseUser, DatabaseUserSaldo  } from '../models/database';
+
+const logger = new Logger(__filename);
 
 export async function createGroup(groupName: string) {
   const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
@@ -19,9 +21,8 @@ export async function createGroup(groupName: string) {
   await knex.from('groups').insert({ name: groupName });
   await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
-  if (appInsights.client) {
-    appInsights.client.trackEvent('Group create', { groupName });
-  }
+  logger.info('Group created', { group_name: groupName });
+
   return groupName;
 }
 

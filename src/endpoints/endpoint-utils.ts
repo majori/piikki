@@ -1,12 +1,14 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as appInsights from 'applicationinsights';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { getTokenInfo } from '../tokenHandler';
 import { ValidationError } from '../errors';
 import { IExtendedRequest, EndpointFunction } from '../models/http';
 import { UserDto } from '../models/user';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
@@ -20,18 +22,13 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
       res.status(200);
 
       // Track a succesful request
-      appInsights.client.trackRequestSync(
-        req,
-        res,
-        (Date.now() - req.insights.startTime),
-        getTokenInfo(req),
-      );
+      logger.request(req, res);
 
       // Send the response
       res.json(response);
 
+    // Pass error to error handler
     } catch (err) {
-      appInsights.client.trackException(err, getTokenInfo(req));
       next(err);
     }
   };

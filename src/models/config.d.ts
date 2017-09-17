@@ -11,7 +11,6 @@ export type Config = {
   env: 'production' | 'development' | 'test';
   isProduction: boolean;
   isTest: boolean;
-  appInsightsKey: string;
 
   hostname: string;
   port: number;
