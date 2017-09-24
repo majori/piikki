@@ -1,3 +1,4 @@
+import * as process from 'process';
 import * as _ from 'lodash';
 import { createApp } from './app';
 import { Logger } from './logger';
@@ -11,8 +12,15 @@ async function startServer(cfg: Config) {
   const app = await createApp(cfg);
 
   // Start server
-  app.listen(cfg.port, cfg.hostname, () => {
+  const server = app.listen(cfg.port, cfg.hostname, () => {
     logger.info('Server start', { host: cfg.hostname, port: _.toString(cfg.port) });
+  });
+
+  process.on('SIGINT', () => {
+    logger.info('Server shutting down');
+    server.close(() => {
+      process.exit();
+    });
   });
 }
 

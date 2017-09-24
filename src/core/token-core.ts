@@ -1,12 +1,15 @@
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
+import { QueryBuilder } from 'knex';
 
 import { knex } from '../database';
 import { groupExists, getGroups } from './group-core';
 import { updateTokens } from '../tokenHandler';
 
-import { QueryBuilder } from 'knex';
 import { DatabaseGroup, DatabaseToken } from '../models/database';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 export async function createRestrictedToken(groupName: string, comment?: string) {
 
@@ -23,6 +26,7 @@ export async function createRestrictedToken(groupName: string, comment?: string)
     .insert({ token_id: id[0], group_id: group.id });
 
   updateTokens(); // Inform token handler about new token
+  logger.info('Restricted token created', { groupName, comment });
 
   return token;
 }
@@ -35,6 +39,7 @@ export async function createGlobalToken(comment?: string) {
     .insert({ token, role: 'global', comment });
 
   updateTokens(); // Inform token handler about new token
+  logger.info('Global token created', { comment });
 
   return token;
 }
@@ -47,6 +52,8 @@ export async function createAdminToken(comment?: string) {
     .insert({ token, role: 'admin', comment });
 
   updateTokens(); // Inform token handler about new token
+  logger.info('Admin token created', { comment });
+
   return token;
 }
 
@@ -61,10 +68,14 @@ export async function getToken(groupName: string) {
 }
 
 export async function deleteToken(token: string) {
-  return await knex
+  const result = await knex
     .from('tokens')
     .where({ token })
     .del();
+
+  logger.info('Token deleted', { token });
+
+  return result;
 }
 
 // Creates one global token and restricted token for every group

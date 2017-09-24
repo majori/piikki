@@ -7,6 +7,9 @@ import { AuthorizationError } from './errors';
 import { Response, NextFunction } from 'express';
 import { IExtendedRequest } from './models/http';
 import { DatabaseToken } from './models/database';
+import { Logger } from './logger';
+
+const logger = new Logger(__filename);
 
 let registeredTokens: DatabaseToken[] = [];
 
@@ -18,6 +21,7 @@ export async function initTokens() {
 
     // There is no tokens in the database, make new ones
     if (_.isEmpty(tokens)) {
+      logger.info('Tokens not found, initializing admin token');
       await createAdminToken('Created on initialize');
     } else {
       await updateTokens(tokens);
@@ -65,6 +69,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
 
 // Fetch current tokens from database
 export async function updateTokens(newTokens?: DatabaseToken[]) {
+  logger.debug('Refreshing tokens', { tokens: JSON.stringify(newTokens) });
   registeredTokens = (newTokens) ? newTokens : await getTokens();
 }
 

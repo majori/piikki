@@ -6,6 +6,9 @@ import { NotFoundError } from '../errors';
 import { knex } from '../database';
 import { DatabaseTransaction } from '../models/database';
 import { TransactionDto, TransactionFilter } from '../models/transaction';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 export async function makeTransaction(newTrx: TransactionDto) {
   type QueryOutput = { 'user_id': string; 'group_id': string; saldo: number; };
@@ -51,6 +54,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
         _.assign(transaction, { comment: newTrx.comment }) :
         transaction,
       );
+
+    logger.debug('New transaction', transaction);
 
     return { username: newTrx.username, saldo: newSaldo.saldo };
   } catch (err) {
