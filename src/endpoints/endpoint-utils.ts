@@ -57,10 +57,11 @@ export function validateUsername(username: any): string {
   if (_.isUndefined(username))  { throw new ValidationError('No username defined'); }
   if (!_.isString(username))    { throw new ValidationError(`Username ${username} was not a string`); }
   if (_.isEmpty(username))      { throw new ValidationError('Username was empty'); }
+  if (username.length < 2)      { throw new ValidationError('Username was shorter 2 characters'); }
   if (username.length > 20)     { throw new ValidationError('Username was longer than 20 characters'); }
   if (!regEx.test(username)) {
     throw new ValidationError(
-      `Username ${username} had invalid characters.` +
+      `Username ${username} had invalid characters. ` +
       'Allowed characters are a-z, A-Z, 0-9, "-" and "_".',
     );
   }
