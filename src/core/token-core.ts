@@ -1,12 +1,10 @@
 import * as crypto from 'crypto';
-import * as _ from 'lodash';
 import { QueryBuilder } from 'knex';
 
 import { knex } from '../database';
 import { groupExists, getGroups } from './group-core';
 import { updateTokens } from '../tokenHandler';
 
-import { DatabaseGroup, DatabaseToken } from '../models/database';
 import { Logger } from '../logger';
 
 const logger = new Logger(__filename);

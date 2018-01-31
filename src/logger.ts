@@ -1,11 +1,10 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import { Logger as Winston, transports, LoggerInstance, CLILoggingLevel } from 'winston';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 import { getTokenInfo } from './tokenHandler';
-import { IExtendedRequest as Request } from './models/http';
-import { Config } from './models/config';
+import { Config } from './types/config';
 
 const config: Config = require('../config'); // tslint:disable-line
 

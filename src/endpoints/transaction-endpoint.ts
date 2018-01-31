@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { Moment } from 'moment';
-
+import { Endpoint } from 'types/endpoints';
 import * as transCore from '../core/transaction-core';
 import {
   createJsonRoute,
@@ -11,13 +10,8 @@ import {
   validateTimestamp,
 } from './endpoint-utils';
 
-import { IExtendedRequest } from '../models/http';
-import { TransactionDto } from '../models/transaction';
-
-import { ValidationError } from '../errors';
-
-const _endpoint = {
-  makeTransaction: async (req: IExtendedRequest) => {
+const endpoint: Endpoint = {
+  makeTransaction: async (req) => {
     let transactions = req.body;
 
     // Allow body to have one or multiple transactions
@@ -47,7 +41,7 @@ const _endpoint = {
     return (_.size(results) === 1) ? _.first(results) : results;
   },
 
-  getUserTransactions: async (req: IExtendedRequest) => {
+  getUserTransactions: async (req) => {
     const username = validateUsername(req.params.username);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
@@ -55,7 +49,7 @@ const _endpoint = {
     return transCore.getUserTransactions(username, from, to);
   },
 
-  getGroupTransactions: async (req: IExtendedRequest) => {
+  getGroupTransactions: async (req) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
@@ -63,7 +57,7 @@ const _endpoint = {
     return transCore.getGroupTransactions(groupName, from, to);
   },
 
-  getUserTransactionsFromGroup: async (req: IExtendedRequest) => {
+  getUserTransactionsFromGroup: async (req) => {
     const username = validateUsername(req.params.username);
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
@@ -72,7 +66,7 @@ const _endpoint = {
     return transCore.getUserTransactionsFromGroup(username, groupName, from, to);
   },
 
-  getGroupSaldo: async (req: IExtendedRequest) => {
+  getGroupSaldo: async (req) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     // Default to present if from-date is not given
     const from = req.query.from ? validateTimestamp(req.query.from) : moment().utc();
@@ -86,7 +80,7 @@ const _endpoint = {
     };
   },
 
-  getDailyGroupSaldos: async (req: IExtendedRequest) => {
+  getDailyGroupSaldos: async (req) => {
     const groupName = validateGroupName(req.piikki.groupAccess.group.name);
     const from = validateTimestamp(req.query.from);
     const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
@@ -96,4 +90,4 @@ const _endpoint = {
 };
 
 // Wrap endpoint to produce JSON route
-export default _.mapValues(_endpoint, (func) => createJsonRoute(func));
+export default _.mapValues(endpoint, (func) => createJsonRoute(func));

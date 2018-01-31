@@ -1,13 +1,11 @@
 /* tslint:disable max-classes-per-file */
-import { Request, Response, NextFunction } from 'express';
+import { ErrorRequestHandler } from 'express';
 import { STATUS_CODES } from 'http';
-import * as _ from 'lodash';
-import { IExtendedRequest } from './models/http';
 import { Logger } from './logger';
 
 const logger = new Logger(__filename);
 
-export const errorResponder = (err: any, req: IExtendedRequest, res: Response, next: NextFunction) => {
+export const errorResponder: ErrorRequestHandler = (err, req, res) => {
   const status = err.status ? err.status : 500;
 
   const response = {

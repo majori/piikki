@@ -7,8 +7,6 @@ import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import { knex} from '../database';
 import { groupExists } from './group-core';
 
-import { DatabaseUser, DatabaseGroup, DatabaseAlternativeLogin } from '../models/database';
-import { UserDto, UserWithSaldo, AlternativeLoginDto, AlternativeLoginForUserDto } from '../models/user';
 import { Logger } from '../logger';
 
 const logger = new Logger(__filename);

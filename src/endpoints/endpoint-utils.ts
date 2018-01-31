@@ -1,11 +1,9 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { RequestHandler } from 'express';
+import { EndpointFunction } from 'types/endpoints';
 
-import { getTokenInfo } from '../tokenHandler';
 import { ValidationError } from '../errors';
-import { IExtendedRequest, EndpointFunction } from '../models/http';
-import { UserDto } from '../models/user';
 import { Logger } from '../logger';
 
 const logger = new Logger(__filename);
@@ -13,7 +11,7 @@ const logger = new Logger(__filename);
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: EndpointFunction): RequestHandler {
-  return async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+  return async (req, res, next) => {
     try {
       const result = await func(req);
       const response = { ok: true, result: result || {} };

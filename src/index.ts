@@ -2,7 +2,7 @@ import * as process from 'process';
 import * as _ from 'lodash';
 import { createApp } from './app';
 import { Logger } from './logger';
-import { Config } from './models/config';
+import { Config } from './types/config';
 
 const logger = new Logger(__filename);
 

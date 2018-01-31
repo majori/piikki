@@ -4,14 +4,12 @@ import { QueryBuilder, JoinClause } from 'knex';
 
 import { NotFoundError } from '../errors';
 import { knex } from '../database';
-import { DatabaseTransaction } from '../models/database';
-import { TransactionDto, TransactionFilter } from '../models/transaction';
 import { Logger } from '../logger';
 
 const logger = new Logger(__filename);
 
 export async function makeTransaction(newTrx: TransactionDto) {
-  type QueryOutput = { 'user_id': string; 'group_id': string; saldo: number; };
+  interface QueryOutput { 'user_id': string; 'group_id': string; saldo: number; }
 
   const amount = _.round(newTrx.amount, 2);
 

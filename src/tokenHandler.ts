@@ -1,12 +1,7 @@
 import * as _ from 'lodash';
-import * as path from 'path';
-import { STATUS_CODES } from 'http';
+import { RequestHandler, Request } from 'express';
 import { getTokens, createAdminToken } from './core/token-core';
 import { AuthorizationError } from './errors';
-
-import { Response, NextFunction } from 'express';
-import { IExtendedRequest } from './models/http';
-import { DatabaseToken } from './models/database';
 import { Logger } from './logger';
 
 const logger = new Logger(__filename);
@@ -30,10 +25,9 @@ export async function initTokens() {
 }
 
 // Authorize request by token found in "Authorization" header
-export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
+export const handleTokens: RequestHandler = (req, res, next) => {
   const token = _.find(registeredTokens, { token: req.get('Authorization') });
   if (!_.isUndefined(token)) {
-
     req.piikki = {
       token,
       groupAccess: {
@@ -65,7 +59,7 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
   } else {
     throw new AuthorizationError();
   }
-}
+};
 
 // Fetch current tokens from database
 export async function updateTokens(newTokens?: DatabaseToken[]) {
@@ -73,7 +67,7 @@ export async function updateTokens(newTokens?: DatabaseToken[]) {
   registeredTokens = (newTokens) ? newTokens : await getTokens();
 }
 
-export function getTokenInfo(req: IExtendedRequest) {
+export function getTokenInfo(req: Request) {
   return {
     token_role: _.get(req, 'piikki.token.role', ''),
     token_comment: _.get(req, 'piikki.token.comment', ''),

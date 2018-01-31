@@ -5,8 +5,6 @@ import transactionEndpoint from './endpoints/transaction-endpoint';
 import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
-import { IExtendedRequest } from './models/http';
-
 export function initApiRoutes() {
   const mainRouter = Router();
 
@@ -41,7 +39,7 @@ function _restrictedTokenRoutes() {
   const restrictedR = Router();
 
   // Authorize restricted token
-  restrictedR.use((req: IExtendedRequest, res, next) => {
+  restrictedR.use((req, res, next) => {
     if (!req.piikki.groupAccess.all) {
       next();
     } else {
@@ -78,7 +76,7 @@ function _globalTokenRoutes() {
   const globalR = Router();
 
   // Authorize global token
-  globalR.use((req: IExtendedRequest, res, next) => {
+  globalR.use((req, res, next) => {
     if (req.piikki.groupAccess.all) {
       next();
     } else {
@@ -94,7 +92,7 @@ function _globalTokenRoutes() {
 
   // If client targets some group, insert the group name to request
   // so endpoint functions can look the group name from the same place
-  globalR.param('groupName', (req: IExtendedRequest, res, next, name) => {
+  globalR.param('groupName', (req, res, next, name) => {
     req.piikki.groupAccess.group.name = name;
     next();
   });
@@ -128,7 +126,7 @@ function _adminTokenRoutes() {
   const adminR = Router();
 
   // Authorize admin token
-  adminR.use((req: IExtendedRequest, res, next) => {
+  adminR.use((req, res, next) => {
     if (req.piikki.admin.isAdmin) {
       next();
     } else {

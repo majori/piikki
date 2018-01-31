@@ -7,8 +7,6 @@ import { createRestrictedToken } from './token-core';
 import { knex } from '../database';
 import { Logger } from '../logger';
 
-import { DatabaseGroup, DatabaseUser, DatabaseUserSaldo  } from '../models/database';
-
 const logger = new Logger(__filename);
 
 export async function createGroup(groupName: string) {
