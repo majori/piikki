@@ -114,9 +114,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
   const deltaSaldos = _.chain(await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
     .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date).utc()))
     .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
-    .mapValues((transactions: any) =>
-      _.reduce(transactions, (total, transaction: any) => total + transaction.saldo_change, 0),
-    )
+    .mapValues((transactions: any) => _.sumBy(transactions, 'saldo_change'))
     .value();
 
   const time = moment(from).startOf('day');
@@ -130,7 +128,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
 
     saldos.push({
       timestamp: time.format('YYYY-MM-DD'),
-      saldo: currentSaldo,
+      saldo: _.round(currentSaldo, 2),
     });
     time.add(1, 'day');
   }
