@@ -59,9 +59,9 @@ export async function getTokens(): Promise<DatabaseToken[]> {
   return _getTokens();
 }
 
-export async function getToken(groupName: string) {
+export async function getToken(comment: string): Promise<DatabaseToken | undefined> {
   return await _getTokens()
-    .where({ 'groups.name': groupName })
+    .where({ comment })
     .first();
 }
 

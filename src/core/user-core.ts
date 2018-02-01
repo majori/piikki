@@ -99,7 +99,7 @@ export async function authenticateUser(user: UserDto) {
 // Checks if user is in database
 export async function userExists(username?: string) {
   if (_.isUndefined(username)) {
-    throw new ValidationError(`Username was undefined`);
+    throw new ValidationError('Username was undefined');
   }
   const row: DatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
