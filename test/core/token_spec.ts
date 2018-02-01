@@ -34,17 +34,17 @@ describe('Tokens', () => {
     const commentA = 'Organization A';
     const restricted = await tokenCore.createRestrictedToken(GROUPNAME, commentA);
     expect(restricted).to.be.string;
-    expect((await tokenCore.getToken(commentA)).token).to.be.equal(restricted);
+    expect((await tokenCore.getToken(commentA))).to.containSubset({ token: restricted });
 
     const commentB = 'For my buddy Bob';
     const global = await tokenCore.createGlobalToken(commentB);
     expect(global).to.be.string;
-    expect((await tokenCore.getToken(commentB)).token).to.be.equal(global);
+    expect((await tokenCore.getToken(commentB))).to.containSubset({ token: global });
 
     const commentC = 'For the allmighty';
     const admin = await tokenCore.createAdminToken(commentC);
     expect(admin).to.be.string;
-    expect((await tokenCore.getToken(commentC)).token).to.be.equal(admin);
+    expect((await tokenCore.getToken(commentC))).to.containSubset({ token: admin });
   });
 
 });
