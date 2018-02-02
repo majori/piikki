@@ -4,11 +4,12 @@ import { QueryBuilder, JoinClause } from 'knex';
 
 import { NotFoundError } from '../errors';
 import { knex } from '../database';
-import { DatabaseTransaction } from '../models/database';
-import { TransactionDto, TransactionFilter } from '../models/transaction';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 export async function makeTransaction(newTrx: TransactionDto) {
-  type QueryOutput = { 'user_id': string; 'group_id': string; saldo: number; };
+  interface QueryOutput { 'user_id': string; 'group_id': string; saldo: number; }
 
   const amount = _.round(newTrx.amount, 2);
 
@@ -51,6 +52,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
         _.assign(transaction, { comment: newTrx.comment }) :
         transaction,
       );
+
+    logger.debug('New transaction', transaction);
 
     return { username: newTrx.username, saldo: newSaldo.saldo };
   } catch (err) {
@@ -109,9 +112,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
   const deltaSaldos = _.chain(await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
     .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date).utc()))
     .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
-    .mapValues((transactions: any) =>
-      _.reduce(transactions, (total, transaction: any) => total + transaction.saldo_change, 0),
-    )
+    .mapValues((transactions: any) => _.sumBy(transactions, 'saldo_change'))
     .value();
 
   const time = moment(from).startOf('day');
@@ -125,7 +126,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
 
     saldos.push({
       timestamp: time.format('YYYY-MM-DD'),
-      saldo: currentSaldo,
+      saldo: _.round(currentSaldo, 2),
     });
     time.add(1, 'day');
   }

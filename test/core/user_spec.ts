@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 
 import * as helper from '../helpers';
-import { Config } from '../../src/models/config';
+import { Config } from '../../src/types/config';
 import { ConflictError } from '../../src/errors';
 import * as userCore from '../../src/core/user-core';
 import * as groupCore from '../../src/core/group-core';

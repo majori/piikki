@@ -1,15 +1,15 @@
-export type UserDto = {
+declare interface UserDto {
   username: string;
   password: string;
 }
 
-export type UserWithSaldo = {
+declare interface UserWithSaldo {
   username: string;
   groupName: string;
   saldo: number;
 }
 
-export type AlternativeLoginDto = {
+declare interface AlternativeLoginDto {
   key: any;
   groupName: string;
   tokenId: number;
@@ -17,9 +17,8 @@ export type AlternativeLoginDto = {
   username?: string;
 }
 
-export type AlternativeLoginForUserDto = {
+declare interface AlternativeLoginForUserDto {
   groupName: string;
   username: string;
   type?: number;
 }
-

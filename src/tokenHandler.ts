@@ -1,13 +1,10 @@
 import * as _ from 'lodash';
-import * as path from 'path';
-import { STATUS_CODES } from 'http';
-import appInsights = require('applicationinsights');
+import { RequestHandler, Request } from 'express';
 import { getTokens, createAdminToken } from './core/token-core';
 import { AuthorizationError } from './errors';
+import { Logger } from './logger';
 
-import { Response, NextFunction } from 'express';
-import { IExtendedRequest } from './models/http';
-import { DatabaseToken } from './models/database';
+const logger = new Logger(__filename);
 
 let registeredTokens: DatabaseToken[] = [];
 
@@ -19,6 +16,7 @@ export async function initTokens() {
 
     // There is no tokens in the database, make new ones
     if (_.isEmpty(tokens)) {
+      logger.info('Tokens not found, initializing admin token');
       await createAdminToken('Created on initialize');
     } else {
       await updateTokens(tokens);
@@ -27,10 +25,9 @@ export async function initTokens() {
 }
 
 // Authorize request by token found in "Authorization" header
-export function handleTokens(req: IExtendedRequest, res: Response, next: NextFunction) {
+export const handleTokens: RequestHandler = (req, res, next) => {
   const token = _.find(registeredTokens, { token: req.get('Authorization') });
   if (!_.isUndefined(token)) {
-
     req.piikki = {
       token,
       groupAccess: {
@@ -62,14 +59,15 @@ export function handleTokens(req: IExtendedRequest, res: Response, next: NextFun
   } else {
     throw new AuthorizationError();
   }
-}
+};
 
 // Fetch current tokens from database
 export async function updateTokens(newTokens?: DatabaseToken[]) {
+  logger.debug('Refreshing tokens', { tokens: JSON.stringify(newTokens) });
   registeredTokens = (newTokens) ? newTokens : await getTokens();
 }
 
-export function getTokenInfo(req: IExtendedRequest) {
+export function getTokenInfo(req: Request) {
   return {
     token_role: _.get(req, 'piikki.token.role', ''),
     token_comment: _.get(req, 'piikki.token.comment', ''),

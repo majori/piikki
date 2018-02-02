@@ -1,4 +1,4 @@
-export type TransactionDto = {
+declare interface TransactionDto {
   username: string;
   groupName: string;
   amount: number;
@@ -6,7 +6,7 @@ export type TransactionDto = {
   comment?: string;
 }
 
-export type TransactionFilter = {
+declare interface TransactionFilter {
   'users.username'?: string;
   'groups.name'?: string;
 }

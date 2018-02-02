@@ -6,18 +6,18 @@ import { Express } from 'express';
 
 import { createApp } from '../src/app';
 import { knex } from '../src/database';
-import { Config } from '../src/models/config';
+import { Config } from '../src/types/config';
 
 import * as seed from '../seeds/data/test';
 
-type RequestOptions = {
+interface RequestOptions {
   method: 'get' | 'post' | 'put' | 'del';
   url: string;
   body?: any;
   query?: any;
-};
+}
 
-const cfg: Config = require('../config');
+const cfg: Config = require('../config'); // tslint:disable-line
 
 export const user = seed.data.users[0];
 export const group = seed.data.groups[0];

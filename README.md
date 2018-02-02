@@ -13,6 +13,7 @@ This github project only includes server backend and api of the Piikki pre-payme
 - [RFID-reader](https://github.com/juilijoel/piikki-client-rfid) by [juilijoel](https://github.com/juilijoel)
 - [Telegram bot](https://github.com/majori/piikki-client-tg) by [majori](https://github.com/majori)
 - [Web UI](https://github.com/majori/piikki-client-web) by [majori](https://github.com/majori)
+- [Desktop](https://github.com/majori/piikki-client-desktop) by [majori](https://github.com/majori)
 
 If you are interested of making your own Piikki client and use our hosted backend service, please contact the [author](https://github.com/majori) to aquire your very own token!
 
@@ -22,14 +23,9 @@ Here is a high-level architechture model of the system.
 
 ![Piikki high-level model](https://raw.githubusercontent.com/majori/piikki/development/docs/high-level.png)
 
-_More coming soon..._
-
 # API
 
-[API Definition](https://piikki-backend-euw.azurewebsites.net/swagger/ui/)
+[API Definition](https://piikki.ddns.net/swagger/ui/)
 
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
-
-## Acknowledgements
-This project is supported by [Eatech](https://www.eatech.fi/)!
 

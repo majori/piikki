@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import * as userCore from '../core/user-core';
-import { ConflictError, ValidationError } from '../errors';
+import { ConflictError } from '../errors';
 import {
   createJsonRoute,
   validateUser,
@@ -10,37 +10,34 @@ import {
   validatePassword,
   validateAlternativeLoginKey,
 } from './endpoint-utils';
+import { Endpoint } from 'types/endpoints';
 
-import { DatabaseAlternativeLogin } from '../models/database';
-import { IExtendedRequest } from '../models/http';
-import { UserDto } from '../models/user';
+const endpoint: Endpoint = {
 
-const _endpoint = {
-
-  getUsers: async (req: IExtendedRequest) => {
+  getUsers: async (req) => {
     return userCore.getUsers();
   },
 
-  getUser: async (req: IExtendedRequest) => {
+  getUser: async (req) => {
     const username = validateUsername(req.params.username);
 
     return userCore.getUser(username);
   },
 
-  createUser: async (req: IExtendedRequest) => {
+  createUser: async (req) => {
     const user = validateUser(req.body);
 
     return userCore.createUser(user);
   },
 
-  authenticateUser: async (req: IExtendedRequest) => {
+  authenticateUser: async (req) => {
     const user = validateUser(req.body);
 
     const authenticated = await userCore.authenticateUser(user);
     return { username: user.username, authenticated };
   },
 
-  alternativeAuthenticateUser: async (req: IExtendedRequest) => {
+  alternativeAuthenticateUser: async (req) => {
     const type = req.body.type;
     const groupName = validateGroupName(
       (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
@@ -62,7 +59,7 @@ const _endpoint = {
       };
   },
 
-  createAlternativeLogin: async (req: IExtendedRequest) => {
+  createAlternativeLogin: async (req) => {
     const type = req.body.type;
     const username = validateUsername(req.body.username);
     const groupName = validateGroupName(
@@ -81,7 +78,7 @@ const _endpoint = {
     return { type, key, username, groupName  };
   },
 
-  getAlternativeLoginCount: async (req: IExtendedRequest) => {
+  getAlternativeLoginCount: async (req) => {
     const type = req.query.type;
     const username = validateUsername(req.query.username);
     const groupName = validateGroupName(
@@ -95,13 +92,13 @@ const _endpoint = {
     };
   },
 
-  deleteUser: async (req: IExtendedRequest) => {
+  deleteUser: async (req) => {
     const username = validateUsername(req.body.username);
 
     return userCore.deleteUser(username);
   },
 
-  resetPassword: async (req: IExtendedRequest) => {
+  resetPassword: async (req) => {
     const user: UserDto = validateUser({
       username: req.body.username,
       password: req.body.oldPassword,
@@ -111,14 +108,14 @@ const _endpoint = {
     return userCore.resetPassword(user, newPassword);
   },
 
-  forceResetPassword: async (req: IExtendedRequest) => {
+  forceResetPassword: async (req) => {
     const username = validateUsername(req.body.username);
     const newPassword = validatePassword(req.body.newPassword);
 
     return userCore.forceResetPassword(username, newPassword);
   },
 
-  resetUsername: async (req: IExtendedRequest) => {
+  resetUsername: async (req) => {
     const oldUsername = validateUsername(req.body.oldUsername);
     const newUsername = validateUsername(req.body.newUsername);
     const password = validatePassword(req.body.password);
@@ -133,4 +130,4 @@ const _endpoint = {
 };
 
 // Wrap endpoint to produce JSON route
-export default _.mapValues(_endpoint, (func) => createJsonRoute(func));
+export default _.mapValues(endpoint, (func) => createJsonRoute(func));

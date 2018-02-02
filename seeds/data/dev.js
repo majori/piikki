@@ -39,8 +39,8 @@ const tokenGroupAccess = [
 
 const userSaldos = [];
 
-const transactions = _.flatMap(users, user => {
-  const quantity = _.times(_.random(1, MAX_TRANSACTION_AMOUNT), () => _.random(-10, 10));
+const transactions = _.flatMap(users, (user) => {
+  const quantity = _.times(_.random(1, MAX_TRANSACTION_AMOUNT), () => _.round(_.random(-10, 10, true), 2));
   const groupName = _.sample(_.initial(groups)).groupName;
   const saldos = [];
 

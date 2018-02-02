@@ -1,17 +1,17 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as appInsights from 'applicationinsights';
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { RequestHandler } from 'express';
+import { EndpointFunction } from 'types/endpoints';
 
-import { getTokenInfo } from '../tokenHandler';
 import { ValidationError } from '../errors';
-import { IExtendedRequest, EndpointFunction } from '../models/http';
-import { UserDto } from '../models/user';
+import { Logger } from '../logger';
+
+const logger = new Logger(__filename);
 
 // Wraps the result to json response if succesful
 // else pass error to express error handler
 export function createJsonRoute(func: EndpointFunction): RequestHandler {
-  return async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+  return async (req, res, next) => {
     try {
       const result = await func(req);
       const response = { ok: true, result: result || {} };
@@ -20,18 +20,13 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
       res.status(200);
 
       // Track a succesful request
-      appInsights.client.trackRequestSync(
-        req,
-        res,
-        (Date.now() - req.insights.startTime),
-        getTokenInfo(req),
-      );
+      logger.request(req, res);
 
       // Send the response
       res.json(response);
 
+    // Pass error to error handler
     } catch (err) {
-      appInsights.client.trackException(err, getTokenInfo(req));
       next(err);
     }
   };
@@ -60,10 +55,11 @@ export function validateUsername(username: any): string {
   if (_.isUndefined(username))  { throw new ValidationError('No username defined'); }
   if (!_.isString(username))    { throw new ValidationError(`Username ${username} was not a string`); }
   if (_.isEmpty(username))      { throw new ValidationError('Username was empty'); }
+  if (username.length < 2)      { throw new ValidationError('Username was shorter 2 characters'); }
   if (username.length > 20)     { throw new ValidationError('Username was longer than 20 characters'); }
   if (!regEx.test(username)) {
     throw new ValidationError(
-      `Username ${username} had invalid characters.` +
+      `Username ${username} had invalid characters. ` +
       'Allowed characters are a-z, A-Z, 0-9, "-" and "_".',
     );
   }

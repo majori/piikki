@@ -1,3 +1,5 @@
+import { CLILoggingLevel } from 'winston';
+
 export type Config = {
   dir: {
     source: string;
@@ -11,7 +13,6 @@ export type Config = {
   env: 'production' | 'development' | 'test';
   isProduction: boolean;
   isTest: boolean;
-  appInsightsKey: string;
 
   hostname: string;
   port: number;
@@ -37,5 +38,7 @@ export type Config = {
     seeds: {
       directory: string;
     }
-  }
+  };
+
+  logLevel: CLILoggingLevel;
 }

@@ -1,4 +1,4 @@
-export type DatabaseUser = {
+declare interface DatabaseUser {
   id: number;
   username: string;
   password: string;
@@ -6,7 +6,7 @@ export type DatabaseUser = {
   active: boolean;
 }
 
-export type DatabaseTransaction = {
+declare interface DatabaseTransaction {
   id?: number;
   user_id: number;
   group_id: number;
@@ -16,19 +16,19 @@ export type DatabaseTransaction = {
   comment: string | null;
 }
 
-export type DatabaseGroup = {
+declare interface DatabaseGroup {
   id: number;
   name: string;
 }
 
-export type DatabaseUserSaldo = {
+declare interface DatabaseUserSaldo {
   id: number;
   user_id: number;
   group_id: number;
   saldo: number;
 }
 
-export type DatabaseToken = {
+declare interface DatabaseToken {
   id: number;
   token: string;
   role: 'restricted' | 'global' | 'admin';
@@ -36,7 +36,7 @@ export type DatabaseToken = {
   comment?: string;
 }
 
-export type DatabaseAlternativeLogin = {
+declare interface DatabaseAlternativeLogin {
   username: string;
   group_name: string;
   type: number | null;

@@ -4,7 +4,7 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { Config } from '../../src/models/config';
+import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 
@@ -79,13 +79,13 @@ describe('Restricted API', () => {
   });
 
   it('authenticate with alternative login [POST group/members/:username/authenticate]', async () => {
-    const right_key = 'some_kind_of_id';
+    const rightKey = 'some_kind_of_id';
 
     // Right username with right key
     const res1 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: right_key },
+        { key: rightKey },
       );
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
@@ -104,7 +104,7 @@ describe('Restricted API', () => {
     const res3 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: right_key, type: 10 },
+        { key: rightKey, type: 10 },
       );
 
     helper.expectOk(res3);
@@ -168,7 +168,6 @@ describe('Restricted API', () => {
     });
   });
 
-
   it('get group members', async () => {
     const res = await API.get('/group/members');
     helper.expectOk(res);
@@ -226,4 +225,3 @@ describe('Restricted API', () => {
   it('get group saldo');
   it('get daily group saldo since');
 });
-

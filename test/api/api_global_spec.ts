@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { Express } from 'express';
 
 import { NotFoundError } from '../../src/errors';
-import { Config } from '../../src/models/config';
+import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 
@@ -160,7 +160,7 @@ describe('Global API', () => {
   });
 
   it('get group member', async () => {
-    const res = await API.get(`/groups/${GROUP.groupName}/members/${USER.username}`)
+    const res = await API.get(`/groups/${GROUP.groupName}/members/${USER.username}`);
     helper.expectOk(res);
     expect(res.body.result).to.have.property('username', USER.username);
     expect(res.body.result).to.have.property('saldo');

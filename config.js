@@ -17,7 +17,6 @@ cfg.dir = {
 cfg.env = process.env.NODE_ENV || 'development';
 cfg.isProduction = cfg.env === 'production';
 cfg.isTest = cfg.env === 'test';
-cfg.appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 
 // ### HTTP-server configs
 //
@@ -50,5 +49,9 @@ cfg.db = {
       directory: './seeds/development'
     }
 };
+
+// ### Logger options
+//
+cfg.logLevel = process.env.LOG_LEVEL || 'info';
 
 module.exports = cfg;
