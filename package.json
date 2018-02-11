@@ -18,7 +18,7 @@
     "url": "git+https://github.com/majori/piikki.git"
   },
   "engines": {
-    "node": "8.3.0"
+    "node": "8.9.4"
   },
   "author": "Antti Kivimäki",
   "license": "MIT",
