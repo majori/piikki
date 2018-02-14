@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "env-cmd ./.env.local.js nodemon --exec ts-node src/index.ts",
-    "lint": "tslint -p tsconfig.json -e **/*.js",
+    "lint": "tslint -p tsconfig.json src/**/*.ts",
+    "lint:fix": "tslint -p tsconfig.json src/**/*.ts --fix",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
     "build": "tsc --listEmittedFiles",
