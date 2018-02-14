@@ -11,6 +11,7 @@ import {
   validateAlternativeLoginKey,
 } from './endpoint-utils';
 import { Endpoint } from 'types/endpoints';
+import * as groupCore from '../core/group-core';
 
 const endpoint: Endpoint = {
 
@@ -126,6 +127,13 @@ const endpoint: Endpoint = {
     } else {
       throw new ConflictError('Invalid password');
     }
+  },
+
+  setDefaultGroup: async (req) => {
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+
+    return userCore.setDefaultGroup(username, groupName);
   },
 };
 

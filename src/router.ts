@@ -57,10 +57,8 @@ function _restrictedTokenRoutes() {
   restrictedR.use(_commonRoutes());
 
   restrictedR.get('/group', groupEndpoint.getCurrentGroup);
-
   restrictedR.get('/group/members', groupEndpoint.getGroupMembers);
   restrictedR.get('/group/members/:username', groupEndpoint.getGroupMember);
-
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
   restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
@@ -102,6 +100,7 @@ function _globalTokenRoutes() {
 
   globalR.get('/users', userEndpoint.getUsers);
   globalR.get('/users/:username', userEndpoint.getUser);
+  globalR.post('/users/:username/defaultGroup', userEndpoint.setDefaultGroup);
   globalR.delete('/users', userEndpoint.deleteUser);
 
   globalR.get('/groups', groupEndpoint.getGroups);

@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 
 import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import { knex} from '../database';
-import { groupExists } from './group-core';
+import { groupExists, userIsInGroup } from './group-core';
 
 import { Logger } from '../logger';
 
@@ -219,6 +219,14 @@ export async function createAlternativeLogin(login: AlternativeLoginDto) {
       type: login.type || null,
       hashed_key: hash,
     });
+}
+
+export async function setDefaultGroup(username: string, groupName: string) {
+  const result = await userIsInGroup(username, groupName);
+  await knex
+    .from('users')
+    .where({ user_id: result.user.id })
+    .update({ default_group: result.group.id });
 }
 
 // Get all users in group
