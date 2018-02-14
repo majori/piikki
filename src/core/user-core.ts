@@ -225,7 +225,7 @@ export async function setDefaultGroup(username: string, groupName: string) {
   const result = await userIsInGroup(username, groupName);
   await knex
     .from('users')
-    .where({ user_id: result.user.id })
+    .where({ id: result.user.id })
     .update({ default_group: result.group.id });
 }
 

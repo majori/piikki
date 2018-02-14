@@ -131,7 +131,7 @@ const endpoint: Endpoint = {
 
   setDefaultGroup: async (req) => {
     const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const groupName = validateGroupName(req.body.groupName);
 
     return userCore.setDefaultGroup(username, groupName);
   },

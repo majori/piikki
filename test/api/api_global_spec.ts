@@ -100,6 +100,13 @@ describe('Global API', () => {
     expect(res.body.result.count).to.equal(1);
   });
 
+  it('set user\'s default group', async () => {
+    const res = await API.post(`/users/${USER.username}/defaultGroup`, {
+      groupName: GROUP.groupName,
+    });
+    helper.expectOk(res);
+  });
+
   it('reset password', async () => {
     const newPassword = 'new_password';
 
