@@ -31,7 +31,7 @@ describe('Transactions', () => {
     for (const index of _.times(times)) {
       const amount = index + 1;
       await makeTransaction(amount);
-      await BBPromise.delay(1); // Wait one millisecond so transactions can't have same
+      await BBPromise.delay(3); // Wait couple milliseconds so transactions can't have same timestamp
       await makeTransaction(-amount);
     }
   }
