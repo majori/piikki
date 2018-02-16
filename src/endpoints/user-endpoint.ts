@@ -2,16 +2,13 @@ import * as _ from 'lodash';
 
 import * as userCore from '../core/user-core';
 import { ConflictError } from '../errors';
-import {
-  createJsonRoute,
-  validateUser,
-  validateUsername,
-  validateGroupName,
-  validatePassword,
-  validateAlternativeLoginKey,
-} from './endpoint-utils';
 import { Endpoint } from 'types/endpoints';
 import * as groupCore from '../core/group-core';
+import { createJsonRoute } from '../utils/endpoint';
+import {
+  validateAlternativeLoginKey, validateGroupName, validatePassword, validateUser,
+  validateUsername,
+} from '../utils/validators';
 
 const endpoint: Endpoint = {
 

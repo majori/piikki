@@ -2,13 +2,8 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Endpoint } from 'types/endpoints';
 import * as transCore from '../core/transaction-core';
-import {
-  createJsonRoute,
-  validateTransactionAmount,
-  validateGroupName,
-  validateUsername,
-  validateTimestamp,
-} from './endpoint-utils';
+import { createJsonRoute } from '../utils/endpoint';
+import { validateGroupName, validateTimestamp, validateUsername, validateTransactionAmount} from '../utils/validators';
 
 const endpoint: Endpoint = {
   makeTransaction: async (req) => {
