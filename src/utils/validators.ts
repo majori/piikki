@@ -1,4 +1,3 @@
-// Check if username and password is valid
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ValidationError } from '../errors';

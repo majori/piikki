@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-import * as moment from 'moment';
 import { RequestHandler } from 'express';
 import { EndpointFunction } from 'types/endpoints';
 import { Logger } from '../logger';

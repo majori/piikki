@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as _ from 'lodash';
-import { Logger as Winston, transports, LoggerInstance, CLILoggingLevel } from 'winston';
+import { Logger as Winston, transports, CLILoggingLevel } from 'winston';
 import { Request, Response } from 'express';
 
 import { getTokenInfo } from './tokenHandler';

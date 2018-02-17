@@ -1,8 +1,6 @@
 /* tslint:disable:no-unused-expression */
 import { expect, request } from 'chai';
 import * as path from 'path';
-import * as _ from 'lodash';
-import { Express } from 'express';
 
 import { createApp } from '../src/app';
 import { knex } from '../src/database';
@@ -27,10 +25,6 @@ export const tokens = {
   global: 'global_token',
   restricted: 'restricted_token',
 };
-
-export async function clearTable(tableName: string) {
-  return knex(tableName).del();
-}
 
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();

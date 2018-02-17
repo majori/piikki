@@ -76,18 +76,6 @@ export async function deleteToken(token: string) {
   return result;
 }
 
-// Creates one global token and restricted token for every group
-export async function initializeTokens() {
-  const token = await createGlobalToken();
-  const groups = await getGroups();
-
-  for (const group of groups) {
-    await createRestrictedToken(group.name);
-  }
-
-  return await getTokens;
-}
-
 function _getTokens(): QueryBuilder {
   return knex
     .select(
