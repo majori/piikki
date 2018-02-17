@@ -1,38 +1,7 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { RequestHandler } from 'express';
-import { EndpointFunction } from 'types/endpoints';
-
 import { ValidationError } from '../errors';
-import { Logger } from '../logger';
 
-const logger = new Logger(__filename);
-
-// Wraps the result to json response if succesful
-// else pass error to express error handler
-export function createJsonRoute(func: EndpointFunction): RequestHandler {
-  return async (req, res, next) => {
-    try {
-      const result = await func(req);
-      const response = { ok: true, result: result || {} };
-
-      // Set status to OK
-      res.status(200);
-
-      // Track a succesful request
-      logger.request(req, res);
-
-      // Send the response
-      res.json(response);
-
-    // Pass error to error handler
-    } catch (err) {
-      next(err);
-    }
-  };
-}
-
-// Check if username and password is valid
 export function validateUser(user: UserDto): UserDto {
   if (!_.isObject(user)) {
     throw new ValidationError('Invalid user object');
@@ -49,15 +18,14 @@ export function validateUser(user: UserDto): UserDto {
 
 // Check if username is valid
 export function validateUsername(username: any): string {
-  // Allow a-z, A-Z, 0-9, underscore and hyphen
-  const regEx = /^[a-zA-Z0-9-_]+$/;
-
   if (_.isUndefined(username))  { throw new ValidationError('No username defined'); }
   if (!_.isString(username))    { throw new ValidationError(`Username ${username} was not a string`); }
   if (_.isEmpty(username))      { throw new ValidationError('Username was empty'); }
   if (username.length < 2)      { throw new ValidationError('Username was shorter 2 characters'); }
   if (username.length > 20)     { throw new ValidationError('Username was longer than 20 characters'); }
-  if (!regEx.test(username)) {
+
+  // Allow a-z, A-Z, 0-9, underscore and hyphen
+  if (!/^[a-zA-Z0-9-_]+$/.test(username)) {
     throw new ValidationError(
       `Username ${username} had invalid characters. ` +
       'Allowed characters are a-z, A-Z, 0-9, "-" and "_".',

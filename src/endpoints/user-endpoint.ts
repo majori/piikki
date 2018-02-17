@@ -2,15 +2,12 @@ import * as _ from 'lodash';
 
 import * as userCore from '../core/user-core';
 import { ConflictError } from '../errors';
-import {
-  createJsonRoute,
-  validateUser,
-  validateUsername,
-  validateGroupName,
-  validatePassword,
-  validateAlternativeLoginKey,
-} from './endpoint-utils';
 import { Endpoint } from 'types/endpoints';
+import { createJsonRoute } from '../utils/endpoint';
+import {
+  validateAlternativeLoginKey, validateGroupName, validatePassword, validateUser,
+  validateUsername,
+} from '../utils/validators';
 
 const endpoint: Endpoint = {
 
@@ -126,6 +123,17 @@ const endpoint: Endpoint = {
     } else {
       throw new ConflictError('Invalid password');
     }
+  },
+
+  setDefaultGroup: async (req) => {
+    const username = validateUsername(req.params.username);
+    const groupName = validateGroupName(req.body.groupName);
+
+    return userCore.setDefaultGroup(username, groupName);
+  },
+
+  resetDefaultGroup: async (req) => {
+    return userCore.resetDefaultGroup(validateUsername(req.params.username));
   },
 };
 

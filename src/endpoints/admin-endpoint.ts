@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as tokenCore from '../core/token-core';
-import { createJsonRoute, validateGroupName } from './endpoint-utils';
+import { createJsonRoute } from '../utils/endpoint';
+import { validateGroupName } from '../utils/validators';
 import { Endpoint } from 'types/endpoints';
 
 const endpoint: Endpoint = {

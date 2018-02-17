@@ -1,11 +1,5 @@
 exports.up = (knex, Promise) => {
-
-  // Use GETDATE() when in mssql, in postgresql use NOW()
-  const timestampFunc = (knex.client.config.client === 'mssql') ?
-    'GETDATE()' :
-    'NOW()';
-
-  return knex.schema.createTableIfNotExists('users', table => {
+  return knex.schema.createTable('users', table => {
         table.increments('id')
             .primary();
         table.string('username', 20)
@@ -14,19 +8,19 @@ exports.up = (knex, Promise) => {
         table.string('password')
             .notNullable();
         table.timestamp('timestamp')
-            .defaultTo(knex.raw(timestampFunc));
+            .defaultTo(knex.fn.now());
         table.boolean('active')
             .notNullable()
             .defaultTo(true);
     })
-    .then(() => knex.schema.createTableIfNotExists('groups', table => {
+    .then(() => knex.schema.createTable('groups', table => {
         table.increments('id')
             .primary();
         table.string('name')
             .notNullable()
             .unique();
     }))
-    .then(() => knex.schema.createTableIfNotExists('tokens', table => {
+    .then(() => knex.schema.createTable('tokens', table => {
         table.increments('id')
             .primary();
         table.string('token')
@@ -37,7 +31,7 @@ exports.up = (knex, Promise) => {
             .defaultTo('restricted');
         table.string('comment');
     }))
-    .then(() => knex.schema.createTableIfNotExists('user_saldos', table => {
+    .then(() => knex.schema.createTable('user_saldos', table => {
         table.increments('id')
             .primary();
         table.integer('user_id')
@@ -52,7 +46,7 @@ exports.up = (knex, Promise) => {
             .notNullable()
             .defaultTo(0);
     }))
-    .then(() => knex.schema.createTableIfNotExists('transactions', table => {
+    .then(() => knex.schema.createTable('transactions', table => {
         table.increments('id')
             .primary();
         table.integer('user_id')
@@ -66,7 +60,7 @@ exports.up = (knex, Promise) => {
             .references('id')
             .inTable('groups');
         table.timestamp('timestamp')
-            .defaultTo(knex.raw(timestampFunc));
+            .defaultTo(knex.fn.now());
         table.decimal('old_saldo', 8, 2)
             .notNullable();
         table.decimal('new_saldo', 8, 2)
@@ -74,7 +68,7 @@ exports.up = (knex, Promise) => {
         table.string('comment')
             .nullable();
     })
-    .then(() => knex.schema.createTableIfNotExists('token_group_access', (table) => {
+    .then(() => knex.schema.createTable('token_group_access', (table) => {
         table.increments('id')
             .primary();
         table.integer('token_id')

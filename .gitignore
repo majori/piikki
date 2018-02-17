@@ -6,5 +6,5 @@ build/
 
 .DS_Store
 npm-debug.log.*
-.env.*.js
-!.env.example.js
+.env*
+!.env-sample

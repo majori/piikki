@@ -92,7 +92,10 @@ export async function addUserToGroup(username: string, groupName: string) {
 
   await knex
     .from('user_saldos')
-    .insert({ group_id: result.group.id, user_id: result.user.id });
+    .insert({
+      group_id: result.group.id,
+      user_id: result.user.id,
+    });
 
   return username;
 }
@@ -101,7 +104,10 @@ export async function removeUserFromGroup(username: string, groupName: string) {
   const result = await userIsInGroup(username, groupName);
   await knex
     .from('user_saldos')
-    .where({ user_id: result.user.id, group_id: result.group.id })
+    .where({
+      user_id: result.user.id,
+      group_id: result.group.id,
+    })
     .del();
 
   return username;

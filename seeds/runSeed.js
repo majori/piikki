@@ -22,8 +22,8 @@ module.exports = (knex, Promise, data) => {
             `(${i},'${user.username}','${bcrypt.hashSync(user.password, 6)}')`
           )
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT users OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT users OFF;'
       ], ' ')
     ))
 
@@ -37,8 +37,8 @@ module.exports = (knex, Promise, data) => {
             `(${i}, '${group.groupName}')`
           )
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT groups OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT groups OFF;'
       ], ' ')
     ))
 
@@ -57,8 +57,8 @@ module.exports = (knex, Promise, data) => {
             )`
           )
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT user_saldos OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT user_saldos OFF;'
       ], ' ')
     ))
 
@@ -70,8 +70,8 @@ module.exports = (knex, Promise, data) => {
         _.chain(data.tokens)
           .map((token, i) => `(${i},'${token.token}','${token.role}','${token.comment}')`)
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT tokens OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT tokens OFF;'
       ], ' ')
     ))
 
@@ -89,8 +89,8 @@ module.exports = (knex, Promise, data) => {
             )`
           )
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT token_group_access OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT token_group_access OFF;'
       ], ' ')
     ))
 
@@ -112,8 +112,8 @@ module.exports = (knex, Promise, data) => {
             )`
           )
           .join(',')
-          .value(),
-        ';SET IDENTITY_INSERT transactions OFF;'
+          .value() + ';',
+        'SET IDENTITY_INSERT transactions OFF;'
       ], ' ')
     ));
 };

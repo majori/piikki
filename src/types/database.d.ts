@@ -4,6 +4,7 @@ declare interface DatabaseUser {
   password: string;
   timestamp: string;
   active: boolean;
+  default_group: number | null;
 }
 
 declare interface DatabaseTransaction {

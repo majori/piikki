@@ -22,7 +22,7 @@ describe('Restricted API', () => {
     await API.start();
   });
 
-  it('create new user [POST /users/create]', async () => {
+  it('create new user', async () => {
     const res = await API
       .post(
         '/users/create',
@@ -32,7 +32,7 @@ describe('Restricted API', () => {
     helper.expectOk(res);
   });
 
-  it('authenticate user [POST /users/authenticate]', async () => {
+  it('authenticate user', async () => {
 
     // With right password
     const res1 = await API
@@ -65,7 +65,7 @@ describe('Restricted API', () => {
     expect(res3.body.result.authenticated).to.be.false;
   });
 
-  it('create alternative login [POST /group/members/:username/authenticate/create]', async () => {
+  it('create alternative login', async () => {
     const key = 'some_kind_of_id';
 
     const res = await API
@@ -78,7 +78,7 @@ describe('Restricted API', () => {
     expect(res.body.result.key).to.equal(key);
   });
 
-  it('authenticate with alternative login [POST group/members/:username/authenticate]', async () => {
+  it('authenticate with alternative login', async () => {
     const rightKey = 'some_kind_of_id';
 
     // Right username with right key

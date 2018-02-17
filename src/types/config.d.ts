@@ -1,6 +1,6 @@
 import { CLILoggingLevel } from 'winston';
 
-export type Config = {
+export interface Config {
   dir: {
     source: string;
     build: string;

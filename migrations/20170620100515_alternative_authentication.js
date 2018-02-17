@@ -1,9 +1,5 @@
 exports.up = function(knex, Promise) {
-  const timestampFunc = (knex.client.config.client === 'mssql') ?
-    'GETDATE()' :
-    'NOW()';
-
-  return knex.schema.createTableIfNotExists('alternative_login', table => {
+  return knex.schema.createTable('alternative_login', table => {
     table.increments('id')
       .primary();
     table.integer('user_id')
@@ -23,7 +19,7 @@ exports.up = function(knex, Promise) {
     table.string('hashed_key')
       .notNullable();
     table.timestamp('created_at')
-      .defaultTo(knex.raw(timestampFunc));
+      .defaultTo(knex.fn.now());
   });
 };
 

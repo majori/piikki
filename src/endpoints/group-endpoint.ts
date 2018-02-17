@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import { Endpoint } from 'types/endpoints';
 import * as groupCore from '../core/group-core';
-import { createJsonRoute, validateGroupName, validateUsername } from './endpoint-utils';
+import { createJsonRoute } from '../utils/endpoint';
+import { validateGroupName, validateUsername } from '../utils/validators';
 
 const endpoint: Endpoint = {
   createGroup: async (req) => {

@@ -5,6 +5,7 @@ declare interface UserDto {
 
 declare interface UserWithSaldo {
   username: string;
+  defaultGroup: string;
   groupName: string;
   saldo: number;
 }
