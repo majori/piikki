@@ -29,3 +29,10 @@ Here is a high-level architechture model of the system.
 
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
+# Development
+- Install [node.js](https://nodejs.org/en/) and [Docker](https://www.docker.com/community-edition)
+- Run `npm install`
+- Create local database with `docker-compose -d up`
+- Copy contents of `.env-sample` to new file called `.env`
+- Initialize database with `npm run init-db`
+- Run `npm run dev` to start the server
