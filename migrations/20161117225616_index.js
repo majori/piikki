@@ -1,10 +1,4 @@
 exports.up = (knex, Promise) => {
-
-  // Use GETDATE() when in mssql, in postgresql use NOW()
-  const timestampFunc = (knex.client.config.client === 'mssql') ?
-    'GETDATE()' :
-    'NOW()';
-
   return knex.schema.createTable('users', table => {
         table.increments('id')
             .primary();
@@ -14,7 +8,7 @@ exports.up = (knex, Promise) => {
         table.string('password')
             .notNullable();
         table.timestamp('timestamp')
-            .defaultTo(knex.raw(timestampFunc));
+            .defaultTo(knex.fn.now());
         table.boolean('active')
             .notNullable()
             .defaultTo(true);
@@ -66,7 +60,7 @@ exports.up = (knex, Promise) => {
             .references('id')
             .inTable('groups');
         table.timestamp('timestamp')
-            .defaultTo(knex.raw(timestampFunc));
+            .defaultTo(knex.fn.now());
         table.decimal('old_saldo', 8, 2)
             .notNullable();
         table.decimal('new_saldo', 8, 2)
