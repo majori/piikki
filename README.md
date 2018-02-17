@@ -1,7 +1,7 @@
 ![Piikki Logo](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki-logo-title.png)
 ------
 
-[![Build Status](https://travis-ci.org/majori/piikki.svg?branch=development)](https://travis-ci.org/majori/piikki)
+[![Build Status](https://ci.appveyor.com/api/projects/status/dslktag9a01mnvfq?svg=true)](https://ci.appveyor.com/project/majori/piikki)
 
 _Piikki_ is a pre-payment system for small societies such as university clubs and non-profit organizations. Its purpose is to replace the classic tab-paper-sheet taped on the fridge door and offer users an easy way to check off refreshments and keep book of their own tab saldo.
 
