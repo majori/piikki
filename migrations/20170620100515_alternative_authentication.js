@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
     'GETDATE()' :
     'NOW()';
 
-  return knex.schema.createTableIfNotExists('alternative_login', table => {
+  return knex.schema.createTable('alternative_login', table => {
     table.increments('id')
       .primary();
     table.integer('user_id')

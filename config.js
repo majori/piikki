@@ -31,10 +31,10 @@ let dbConnection = {
   server: process.env.PIIKKI_DATABASE_HOSTNAME,
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
+  database: process.env.PIIKKI_DATABASE_NAME,
   options: {
-    port: process.env.PIIKKI_DATABASE_PORT || 1433,
-    database: process.env.PIIKKI_DATABASE_NAME,
     encrypt: true,
+    port: process.env.PIIKKI_DATABASE_PORT || 1433,
   }
 };
 
