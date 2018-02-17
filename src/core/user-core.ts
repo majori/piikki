@@ -18,15 +18,19 @@ export async function getUsers() {
   const results: UserWithSaldo[] = await _getUsersWithSaldos();
 
   return _.chain(results)
-    .groupBy((x) => x.username)
-    .map((x: UserWithSaldo[], key: string) => _.reduce(x, (user: any, value: UserWithSaldo) => {
+    .groupBy((user) => user.username)
+    .map((users: UserWithSaldo[], key: string) => _.reduce(users, (user: any, value: UserWithSaldo) => {
       if (value.groupName) {
         user.saldos[value.groupName] = value.saldo;
+      }
+      if (value.defaultGroup && !user.defaultGroup) {
+        user.defaultGroup = value.defaultGroup;
       }
       return user;
     },
       {
         username: key,
+        defaultGroup: null,
         saldos: {},
       }),
     )
@@ -35,12 +39,15 @@ export async function getUsers() {
 
 // Get user info and saldo in each group
 export async function getUser(username: string) {
-  const user = { username, saldos: {} };
-
-  await userExists(username);
+  const rawUser = await userExists(username);
+  const user = {
+    username: rawUser.username,
+    defaultGroup: null,
+    saldos: {},
+  };
 
   // Fetch possible saldos in groups
-  const results = await _getUsersWithSaldos().andWhere({ 'users.username': username });
+  const results = await _getUsersWithSaldos().andWhere({ 'usr.username': username });
   // There was no saldos, return only user info
   if (_.isEmpty(results)) { return user; }
 
@@ -48,6 +55,9 @@ export async function getUser(username: string) {
   return _.reduce(results, (result: any, value: any) => {
     if (value.groupName) {
       result.saldos[value.groupName] = value.saldo;
+    }
+    if (value.defaultGroup && !result.defaultGroup) {
+      result.defaultGroup = value.defaultGroup;
     }
     return result;
   }, user);
@@ -238,13 +248,18 @@ export async function resetDefaultGroup(username: string) {
 
 // Get all users in group
 function _getUsersWithSaldos(): QueryBuilder {
-  return knex
-    .select('users.username', 'groups.name AS groupName', 'user_saldos.saldo')
-    .from('users')
-    .leftJoin('user_saldos', { 'user_saldos.user_id': 'users.id' })
+  return knex.with('usr', (qb) => {
+      qb
+        .select('users.id', 'users.username', 'users.active', 'groups.name AS defaultGroup')
+        .from('users')
+        .leftJoin('groups', { 'groups.id': 'users.default_group' });
+    })
+    .select('usr.username', 'usr.defaultGroup', 'groups.name AS groupName', 'user_saldos.saldo')
+    .from('usr')
+    .leftJoin('user_saldos', { 'user_saldos.user_id': 'usr.id' })
     .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })
-    .orderBy('users.username')
-    .where({ 'users.active': true });
+    .orderBy('usr.username')
+    .where({ 'usr.active': true });
 }
 
 // Hash passwords
