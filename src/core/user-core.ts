@@ -229,6 +229,13 @@ export async function setDefaultGroup(username: string, groupName: string) {
     .update({ default_group: result.group.id });
 }
 
+export async function resetDefaultGroup(username: string) {
+  await knex
+    .from('users')
+    .where({ username })
+    .update({ default_group: null });
+}
+
 // Get all users in group
 function _getUsersWithSaldos(): QueryBuilder {
   return knex

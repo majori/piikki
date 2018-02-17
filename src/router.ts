@@ -101,6 +101,7 @@ function _globalTokenRoutes() {
   globalR.get('/users', userEndpoint.getUsers);
   globalR.get('/users/:username', userEndpoint.getUser);
   globalR.post('/users/:username/defaultGroup', userEndpoint.setDefaultGroup);
+  globalR.delete('/users/:username/defaultGroup', userEndpoint.resetDefaultGroup);
   globalR.delete('/users', userEndpoint.deleteUser);
 
   globalR.get('/groups', groupEndpoint.getGroups);

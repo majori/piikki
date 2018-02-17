@@ -132,6 +132,10 @@ const endpoint: Endpoint = {
 
     return userCore.setDefaultGroup(username, groupName);
   },
+
+  resetDefaultGroup: async (req) => {
+    return userCore.resetDefaultGroup(validateUsername(req.params.username));
+  },
 };
 
 // Wrap endpoint to produce JSON route
