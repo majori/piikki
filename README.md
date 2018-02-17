@@ -17,12 +17,6 @@ This github project only includes server backend and api of the Piikki pre-payme
 
 If you are interested of making your own Piikki client and use our hosted backend service, please contact the [author](https://github.com/majori) to aquire your very own token!
 
-# Architechture
-
-Here is a high-level architechture model of the system.
-
-![Piikki high-level model](https://raw.githubusercontent.com/majori/piikki/development/docs/high-level.png)
-
 # API
 
 [API Definition](https://piikki.ddns.net/swagger/ui/)
