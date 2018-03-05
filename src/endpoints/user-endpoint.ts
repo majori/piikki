@@ -138,4 +138,4 @@ const endpoint: Endpoint = {
 };
 
 // Wrap endpoint to produce JSON route
-export default _.mapValues(endpoint, (func) => createJsonRoute(func));
+export default _.mapValues(endpoint, createJsonRoute);
