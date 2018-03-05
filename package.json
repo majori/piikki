@@ -5,8 +5,9 @@
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "dev": "env-cmd .env nodemon --exec ts-node src/index.ts",
+    "dev": "env-cmd .env nodemon $NODE_DEBUG_OPTION --exec ts-node src/index.ts",
     "lint": "tslint -p tsconfig.json src/**/*.ts",
+    "lint:fix": "tslint --fix -p tsconfig.json src/**/*.ts",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
     "init-db": "env-cmd .env npm run migrate && env-cmd .env npm run seed",
