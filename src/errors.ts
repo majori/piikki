@@ -5,7 +5,7 @@ import { Logger } from './logger';
 
 const logger = new Logger(__filename);
 
-export const errorResponder: ErrorRequestHandler = (err, req, res) => {
+export const errorResponder: ErrorRequestHandler = (err, req, res, next) => {
   const status = err.status ? err.status : 500;
 
   const response = {
