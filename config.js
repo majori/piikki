@@ -32,9 +32,9 @@ let dbConnection = {
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
   database: process.env.PIIKKI_DATABASE_NAME,
+  port: process.env.PIIKKI_DATABASE_PORT ? parseInt(process.env.PIIKKI_DATABASE_PORT) : 1433,
   options: {
     encrypt: true,
-    port: process.env.PIIKKI_DATABASE_PORT || 1433,
   }
 };
 
