@@ -84,6 +84,7 @@ export async function createUser(user: UserDto) {
 
 // Puts user's "active" -status to false
 export async function deleteUser(username: string) {
+  await userExists(username);
   await knex.from('users').where({ username }).update({ active: false });
   logger.info('User deleted', { username });
   return;

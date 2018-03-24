@@ -249,5 +249,13 @@ describe('Global API', () => {
 
     // Check if he does still exists
     expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;
+
+    // Try delete user which does not exist
+    const res2 = await API.del(
+      '/users',
+      { username: 'unknown_user'},
+    );
+
+    expect(API.del('/users', { username: 'unknown_user' })).to.eventually.be.rejected;
   });
 });
