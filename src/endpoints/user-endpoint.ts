@@ -1,13 +1,10 @@
 import * as _ from 'lodash';
+import { badRequest } from 'boom';
 
 import * as userCore from '../core/user-core';
-import { ConflictError } from '../errors';
 import { Endpoint } from 'types/endpoints';
 import { createJsonRoute } from '../utils/endpoint';
-import {
-  validateAlternativeLoginKey, validateGroupName, validatePassword, validateUser,
-  validateUsername,
-} from '../utils/validators';
+import validate from '../utils/validators';
 
 const endpoint: Endpoint = {
 
@@ -16,19 +13,19 @@ const endpoint: Endpoint = {
   },
 
   getUser: async (req) => {
-    const username = validateUsername(req.params.username);
+    const username = validate.username(req.params.username);
 
     return userCore.getUser(username);
   },
 
   createUser: async (req) => {
-    const user = validateUser(req.body);
+    const user = validate.user(req.body);
 
     return userCore.createUser(user);
   },
 
   authenticateUser: async (req) => {
-    const user = validateUser(req.body);
+    const user = validate.user(req.body);
 
     const authenticated = await userCore.authenticateUser(user);
     return { username: user.username, authenticated };
@@ -36,10 +33,10 @@ const endpoint: Endpoint = {
 
   alternativeAuthenticateUser: async (req) => {
     const type = req.body.type;
-    const groupName = validateGroupName(
+    const groupName = validate.groupName(
       (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
     );
-    const key = validateAlternativeLoginKey(req.body.key);
+    const key = validate.alternativeLoginKey(req.body.key);
 
     const found = await userCore.getAlternativeLogin({
       key,
@@ -58,11 +55,11 @@ const endpoint: Endpoint = {
 
   createAlternativeLogin: async (req) => {
     const type = req.body.type;
-    const username = validateUsername(req.body.username);
-    const groupName = validateGroupName(
+    const username = validate.username(req.body.username);
+    const groupName = validate.groupName(
       (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
     );
-    const key = validateAlternativeLoginKey(req.body.key);
+    const key = validate.alternativeLoginKey(req.body.key);
 
     await userCore.createAlternativeLogin({
       username,
@@ -77,8 +74,8 @@ const endpoint: Endpoint = {
 
   getAlternativeLoginCount: async (req) => {
     const type = req.query.type;
-    const username = validateUsername(req.query.username);
-    const groupName = validateGroupName(
+    const username = validate.username(req.query.username);
+    const groupName = validate.groupName(
       (req.piikki.groupAccess.all) ? req.query.groupName : req.piikki.groupAccess.group.name,
     );
 
@@ -90,50 +87,50 @@ const endpoint: Endpoint = {
   },
 
   deleteUser: async (req) => {
-    const username = validateUsername(req.body.username);
+    const username = validate.username(req.body.username);
 
     return userCore.deleteUser(username);
   },
 
   resetPassword: async (req) => {
-    const user: UserDto = validateUser({
+    const user: UserDto = validate.user({
       username: req.body.username,
       password: req.body.oldPassword,
     });
-    const newPassword = validatePassword(req.body.newPassword);
+    const newPassword = validate.password(req.body.newPassword);
 
     return userCore.resetPassword(user, newPassword);
   },
 
   forceResetPassword: async (req) => {
-    const username = validateUsername(req.body.username);
-    const newPassword = validatePassword(req.body.newPassword);
+    const username = validate.username(req.body.username);
+    const newPassword = validate.password(req.body.newPassword);
 
     return userCore.forceResetPassword(username, newPassword);
   },
 
   resetUsername: async (req) => {
-    const oldUsername = validateUsername(req.body.oldUsername);
-    const newUsername = validateUsername(req.body.newUsername);
-    const password = validatePassword(req.body.password);
+    const oldUsername = validate.username(req.body.oldUsername);
+    const newUsername = validate.username(req.body.newUsername);
+    const password = validate.password(req.body.password);
 
     const auth = await userCore.authenticateUser({ username: oldUsername, password });
     if (auth) {
       return userCore.resetUsername(oldUsername, newUsername);
     } else {
-      throw new ConflictError('Invalid password');
+      throw badRequest('Invalid password');
     }
   },
 
   setDefaultGroup: async (req) => {
-    const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.body.groupName);
+    const username = validate.username(req.params.username);
+    const groupName = validate.groupName(req.body.groupName);
 
     return userCore.setDefaultGroup(username, groupName);
   },
 
   resetDefaultGroup: async (req) => {
-    return userCore.resetDefaultGroup(validateUsername(req.params.username));
+    return userCore.resetDefaultGroup(validate.username(req.params.username));
   },
 };
 

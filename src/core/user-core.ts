@@ -2,8 +2,8 @@ import * as bcrypt from 'bcrypt';
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
+import { badRequest, notFound } from 'boom';
 
-import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import { knex} from '../database';
 import { groupExists, userIsInGroup } from './group-core';
 
@@ -68,7 +68,7 @@ export async function createUser(user: UserDto) {
   const results = await knex.from('users').where({ username: user.username });
 
   if (!_.isEmpty(results)) {
-    throw new ConflictError(`Username ${user.username} already exists`);
+    throw badRequest(`Username ${user.username} already exists`);
   }
 
   const hash = await _hashPassword(user.password);
@@ -96,7 +96,7 @@ export async function authenticateUser(user: UserDto) {
     return await bcrypt.compare(user.password, row.password);
   } catch (err) {
     // If user was not found, just response with failed authentication
-    if (err instanceof NotFoundError) {
+    if (err.isBoom && err.typeof(notFound)) {
       return false;
 
     // Some other error occured, pass the exception
@@ -109,23 +109,23 @@ export async function authenticateUser(user: UserDto) {
 // Checks if user is in database
 export async function userExists(username?: string) {
   if (_.isUndefined(username)) {
-    throw new ValidationError('Username was undefined');
+    throw badRequest('Username was undefined');
   }
   const row: DatabaseUser = await knex.from('users').where({ username, active: true }).first();
 
   if (row) {
     return row;
   } else {
-    throw new NotFoundError(`User ${username} not found`);
+    throw notFound(`User ${username} not found`);
   }
 }
 
 export async function userNotExists(username: string) {
   try {
     await userExists(username);
-    throw new ConflictError(`User ${username} already exists`);
+    throw badRequest(`User ${username} already exists`);
   } catch (err) {
-    if (err instanceof NotFoundError) {
+    if (err.isBoom && err.typeof(notFound)) {
       return true;
     } else {
       throw err;
@@ -139,7 +139,7 @@ export async function resetPassword(user: UserDto, newPassword: string) {
   const isSame = await authenticateUser(user);
 
   if (!isSame) {
-    throw new ConflictError('Old password did not match');
+    throw badRequest('Old password did not match');
   }
 
   const hash = await _hashPassword(newPassword);

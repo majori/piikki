@@ -3,10 +3,10 @@ import 'mocha';
 import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
 import * as path from 'path';
+import { isBoom } from 'boom';
 
 import * as helper from '../helpers';
 import { Config } from '../../src/types/config';
-import { ConflictError } from '../../src/errors';
 import * as userCore from '../../src/core/user-core';
 import * as groupCore from '../../src/core/group-core';
 
@@ -28,7 +28,8 @@ describe('Users & groups', () => {
     try {
       await groupCore.createGroup(GROUP);
     } catch (err) {
-      expect(err).to.have.property('name', 'ConflictError');
+      expect(isBoom(err)).to.be.true;
+      expect(err.message).to.equal('Group new_group already exists');
     }
   });
 
@@ -44,7 +45,8 @@ describe('Users & groups', () => {
     try {
       await userCore.createUser(USER);
     } catch (err) {
-      expect(err).to.have.property('name', 'ConflictError');
+      expect(isBoom(err)).to.be.true;
+      expect(err.message).to.equal('Username testUser1 already exists');
     }
   });
 

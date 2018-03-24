@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { QueryBuilder, JoinClause } from 'knex';
+import { notFound } from 'boom';
 
-import { NotFoundError } from '../errors';
 import { knex } from '../database';
 import { Logger } from '../logger';
 
@@ -34,7 +34,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
     const newSaldo: QueryOutput | undefined = _.first(result);
 
     if (_.isUndefined(newSaldo)) {
-      throw new NotFoundError(`User "${newTrx.username}" was not found in group "${newTrx.groupName}`);
+      throw notFound(`User "${newTrx.username}" was not found in group "${newTrx.groupName}`);
     }
 
     const transaction = {

@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { Endpoint } from 'types/endpoints';
 import * as transCore from '../core/transaction-core';
 import { createJsonRoute } from '../utils/endpoint';
-import { validateGroupName, validateTimestamp, validateUsername, validateTransactionAmount} from '../utils/validators';
+import validate from '../utils/validators';
 
 const endpoint: Endpoint = {
   makeTransaction: async (req) => {
@@ -23,9 +23,9 @@ const endpoint: Endpoint = {
         trx.groupName;
 
       const transaction = {
-        username: validateUsername(trx.username),
-        amount: validateTransactionAmount(trx.amount),
-        groupName: validateGroupName(trx.groupName),
+        username: validate.username(trx.username),
+        amount: validate.transactionAmount(trx.amount),
+        groupName: validate.groupName(trx.groupName),
         comment: trx.comment,
         tokenId: req.piikki.token.id,
       };
@@ -37,34 +37,34 @@ const endpoint: Endpoint = {
   },
 
   getUserTransactions: async (req) => {
-    const username = validateUsername(req.params.username);
-    const from = validateTimestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+    const username = validate.username(req.params.username);
+    const from = validate.timestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
 
     return transCore.getUserTransactions(username, from, to);
   },
 
   getGroupTransactions: async (req) => {
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-    const from = validateTimestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
+    const from = validate.timestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
 
     return transCore.getGroupTransactions(groupName, from, to);
   },
 
   getUserTransactionsFromGroup: async (req) => {
-    const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-    const from = validateTimestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+    const username = validate.username(req.params.username);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
+    const from = validate.timestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
 
     return transCore.getUserTransactionsFromGroup(username, groupName, from, to);
   },
 
   getGroupSaldo: async (req) => {
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     // Default to present if from-date is not given
-    const from = req.query.from ? validateTimestamp(req.query.from) : moment().utc();
+    const from = req.query.from ? validate.timestamp(req.query.from) : moment().utc();
 
     const result = await transCore.getGroupSaldo(groupName, from);
 
@@ -76,9 +76,9 @@ const endpoint: Endpoint = {
   },
 
   getDailyGroupSaldos: async (req) => {
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
-    const from = validateTimestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validateTimestamp(req.query.to);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
+    const from = validate.timestamp(req.query.from);
+    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
 
     return transCore.getDailyGroupSaldosSince(groupName, from, to);
   },

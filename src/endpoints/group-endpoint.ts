@@ -2,25 +2,25 @@ import * as _ from 'lodash';
 import { Endpoint } from 'types/endpoints';
 import * as groupCore from '../core/group-core';
 import { createJsonRoute } from '../utils/endpoint';
-import { validateGroupName, validateUsername } from '../utils/validators';
+import validate from '../utils/validators';
 
 const endpoint: Endpoint = {
   createGroup: async (req) => {
-    const groupName = validateGroupName(req.body.groupName);
+    const groupName = validate.groupName(req.body.groupName);
 
     return groupCore.createGroup(groupName);
   },
 
   addMember: async (req) => {
-    const username = validateUsername(req.body.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const username = validate.username(req.body.username);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
 
     return groupCore.addUserToGroup(username, groupName);
   },
 
   removeMember: async (req) => {
-    const username = validateUsername(req.body.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const username = validate.username(req.body.username);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
 
     return groupCore.removeUserFromGroup(username, groupName);
   },
@@ -30,15 +30,15 @@ const endpoint: Endpoint = {
   },
 
   getGroupMembers: async (req) => {
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     await groupCore.groupExists(groupName);
 
     return groupCore.getUsersFromGroup(groupName);
   },
 
   getGroupMember: async (req) => {
-    const username = validateUsername(req.params.username);
-    const groupName = validateGroupName(req.piikki.groupAccess.group.name);
+    const username = validate.username(req.params.username);
+    const groupName = validate.groupName(req.piikki.groupAccess.group.name);
 
     const result = await groupCore.userIsInGroup(username, groupName);
     return groupCore.getUserFromGroup(result.group.name, result.user.username);
