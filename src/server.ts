@@ -12,7 +12,7 @@ import { Config } from './types/config';
 
 const logger = new Logger(__filename);
 
-export async function createApp(cfg: Config) {
+export async function createServer(cfg: Config) {
   const app = express();
 
   // 3rd party middleware
@@ -51,6 +51,7 @@ export async function createApp(cfg: Config) {
       error: {
         type: payload.error,
         message: payload.message,
+        details: err.data,
       },
     };
 
