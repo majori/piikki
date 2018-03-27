@@ -1,0 +1,62 @@
+/* tslint:disable:no-unused-expression */
+import 'mocha';
+import { expect, assert, should } from 'chai';
+import * as _ from 'lodash';
+import { isBoom } from 'boom';
+
+import * as seed from '../../seeds/data/test';
+import * as helper from '../helpers';
+import * as userCore from '../../src/core/user-core';
+import * as groupCore from '../../src/core/group-core';
+
+describe.only('Groups', () => {
+
+  const USER = _.clone(helper.user);
+  const USER_NOT_IN_GROUP = _.clone(seed.data.users[2]);
+  const USER_NOT_IN_ANY_GROUP = _.clone(seed.data.users[3]);
+
+  const GROUP = _.clone(helper.group);
+  const NEW_GROUP_NAME = 'new_group';
+
+  beforeEach(helper.clearDbAndRunSeed);
+
+  it('create a new group', async () => {
+    await groupCore.createGroup(NEW_GROUP_NAME);
+    const group = await groupCore.groupExists(NEW_GROUP_NAME);
+
+    expect(group).to.containSubset({ name: NEW_GROUP_NAME });
+  });
+
+  it('not create a group with existing name', async () => {
+    try {
+      await groupCore.createGroup(GROUP.groupName);
+      throw new Error('Group dublicate');
+    } catch (err) {
+      expect(isBoom(err)).to.be.true;
+      expect(err.message).to.contain(GROUP.groupName);
+    }
+  });
+
+  it('create saldo for user', async () => {
+    const user = await groupCore.addUserToGroup(USER_NOT_IN_GROUP.username, GROUP.groupName);
+    expect(user).to.be.string;
+  });
+
+  it('will set user\'s default group to new group if user has no other groups', async () => {
+    let user = await userCore.getUser(USER_NOT_IN_ANY_GROUP.username);
+    expect(user).to.have.property('defaultGroup', null);
+
+    await groupCore.addUserToGroup(USER_NOT_IN_ANY_GROUP.username, GROUP.groupName);
+
+    user = await userCore.getUser(USER_NOT_IN_ANY_GROUP.username);
+    expect(user).to.have.property('defaultGroup', GROUP.groupName);
+  });
+
+  it('will reset user\'s default group if he is removed from group', async () => {
+    await userCore.setDefaultGroup(USER.username, GROUP.groupName);
+    await groupCore.removeUserFromGroup(USER.username, GROUP.groupName);
+    const user = await userCore.getUser(USER.username);
+
+    expect(user).to.have.property('defaultGroup', null);
+  });
+});
