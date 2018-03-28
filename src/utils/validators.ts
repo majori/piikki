@@ -6,7 +6,7 @@ import * as Joi from 'joi';
 namespace schemas {
   export const username = Joi.string().token().empty().min(2).max(20).label('Username');
   export const password = Joi.string().empty().min(1).label('Password');
-  export const user = Joi.object().keys({ username, password }).label('User');
+  export const user = Joi.object().keys({ username, password }).options({ stripUnknown: true }).label('User');
   export const transactionAmount = Joi.number().precision(2).label('Transaction amount');
   export const groupName = Joi.string().min(4).max(255).label('Group name');
   export const alternativeLoginKey = Joi.string().empty().label('Alternative login key');

@@ -9,7 +9,7 @@ import * as helper from '../helpers';
 import * as userCore from '../../src/core/user-core';
 import * as groupCore from '../../src/core/group-core';
 
-describe.only('Groups', () => {
+describe('Groups', () => {
 
   const USER = _.clone(helper.user);
   const USER_NOT_IN_GROUP = _.clone(seed.data.users[2]);
