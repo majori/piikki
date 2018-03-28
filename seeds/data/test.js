@@ -6,19 +6,23 @@ const data = {
   users: [
     {
       username: 'testUser1',
-      password: '1234'
+      password: '1234',
+      defaultGroup: 'group1',
     },
     {
       username: 'testUser2',
-      password: '4321'
+      password: '4321',
+      defaultGroup: 'group1',
     },
     {
       username: 'testUser3',
-      password: '1243'
+      password: '1243',
+      defaultGroup: 'group2',
     },
     {
       username: 'testUser4',
-      password: '4312'
+      password: '4312',
+      defaultGroup: null,
     }
   ],
   groups: [
@@ -29,17 +33,17 @@ const data = {
     {
       username: 'testUser1',
       groupName: 'group1',
-      saldo: 10
+      saldo: 10,
     },
     {
       username: 'testUser2',
       groupName: 'group1',
-      saldo: -10
+      saldo: -10,
     },
     {
       username: 'testUser3',
       groupName: 'group2',
-      saldo: 5
+      saldo: 5,
     }
   ],
   tokens: [

@@ -12,21 +12,6 @@ module.exports = (knex, Promise, data) => {
     .then(() => knex('users').del())
     .then(() => knex('groups').del())
 
-    // USERS
-    .then(() => knex.raw(_.join(
-      [
-        'SET IDENTITY_INSERT users ON;',
-        'INSERT INTO users(id, username, password) VALUES',
-        _.chain(data.users)
-          .map((user, i) =>
-            `(${i},'${user.username}','${bcrypt.hashSync(user.password, 6)}')`
-          )
-          .join(',')
-          .value() + ';',
-        'SET IDENTITY_INSERT users OFF;'
-      ], ' ')
-    ))
-
     // GROUPS
     .then(() => knex.raw(_.join(
       [
@@ -39,6 +24,26 @@ module.exports = (knex, Promise, data) => {
           .join(',')
           .value() + ';',
         'SET IDENTITY_INSERT groups OFF;'
+      ], ' ')
+    ))
+
+    // USERS
+    .then(() => knex.raw(_.join(
+      [
+        'SET IDENTITY_INSERT users ON;',
+        'INSERT INTO users(id, username, password, default_group) VALUES',
+        _.chain(data.users)
+          .map((user, i) =>
+            `(
+              ${i},
+              '${user.username}',
+              '${bcrypt.hashSync(user.password, 6)}',
+              ${user.defaultGroup ? _.findIndex(data.groups, ['groupName', user.defaultGroup]) : null}
+            )`
+          )
+          .join(',')
+          .value() + ';',
+        'SET IDENTITY_INSERT users OFF;'
       ], ' ')
     ))
 

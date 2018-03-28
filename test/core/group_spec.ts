@@ -52,6 +52,13 @@ describe.only('Groups', () => {
     expect(user).to.have.property('defaultGroup', GROUP.groupName);
   });
 
+  it('will not set user\'s default group to new group if user has already a default group', async () => {
+    await groupCore.addUserToGroup(USER_NOT_IN_GROUP.username, GROUP.groupName);
+
+    const user = await userCore.getUser(USER_NOT_IN_GROUP.username);
+    expect(user).to.not.have.property('defaultGroup', GROUP.groupName);
+  });
+
   it('will reset user\'s default group if he is removed from group', async () => {
     await userCore.setDefaultGroup(USER.username, GROUP.groupName);
     await groupCore.removeUserFromGroup(USER.username, GROUP.groupName);
