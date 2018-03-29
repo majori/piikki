@@ -13,24 +13,22 @@ namespace schemas {
   export const timestamp = Joi.date().label('Timestamp');
 }
 
-export namespace validate {
-  function validateSchema<T>(schema: Joi.Schema, value: T): T {
-    const result = schema.validate(value);
+function validateSchema<T>(schema: Joi.Schema, value: T): T {
+  const result = schema.validate(value);
 
-    if (result.error) {
-      throw badRequest(result.error.message, result.error.details);
-    }
-
-    return result.value;
+  if (result.error) {
+    throw badRequest(result.error.message, result.error.details);
   }
 
-  export const user = _.partial(validateSchema, schemas.user);
-  export const username = _.partial(validateSchema, schemas.username);
-  export const password = _.partial(validateSchema, schemas.password);
-  export const transactionAmount = _.partial(validateSchema, schemas.transactionAmount);
-  export const groupName = _.partial(validateSchema, schemas.groupName);
-  export const alternativeLoginKey = _.partial(validateSchema, schemas.alternativeLoginKey);
-  export const timestamp = (time: any): moment.Moment => moment(validateSchema(schemas.timestamp, time)).utc();
+  return result.value;
 }
 
-export default validate;
+export default {
+  user: _.partial(validateSchema, schemas.user),
+  username: _.partial(validateSchema, schemas.username),
+  password: _.partial(validateSchema, schemas.password),
+  transactionAmount: _.partial(validateSchema, schemas.transactionAmount),
+  groupName: _.partial(validateSchema, schemas.groupName),
+  alternativeLoginKey: _.partial(validateSchema, schemas.alternativeLoginKey),
+  timestamp: (time: any): moment.Moment => moment(validateSchema(schemas.timestamp, time)).utc(),
+};
