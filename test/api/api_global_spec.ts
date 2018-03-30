@@ -1,8 +1,8 @@
 /* tslint:disable:no-unused-expression */
 import 'mocha';
-import { expect, assert, should, request } from 'chai';
+import { expect } from 'chai';
 import * as _ from 'lodash';
-import { Express } from 'express';
+import * as moment from 'moment';
 
 import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
@@ -17,10 +17,8 @@ const API = new helper.Api(cfg, 'global');
 
 describe('Global API', () => {
 
-  before(async () => {
-    await helper.clearDbAndRunSeed();
-    await API.start();
-  });
+  before(() => API.start());
+  beforeEach(helper.clearDbAndRunSeed);
 
   it('get users', async () => {
     const res = await API.get('/users');
@@ -61,6 +59,11 @@ describe('Global API', () => {
   });
 
   it('authenticate with alternative login', async () => {
+    await API.post(
+      '/users/authenticate/alternative/create',
+      { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
+    );
+
     // Right username with right key
     const res1 = await API.post(
       '/users/authenticate/alternative',
@@ -90,13 +93,26 @@ describe('Global API', () => {
   });
 
   it('get alternative login count for user', async () => {
-    const res = await API.get('/users/authenticate/alternative/count', {
+    const res1 = await API.get('/users/authenticate/alternative/count', {
       username: USER.username,
       groupName: GROUP.groupName,
     });
 
-    helper.expectOk(res);
-    expect(res.body.result.count).to.equal(1);
+    await API.post(
+      '/users/authenticate/alternative/create',
+      { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
+    );
+
+    helper.expectOk(res1);
+    expect(res1.body.result.count).to.equal(0);
+
+    const res2 = await API.get('/users/authenticate/alternative/count', {
+      username: USER.username,
+      groupName: GROUP.groupName,
+    });
+
+    helper.expectOk(res2);
+    expect(res2.body.result.count).to.equal(1);
   });
 
   it('set user\'s default group', async () => {
@@ -207,6 +223,10 @@ describe('Global API', () => {
   });
 
   it('remove member from group', async () => {
+      await API.post(`/groups/${GROUP.groupName}/addMember`, {
+        username: seed.data.users[3].username,
+      });
+
       const res1 = await API.get(`/groups/${GROUP.groupName}/members`);
       helper.expectOk(res1);
       const memberCount = _.size(res1.body.result);
@@ -232,10 +252,63 @@ describe('Global API', () => {
     expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + 1);
   });
 
-  it('get group transactions');
-  it('get user transactions');
-  it('get group saldo');
-  it('get daily group saldo since');
+  it('get group transactions', async () => {
+    const res = await API.get(`/transactions/group/${GROUP.groupName}`, {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result).to.have.length(2);
+  });
+
+  it('get user transactions', async () => {
+    const res = await API.get(`/transactions/user/${USER.username}`, {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result).to.have.length(1);
+  });
+
+  it('get group saldo', async () => {
+    const res = await API.get(`/groups/${GROUP.groupName}/saldo`);
+
+    helper.expectOk(res);
+    expect(res.body.result.saldo).to.equal(0);
+  });
+
+  it('get daily group saldo since', async () => {
+    const res1 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {
+      from: moment().format(),
+    });
+
+    helper.expectOk(res1);
+    expect(res1.body.result[0].saldo).to.equal(0);
+    expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
+
+    const amount = 1;
+    const res2 = await API.post('/transaction', {
+      username: USER.username,
+      groupName: GROUP.groupName,
+      amount,
+    });
+
+    const res3 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {
+      from: moment().format(),
+    });
+
+    helper.expectOk(res3);
+    expect(res3.body.result[0].saldo).to.equal(1);
+
+    const res4 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res4);
+    expect(res4.body.result).to.have.length(2);
+    expect(res4.body.result[0].saldo).to.equal(0);
+    expect(res4.body.result[1].saldo).to.equal(1);
+  });
 
   it('delete user', async () => {
 

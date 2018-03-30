@@ -260,13 +260,13 @@ describe('Restricted API', () => {
   });
 
   it('get daily group saldo since', async () => {
-    const res1 = await API.get('/group/saldo', {
+    const res1 = await API.get('/group/saldo/daily', {
       from: moment().format(),
     });
 
     helper.expectOk(res1);
-    expect(res1.body.result.saldo).to.equal(0);
-    expect(res1.body.result.timestamp).to.equal(moment().format('YYYY-MM-DD'));
+    expect(res1.body.result[0].saldo).to.equal(0);
+    expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
 
     const amount = 1;
     const res2 = await API.post('/transaction', {
@@ -274,11 +274,21 @@ describe('Restricted API', () => {
       amount,
     });
 
-    const res3 = await API.get('/group/saldo', {
+    const res3 = await API.get('/group/saldo/daily', {
       from: moment().format(),
     });
 
     helper.expectOk(res3);
-    expect(res3.body.result.saldo).to.equal(1);
+    expect(res3.body.result[0].saldo).to.equal(1);
+
+    const res4 = await API.get('/group/saldo/daily', {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res4);
+    expect(res4.body.result).to.have.length(2);
+    expect(res4.body.result[0].saldo).to.equal(0);
+    expect(res4.body.result[1].saldo).to.equal(1);
+
   });
 });
