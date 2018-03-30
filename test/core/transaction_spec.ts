@@ -31,7 +31,7 @@ describe('Transactions', () => {
     for (const index of _.times(times)) {
       const amount = index + 1;
       await makeTransaction(amount);
-      await BBPromise.delay(3); // Wait couple milliseconds so transactions can't have same timestamp
+      await BBPromise.delay(10); // Wait couple milliseconds so transactions can't have same timestamp
       await makeTransaction(-amount);
     }
   }
@@ -73,7 +73,7 @@ describe('Transactions', () => {
     );
 
     _.reduce(
-      _.orderBy(transactions, ['timestamp', 'asc']),
+      _.reverse(transactions),
       (old: number, transaction: any) => {
         expect(transaction.oldSaldo).to.equal(old);
         return transaction.newSaldo;

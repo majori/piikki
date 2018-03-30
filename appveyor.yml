@@ -1,5 +1,5 @@
 environment:
-  nodejs_version: "8.9.4"
+  nodejs_version: "8.10.0"
   PIIKKI_DATABASE_HOSTNAME: "localhost"
   PIIKKI_DATABASE_PORT: "1433"
   PIIKKI_DATABASE_USER: "sa"

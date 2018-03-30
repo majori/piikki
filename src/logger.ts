@@ -26,7 +26,7 @@ export class Logger extends Winston {
     });
 
     // Suppress console messages when testing
-    if (config.isTest) {
+    if (config.isTest && process.env.LOGGER_LEVEL !== 'debug') {
       this.remove(transports.Console);
     }
 

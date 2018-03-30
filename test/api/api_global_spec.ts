@@ -3,6 +3,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import * as BBPromise from 'bluebird';
 
 import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
@@ -287,27 +288,20 @@ describe('Global API', () => {
     expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
 
     const amount = 1;
-    const res2 = await API.post('/transaction', {
+    await API.post('/transaction', {
       username: USER.username,
       groupName: GROUP.groupName,
       amount,
     });
 
     const res3 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {
-      from: moment().format(),
-    });
-
-    helper.expectOk(res3);
-    expect(res3.body.result[0].saldo).to.equal(1);
-
-    const res4 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {
       from: moment().subtract(1, 'day').format(),
     });
 
-    helper.expectOk(res4);
-    expect(res4.body.result).to.have.length(2);
-    expect(res4.body.result[0].saldo).to.equal(0);
-    expect(res4.body.result[1].saldo).to.equal(1);
+    helper.expectOk(res3);
+    expect(res3.body.result).to.have.length(2);
+    expect(res3.body.result[0].saldo).to.equal(0);
+    expect(res3.body.result[1].saldo).to.equal(1); // Newest last
   });
 
   it('delete user', async () => {

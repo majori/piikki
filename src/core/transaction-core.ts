@@ -110,7 +110,7 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
 
   // How much change happened in each day
   const deltaSaldos = _.chain(await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
-    .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date).utc()))
+    .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date)))
     .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
     .mapValues((transactions: any) => _.sumBy(transactions, 'saldo_change'))
     .value();
@@ -146,7 +146,8 @@ async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Mo
     .where('groups.name', '=', groupName)
     .andWhere('transactions.timestamp', '>=', moment(from).startOf('day').format())
     .andWhere('transactions.timestamp', '<=', moment(to).endOf('day').format())
-    .groupBy('transactions.timestamp');
+    .groupBy('transactions.timestamp')
+    .orderBy('transactions.timestamp', 'desc');
 }
 
 async function _getTransactions(filterObject: TransactionFilter, from?: moment.Moment, to?: moment.Moment) {
@@ -169,14 +170,14 @@ async function _getTransactions(filterObject: TransactionFilter, from?: moment.M
     query.where(
       'transactions.timestamp',
       '>',
-      from.format(),
+      from.startOf('second').format(),
     );
   }
 
   query.where(
     'transactions.timestamp',
     '<',
-    moment(to).utc().format(),
+    (to ? to : moment().utc()).endOf('second').format(),
   );
 
   const results: DatabaseTransaction[] = await query;
