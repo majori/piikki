@@ -17,8 +17,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
     return;
   }
 
-  try {
-    const result: QueryOutput[] = await knex.raw(`
+  const saldo = await knex.transaction(async (trx) => {
+    const result = await trx.raw(`
       UPDATE S
       SET S.[saldo] = S.[saldo] + ?
       OUTPUT INSERTED.[saldo], INSERTED.[user_id], INSERTED.[group_id]
@@ -45,8 +45,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
       token_id: newTrx.tokenId,
     };
 
-    await knex
-      .table('transactions')
+    await knex('transactions')
+      .transacting(trx)
       .insert(
         _.isString(newTrx.comment) ?
         _.assign(transaction, { comment: newTrx.comment }) :
@@ -54,11 +54,10 @@ export async function makeTransaction(newTrx: TransactionDto) {
       );
 
     logger.debug('New transaction', transaction);
+    return trx.commit(newSaldo.saldo);
+  });
 
-    return { username: newTrx.username, saldo: newSaldo.saldo };
-  } catch (err) {
-    throw err;
-  }
+  return { username: newTrx.username, saldo };
 }
 
 // Get user's all transactions
