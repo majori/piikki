@@ -84,7 +84,7 @@ const data = {
       token: 'restricted_token',
       oldSaldo: 0,
       newSaldo: -10,
-      timestamp: time.format()
+      timestamp: time.subtract(1, 'm').format()
     },
     {
       username: 'testUser3',
@@ -92,7 +92,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: 5,
-      timestamp: time.format()
+      timestamp: time.subtract(2, 'm').format()
     },
     {
       username: 'testUser3',
@@ -100,7 +100,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: -5,
-      timestamp: time.format()
+      timestamp: time.subtract(3, 'm').format()
     }
   ]
 };
