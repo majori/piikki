@@ -22,6 +22,7 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
+        `ALTER SEQUENCE groups_id_seq RESTART WITH ${data.groups.length};`
       ], ' ')
     ))
 
@@ -40,6 +41,7 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
+        `ALTER SEQUENCE users_id_seq RESTART WITH ${data.users.length};`
       ], ' ')
     ))
 
@@ -58,6 +60,7 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
+        `ALTER SEQUENCE user_saldos_id_seq RESTART WITH ${data.userSaldos.length};`
       ], ' ')
     ))
 
@@ -69,6 +72,7 @@ module.exports = (knex, Promise, data) => {
           .map((token, i) => `(${i},'${token.token}','${token.role}','${token.comment}')`)
           .join(',')
           .value() + ';',
+          `ALTER SEQUENCE tokens_id_seq RESTART WITH ${data.tokens.length};`
       ], ' ')
     ))
 
@@ -86,6 +90,7 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
+        `ALTER SEQUENCE token_group_access_id_seq RESTART WITH ${data.tokenGroupAccess.length};`
       ], ' ')
     ))
 
@@ -107,6 +112,7 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
+        `ALTER SEQUENCE transactions_id_seq RESTART WITH ${data.transactions.length};`
       ], ' ')
     ));
 };
