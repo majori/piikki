@@ -17,13 +17,14 @@ describe('Transactions', () => {
   const GROUP = _.clone(helper.group);
   const ORIGINAL_SALDO: number = seed.meta.saldos[USER.username][GROUP.groupName];
 
-  async function makeTransaction(amount: number) {
+  async function makeTransaction(amount: number, comment?: string) {
     return transactionCore.makeTransaction({
       username: USER.username,
       groupName: GROUP.groupName,
       amount,
       tokenId: 1,
       timestamp: moment().toISOString(),
+      comment,
     });
   }
 
@@ -57,6 +58,14 @@ describe('Transactions', () => {
 
     const user2 = await userCore.getUser(USER.username);
     expect(user2).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
+  });
+
+  it.only('make a transaction with a comment', async () => {
+    const comment = 'test_comment';
+    await makeTransaction(5, comment);
+
+    const transactions = await transactionCore.getUserTransactions(USER.username);
+    expect(transactions[0]).to.containSubset({ comment });
   });
 
   it('can handle fast transactions', async () => {
