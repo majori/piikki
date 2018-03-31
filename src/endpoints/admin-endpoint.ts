@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as tokenCore from '../core/token-core';
 import { createJsonRoute } from '../utils/endpoint';
-import { validateGroupName } from '../utils/validators';
+import validate from '../utils/validators';
 import { Endpoint } from 'types/endpoints';
 
 const endpoint: Endpoint = {
@@ -12,7 +12,7 @@ const endpoint: Endpoint = {
   },
 
   createRestrictedToken: async (req) => {
-    const groupName = validateGroupName(req.body.groupName);
+    const groupName = validate.groupName(req.body.groupName);
     const comment = req.body.comment;
 
     return tokenCore.createRestrictedToken(groupName, comment);

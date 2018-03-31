@@ -2,15 +2,17 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as methodOverride from 'method-override';
 import * as cors from 'cors';
+import { isBoom } from 'boom';
 
 import { handleTokens, initTokens } from './tokenHandler';
-import { errorResponder } from './errors';
 import { initApiRoutes } from './router';
 import swagger from './swagger';
-
+import { Logger } from './logger';
 import { Config } from './types/config';
 
-export async function createApp(cfg: Config) {
+const logger = new Logger(__filename);
+
+export async function createServer(cfg: Config) {
   const app = express();
 
   // 3rd party middleware
@@ -40,7 +42,29 @@ export async function createApp(cfg: Config) {
   app.use('/api/v1', initApiRoutes());
 
   // Setup error responder
-  app.use(errorResponder);
+  const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
+    const status = isBoom(err) ? err.output.statusCode : 500;
+    const payload = isBoom(err) ? err.output.payload : { error: 'Internal Server Error', message: '' };
+
+    const response = {
+      ok: false,
+      error: {
+        type: payload.error,
+        message: payload.message,
+        details: err.data,
+      },
+    };
+
+    // Set response status
+    res.status(status);
+
+    // Log error request
+    logger.errorRequest(req, res, err);
+
+    res.send(response);
+  };
+
+  app.use(errorHandler);
 
   return app;
 }

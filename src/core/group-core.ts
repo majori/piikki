@@ -1,8 +1,8 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 
-import { ConflictError, NotFoundError } from '../errors';
-import { userExists } from './user-core';
+import { badRequest, notFound } from 'boom';
+import * as userCore from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex } from '../database';
 import { Logger } from '../logger';
@@ -13,7 +13,7 @@ export async function createGroup(groupName: string) {
   const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
 
   if (!_.isEmpty(records)) {
-    throw new ConflictError(`Group ${groupName} already exists`);
+    throw badRequest(`Group ${groupName} already exists`);
   }
 
   await knex.from('groups').insert({ name: groupName });
@@ -30,7 +30,7 @@ export async function groupExists(groupName: string) {
   if (row) {
     return row;
   } else {
-    throw new NotFoundError(`Group ${groupName} not found`);
+    throw notFound(`Group ${groupName} not found`);
   }
 }
 
@@ -40,7 +40,7 @@ export async function userIsNotInGroup(username: string, groupName: string) {
   if (!result.found) {
     return { user: result.user, group: result.group };
   } else {
-    throw new ConflictError(`User ${result.user.username} is already in group ${result.group.name}`);
+    throw badRequest(`User ${result.user.username} is already in group ${result.group.name}`);
   }
 }
 
@@ -48,9 +48,12 @@ export async function userIsInGroup(username: string, groupName: string) {
   const result = await _userInGroup(username, groupName);
 
   if (result.found) {
-    return { user: result.user, group: result.group };
+    return {
+      user: result.user,
+      group: result.group,
+    };
   } else {
-    throw new NotFoundError(`User ${result.user.username} is not in group ${result.group.name}`);
+    throw notFound(`User ${result.user.username} is not in group ${result.group.name}`);
   }
 }
 
@@ -71,7 +74,7 @@ export async function getUserFromGroup(groupName: string, username: string) {
   if (!_.isEmpty(row)) {
     return row;
   } else {
-    throw new NotFoundError(`User ${username} is not in group ${groupName}`);
+    throw notFound(`User ${username} is not in group ${groupName}`);
   }
 }
 
@@ -97,6 +100,19 @@ export async function addUserToGroup(username: string, groupName: string) {
       user_id: result.user.id,
     });
 
+  // If the user isn't in other groups, set the group as user's default
+  const saldos = await knex
+    .select('users.username')
+    .from('user_saldos')
+    .where({
+      user_id: result.user.id,
+    })
+    .join('users', { 'users.id': 'user_saldos.user_id' });
+
+  if (_.size(saldos) === 1) {
+    await userCore.setDefaultGroup(saldos[0].username, groupName);
+  }
+
   return username;
 }
 
@@ -110,11 +126,17 @@ export async function removeUserFromGroup(username: string, groupName: string) {
     })
     .del();
 
+  // Check if the group was users default group
+  const user = await userCore.getUser(username);
+  if (user.defaultGroup === groupName) {
+    await userCore.resetDefaultGroup(username);
+  }
+
   return username;
 }
 
 async function _userInGroup(username: string, groupName: string) {
-  const user = await userExists(username);
+  const user = await userCore.userExists(username);
   const group = await groupExists(groupName);
 
   const row = await knex

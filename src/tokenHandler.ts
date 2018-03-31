@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { RequestHandler, Request } from 'express';
+import { unauthorized } from 'boom';
 import { getTokens, createAdminToken } from './core/token-core';
-import { AuthorizationError } from './errors';
 import { Logger } from './logger';
 
 const logger = new Logger(__filename);
@@ -9,7 +9,6 @@ const logger = new Logger(__filename);
 let registeredTokens: DatabaseToken[] = [];
 
 export async function initTokens() {
-
   // Fetch tokens from database if no tokens registered
   if (_.isEmpty(registeredTokens)) {
     const tokens = await getTokens();
@@ -57,14 +56,14 @@ export const handleTokens: RequestHandler = (req, res, next) => {
 
     // Request didn't have a proper token
   } else {
-    throw new AuthorizationError();
+    throw unauthorized();
   }
 };
 
 // Fetch current tokens from database
 export async function updateTokens(newTokens?: DatabaseToken[]) {
-  logger.debug('Refreshing tokens', { tokens: JSON.stringify(newTokens) });
   registeredTokens = (newTokens) ? newTokens : await getTokens();
+  logger.debug('Refreshing tokens', { tokens: JSON.stringify(registeredTokens) });
 }
 
 export function getTokenInfo(req: Request) {

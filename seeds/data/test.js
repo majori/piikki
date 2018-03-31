@@ -1,24 +1,26 @@
 const moment = require('moment');
 
-const time = moment().utc();
-
 const data = {
   users: [
     {
       username: 'testUser1',
-      password: '1234'
+      password: '1234',
+      defaultGroup: 'group1',
     },
     {
       username: 'testUser2',
-      password: '4321'
+      password: '4321',
+      defaultGroup: 'group1',
     },
     {
       username: 'testUser3',
-      password: '1243'
+      password: '1243',
+      defaultGroup: 'group2',
     },
     {
       username: 'testUser4',
-      password: '4312'
+      password: '4312',
+      defaultGroup: null,
     }
   ],
   groups: [
@@ -29,17 +31,17 @@ const data = {
     {
       username: 'testUser1',
       groupName: 'group1',
-      saldo: 10
+      saldo: 10,
     },
     {
       username: 'testUser2',
       groupName: 'group1',
-      saldo: -10
+      saldo: -10,
     },
     {
       username: 'testUser3',
       groupName: 'group2',
-      saldo: 5
+      saldo: 5,
     }
   ],
   tokens: [
@@ -72,7 +74,7 @@ const data = {
       token: 'restricted_token',
       oldSaldo: 0,
       newSaldo: 10,
-      timestamp: time.format()
+      timestamp: moment().toISOString()
     },
     {
       username: 'testUser2',
@@ -80,7 +82,7 @@ const data = {
       token: 'restricted_token',
       oldSaldo: 0,
       newSaldo: -10,
-      timestamp: time.format()
+      timestamp: moment().subtract(1, 'minute').toISOString()
     },
     {
       username: 'testUser3',
@@ -88,7 +90,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: 5,
-      timestamp: time.format()
+      timestamp: moment().subtract(2, 'minute').toISOString()
     },
     {
       username: 'testUser3',
@@ -96,7 +98,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: -5,
-      timestamp: time.format()
+      timestamp: moment().subtract(3, 'minute').toISOString()
     }
   ]
 };

@@ -2,7 +2,7 @@
 import { expect, request } from 'chai';
 import * as path from 'path';
 
-import { createApp } from '../src/app';
+import { createServer } from '../src/server';
 import { knex } from '../src/database';
 import { Config } from '../src/types/config';
 
@@ -70,7 +70,7 @@ export class Api {
   }
 
   public async start() {
-    this.api = request(await createApp(this.config));
+    this.api = request(await createServer(this.config));
   }
 
   public get(url: string, query?: any) {

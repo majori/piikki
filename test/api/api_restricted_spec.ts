@@ -1,12 +1,13 @@
 /* tslint:disable:no-unused-expression */
 import 'mocha';
-import { expect, assert, should, request } from 'chai';
+import { expect } from 'chai';
 import * as _ from 'lodash';
-import { Express } from 'express';
+import * as moment from 'moment';
 
 import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
+import * as transactionCore from '../../src/core/transaction-core';
 
 const cfg: Config = require('../../config'); // tslint:disable-line
 
@@ -17,10 +18,8 @@ const API = new helper.Api(cfg, 'restricted');
 
 describe('Restricted API', () => {
 
-  before(async () => {
-    await helper.clearDbAndRunSeed();
-    await API.start();
-  });
+  before(() => API.start());
+  beforeEach(helper.clearDbAndRunSeed);
 
   it('create new user', async () => {
     const res = await API
@@ -66,45 +65,49 @@ describe('Restricted API', () => {
   });
 
   it('create alternative login', async () => {
-    const key = 'some_kind_of_id';
-
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
     const res = await API
       .post(
         '/users/authenticate/alternative/create',
-        { key, username: USER.username },
+        { key: ALTERNATIVE_KEY, username: USER.username },
       );
 
     helper.expectOk(res);
-    expect(res.body.result.key).to.equal(key);
+    expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
   });
 
   it('authenticate with alternative login', async () => {
-    const rightKey = 'some_kind_of_id';
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
+    await API.post(
+      '/users/authenticate/alternative/create',
+      { key: ALTERNATIVE_KEY, username: USER.username, type: 20 },
+    );
 
     // Right username with right key
     const res1 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: rightKey },
+        { key: ALTERNATIVE_KEY, type: 20 },
       );
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
+    expect(res1.body.result.username).to.equal(USER.username);
 
-    // Right username with wrong key
+    // Wrong key with right type
     const res2 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: 'wrong_key' },
+        { key: 'wrong_key', type: 20 },
       );
 
     helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
-    // Wrong username with right type
+    // Right key with wrong type
     const res3 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: rightKey, type: 10 },
+        { key: ALTERNATIVE_KEY, type: 10 },
       );
 
     helper.expectOk(res3);
@@ -112,6 +115,11 @@ describe('Restricted API', () => {
   });
 
   it('get alternative login count for user', async () => {
+    await API.post(
+      '/users/authenticate/alternative/create',
+      { key: 'key', username: USER.username },
+    );
+
     const res = await API.get('/users/authenticate/alternative/count', {
       username: USER.username,
       groupName: GROUP.groupName,
@@ -197,31 +205,86 @@ describe('Restricted API', () => {
   });
 
   it('remove member from group', async () => {
-      const res1 = await API.get('/group/members');
-      helper.expectOk(res1);
-      const memberCount = _.size(res1.body.result);
-
-      const res2 = await API.del('/group/removeMember', {
+      const res1 = await API.post('/group/addMember', {
         username: seed.data.users[3].username,
       });
-      helper.expectOk(res2);
+      helper.expectOk(res1);
 
-      const res3 = await API.get('/group/members');
+      const res2 = await API.get('/group/members');
+      helper.expectOk(res2);
+      const memberCount = _.size(res2.body.result);
+
+      const res3 = await API.del('/group/removeMember', {
+        username: seed.data.users[3].username,
+      });
       helper.expectOk(res3);
-      expect(res3.body.result).to.have.length(memberCount - 1);
+
+      const res4 = await API.get('/group/members');
+      helper.expectOk(res4);
+      expect(res4.body.result).to.have.length(memberCount - 1);
   });
-  it('make transaction', async () => {
+
+  it('make a transaction', async () => {
+    const amount = 1;
     const res = await API.post('/transaction', {
       username: USER.username,
-      amount: 1,
+      amount,
     });
 
     helper.expectOk(res);
-    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + 1);
+    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + amount);
   });
 
-  it('get group transactions');
-  it('get user transactions from group');
-  it('get group saldo');
-  it('get daily group saldo since');
+  it('get group transactions', async () => {
+    const res = await API.get('/group/transactions', {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result).to.have.length(2);
+  });
+
+  it('get user transactions from group', async () => {
+    const res = await API.get(`/group/transactions/${USER.username}`, {
+      from: moment().subtract(1, 'day').format(),
+    });
+
+    helper.expectOk(res);
+    expect(res.body.result).to.have.length(1);
+  });
+
+  it('get group saldo', async () => {
+    const res = await API.get('/group/saldo');
+
+    helper.expectOk(res);
+    expect(res.body.result.saldo).to.equal(0);
+  });
+
+  it('get daily group saldo since', async () => {
+    const res1 = await API.get('/group/saldo/daily', {
+      from: moment().format('YYYY-MM-DD'),
+    });
+
+    helper.expectOk(res1);
+    expect(res1.body.result[0].saldo).to.equal(0);
+    expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
+
+    await transactionCore.makeTransaction({
+      username: USER.username,
+      groupName: GROUP.groupName,
+      amount: 1,
+      tokenId: 1,
+      timestamp: moment().toISOString(),
+    });
+
+    const res3 = await API.get('/group/saldo/daily', {
+      from: moment().subtract(1, 'day').format('YYYY-MM-DD'),
+    });
+
+    helper.expectOk(res3);
+    expect(res3.body.result).to.have.length(2);
+    expect(res3.body.result[0].saldo).to.equal(0);
+    expect(res3.body.result[1].saldo).to.equal(1);
+
+  });
 });

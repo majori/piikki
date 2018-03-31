@@ -16,7 +16,7 @@ describe('Tokens', () => {
 
   const GROUPNAME = seed.data.groups[0].groupName;
 
-  before(helper.clearDbAndRunSeed);
+  beforeEach(helper.clearDbAndRunSeed);
 
   it('get existing tokens from database', async () => {
     const tokens = await tokenCore.getTokens();
@@ -46,6 +46,4 @@ describe('Tokens', () => {
     expect(admin).to.be.string;
     expect((await tokenCore.getToken(commentC))).to.containSubset({ token: admin });
   });
-
 });
-
