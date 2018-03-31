@@ -60,7 +60,7 @@ describe('Transactions', () => {
     expect(user2).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
   });
 
-  it.only('make a transaction with a comment', async () => {
+  it('make a transaction with a comment', async () => {
     const comment = 'test_comment';
     await makeTransaction(5, comment);
 

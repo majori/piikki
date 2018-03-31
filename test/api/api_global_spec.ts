@@ -48,9 +48,9 @@ describe('Global API', () => {
 
   });
 
-  const ALTERNATIVE_KEY = 'some_kind_of_id';
-
   it('create alternative login for user', async () => {
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
+
     const res = await API.post(
       '/users/authenticate/alternative/create',
       { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
@@ -61,6 +61,8 @@ describe('Global API', () => {
   });
 
   it('authenticate with alternative login', async () => {
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
+
     await API.post(
       '/users/authenticate/alternative/create',
       { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
@@ -95,6 +97,8 @@ describe('Global API', () => {
   });
 
   it('get alternative login count for user', async () => {
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
+
     const res1 = await API.get('/users/authenticate/alternative/count', {
       username: USER.username,
       groupName: GROUP.groupName,
@@ -243,15 +247,16 @@ describe('Global API', () => {
       expect(res3.body.result).to.have.length(memberCount - 1);
   });
 
-  it('make transaction', async () => {
+  it('make a transaction', async () => {
+    const amount = 1;
     const res = await API.post('/transaction', {
       username: USER.username,
       groupName: GROUP.groupName,
-      amount: 1,
+      amount,
     });
 
     helper.expectOk(res);
-    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + 1);
+    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + amount);
   });
 
   it('get group transactions', async () => {

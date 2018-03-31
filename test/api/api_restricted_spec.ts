@@ -65,49 +65,49 @@ describe('Restricted API', () => {
   });
 
   it('create alternative login', async () => {
-    const key = 'some_kind_of_id';
-
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
     const res = await API
       .post(
         '/users/authenticate/alternative/create',
-        { key, username: USER.username },
+        { key: ALTERNATIVE_KEY, username: USER.username },
       );
 
     helper.expectOk(res);
-    expect(res.body.result.key).to.equal(key);
+    expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
   });
 
   it('authenticate with alternative login', async () => {
-    const rightKey = 'some_kind_of_id';
+    const ALTERNATIVE_KEY = 'some_kind_of_id';
     await API.post(
       '/users/authenticate/alternative/create',
-      { key: rightKey, username: USER.username },
+      { key: ALTERNATIVE_KEY, username: USER.username, type: 20 },
     );
 
     // Right username with right key
     const res1 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: rightKey },
+        { key: ALTERNATIVE_KEY, type: 20 },
       );
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
+    expect(res1.body.result.username).to.equal(USER.username);
 
-    // Right username with wrong key
+    // Wrong key with right type
     const res2 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: 'wrong_key' },
+        { key: 'wrong_key', type: 20 },
       );
 
     helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
-    // Wrong username with right type
+    // Right key with wrong type
     const res3 = await API
       .post(
         '/users/authenticate/alternative',
-        { key: rightKey, type: 10 },
+        { key: ALTERNATIVE_KEY, type: 10 },
       );
 
     helper.expectOk(res3);
@@ -224,7 +224,7 @@ describe('Restricted API', () => {
       expect(res4.body.result).to.have.length(memberCount - 1);
   });
 
-  it('make transaction', async () => {
+  it('make a transaction', async () => {
     const amount = 1;
     const res = await API.post('/transaction', {
       username: USER.username,
