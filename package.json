@@ -72,7 +72,7 @@
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
     "moment": "^2.20.1",
-    "mssql": "^4.1.0",
+    "pg": "^7.4.1",
     "swagger-ui-dist": "^3.9.3",
     "winston": "^2.4.0"
   }

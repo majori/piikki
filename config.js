@@ -39,7 +39,7 @@ let dbConnection = {
 };
 
 cfg.db = {
-    client: process.env.PIIKKI_DATABASE_CLIENT || 'mssql',
+    client: process.env.PIIKKI_DATABASE_CLIENT || 'pg',
     connection: dbConnection,
     migrations: {
       disableTransactions: true,
