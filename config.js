@@ -21,7 +21,7 @@ cfg.isTest = cfg.env === 'test';
 // ### HTTP-server configs
 //
 cfg.hostname = process.env.PIIKKI_HTTP_HOSTNAME || 'localhost';
-cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 3000;
+cfg.port = process.env.PIIKKI_HTTP_PORT || process.env.port || 4000;
 
 cfg.cors = {};
 
