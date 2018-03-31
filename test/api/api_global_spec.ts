@@ -8,6 +8,7 @@ import * as BBPromise from 'bluebird';
 import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
+import * as transactionCore from '../../src/core/transaction-core';
 
 const cfg: Config = require('../../config'); // tslint:disable-line
 
@@ -287,11 +288,12 @@ describe('Global API', () => {
     expect(res1.body.result[0].saldo).to.equal(0);
     expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
 
-    const amount = 1;
-    await API.post('/transaction', {
+    await transactionCore.makeTransaction({
       username: USER.username,
       groupName: GROUP.groupName,
-      amount,
+      amount: 1,
+      tokenId: 1,
+      timestamp: moment().toISOString(),
     });
 
     const res3 = await API.get(`/groups/${GROUP.groupName}/saldo/daily`, {

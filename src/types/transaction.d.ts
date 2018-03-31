@@ -4,6 +4,7 @@ declare interface TransactionDto {
   amount: number;
   tokenId: number;
   comment?: string;
+  timestamp?: string;
 }
 
 declare interface TransactionFilter {

@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { Config } from '../../src/types/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
+import * as transactionCore from '../../src/core/transaction-core';
 
 const cfg: Config = require('../../config'); // tslint:disable-line
 
@@ -268,10 +269,12 @@ describe('Restricted API', () => {
     expect(res1.body.result[0].saldo).to.equal(0);
     expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
 
-    const amount = 1;
-    const res2 = await API.post('/transaction', {
+    await transactionCore.makeTransaction({
       username: USER.username,
-      amount,
+      groupName: GROUP.groupName,
+      amount: 1,
+      tokenId: 1,
+      timestamp: moment().toISOString(),
     });
 
     const res3 = await API.get('/group/saldo/daily', {

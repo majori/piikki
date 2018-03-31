@@ -23,6 +23,7 @@ describe('Transactions', () => {
       groupName: GROUP.groupName,
       amount,
       tokenId: 1,
+      timestamp: moment().toISOString(),
     });
   }
 
@@ -31,7 +32,7 @@ describe('Transactions', () => {
     for (const index of _.times(times)) {
       const amount = index + 1;
       await makeTransaction(amount);
-      await BBPromise.delay(10); // Wait couple milliseconds so transactions can't have same timestamp
+      await BBPromise.delay(2); // Wait couple milliseconds so transactions can't have same timestamp
       await makeTransaction(-amount);
     }
   }
@@ -59,7 +60,9 @@ describe('Transactions', () => {
   });
 
   it('can handle fast transactions', async () => {
-    await makeMultipleTransactions(10);
+
+    const count = 20;
+    await makeMultipleTransactions(count);
 
     // Final user saldo stays consistent
     const user = await userCore.getUser(USER.username);
@@ -68,9 +71,11 @@ describe('Transactions', () => {
     // Transactions has to stay in chronological order
     const transactions = await transactionCore.getUserTransactions(
       USER.username,
-      moment().subtract(1, 'minute').utc(),
-      moment().add(1, 'minute').utc(),
+      moment().subtract(1, 'day'),
+      moment().add(1, 'day'),
     );
+
+    expect(transactions).to.have.length(count * 2 + 1);
 
     _.reduce(
       _.reverse(transactions),

@@ -1,7 +1,5 @@
 const moment = require('moment');
 
-const time = moment().utc();
-
 const data = {
   users: [
     {
@@ -76,7 +74,7 @@ const data = {
       token: 'restricted_token',
       oldSaldo: 0,
       newSaldo: 10,
-      timestamp: time.format()
+      timestamp: moment().toISOString()
     },
     {
       username: 'testUser2',
@@ -84,7 +82,7 @@ const data = {
       token: 'restricted_token',
       oldSaldo: 0,
       newSaldo: -10,
-      timestamp: time.subtract(1, 'm').format()
+      timestamp: moment().subtract(1, 'minute').toISOString()
     },
     {
       username: 'testUser3',
@@ -92,7 +90,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: 5,
-      timestamp: time.subtract(2, 'm').format()
+      timestamp: moment().subtract(2, 'minute').toISOString()
     },
     {
       username: 'testUser3',
@@ -100,7 +98,7 @@ const data = {
       token: 'global_token',
       oldSaldo: 0,
       newSaldo: -5,
-      timestamp: time.subtract(3, 'm').format()
+      timestamp: moment().subtract(3, 'minute').toISOString()
     }
   ]
 };
