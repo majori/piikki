@@ -42,4 +42,9 @@ describe('Users', () => {
     const auth = await userCore.authenticateUser({ username: USER.username, password: 'wrong' });
     expect(auth).to.equal(false);
   });
+
+  it('does not throw an error even if user was not found', async () => {
+    const auth = await userCore.authenticateUser({ username: 'unknown_user', password: 'wrong' });
+    expect(auth).to.equal(false);
+  });
 });

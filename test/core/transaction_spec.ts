@@ -32,7 +32,7 @@ describe('Transactions', () => {
     for (const index of _.times(times)) {
       const amount = index + 1;
       await makeTransaction(amount);
-      await BBPromise.delay(2); // Wait couple milliseconds so transactions can't have same timestamp
+      await BBPromise.delay(1); // Wait one millisecond so transactions can't have same timestamps
       await makeTransaction(-amount);
     }
   }
@@ -61,7 +61,8 @@ describe('Transactions', () => {
 
   it('can handle fast transactions', async () => {
 
-    const count = 20;
+    const start = moment();
+    const count = 30;
     await makeMultipleTransactions(count);
 
     // Final user saldo stays consistent
@@ -71,17 +72,16 @@ describe('Transactions', () => {
     // Transactions has to stay in chronological order
     const transactions = await transactionCore.getUserTransactions(
       USER.username,
-      moment().subtract(1, 'day'),
-      moment().add(1, 'day'),
+      start,
     );
 
-    expect(transactions).to.have.length(count * 2 + 1);
+    expect(transactions).to.have.length(count * 2);
 
     _.reduce(
       _.reverse(transactions),
       (old: number, transaction: any) => {
         expect(transaction.oldSaldo).to.equal(old);
         return transaction.newSaldo;
-      }, 0);
+      }, ORIGINAL_SALDO);
   });
 });
