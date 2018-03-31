@@ -1,6 +1,6 @@
 {
   "name": "piikki",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
