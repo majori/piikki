@@ -4,7 +4,6 @@ import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as path from 'path';
-import * as BBPromise from 'bluebird';
 
 import * as helper from '../helpers';
 import * as seed from '../../seeds/data/test';
@@ -33,7 +32,6 @@ describe('Transactions', () => {
     for (const index of _.times(times)) {
       const amount = index + 1;
       await makeTransaction(amount);
-      await BBPromise.delay(1); // Wait one millisecond so transactions can't have same timestamps
       await makeTransaction(-amount);
     }
   }
