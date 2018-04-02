@@ -18,8 +18,8 @@ const API = new helper.Api(cfg, 'restricted');
 
 describe('Restricted API', () => {
 
-  before(() => API.start());
   beforeEach(helper.clearDbAndRunSeed);
+  before(() => API.start());
 
   it('create new user', async () => {
     const res = await API
@@ -262,7 +262,7 @@ describe('Restricted API', () => {
 
   it('get daily group saldo since', async () => {
     const res1 = await API.get('/group/saldo/daily', {
-      from: moment().format('YYYY-MM-DD'),
+      from: moment().format(),
     });
 
     helper.expectOk(res1);
@@ -278,7 +278,7 @@ describe('Restricted API', () => {
     });
 
     const res3 = await API.get('/group/saldo/daily', {
-      from: moment().subtract(1, 'day').format('YYYY-MM-DD'),
+      from: moment().subtract(1, 'day').format(),
     });
 
     helper.expectOk(res3);

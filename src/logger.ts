@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import { Logger as Winston, transports, CLILoggingLevel } from 'winston';
 import { Request, Response } from 'express';
+import { isBoom } from 'boom';
 
 import { getTokenInfo } from './tokenHandler';
 import { Config } from './types/config';
@@ -64,10 +65,16 @@ export class Logger extends Winston {
   }
 
   private getErrorMetadata(err: Error) {
-    return {
-      name: err.name,
-      message: err.message,
-    };
+    return isBoom(err) ?
+      {
+        error: err.output.payload.error,
+        message: err.output.payload.message,
+        ...err.data,
+      } :
+      {
+        error: 'Internal Server Error',
+        message: err.message,
+      };
   }
 
   private setLevelForTransports(level: CLILoggingLevel) {

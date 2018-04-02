@@ -25,8 +25,8 @@ describe('Tokens', () => {
 
     _.forEach(tokens, (token, i) => {
       expect(token).to.have.property('token');
-      expect(token).to.have.property('role', seed.data.tokens[i].role);
-      expect(token).to.have.property('comment', seed.data.tokens[i].comment);
+      expect(token).to.have.property('role');
+      expect(token).to.have.property('comment');
     });
   });
 

@@ -56,7 +56,7 @@ export const handleTokens: RequestHandler = (req, res, next) => {
 
     // Request didn't have a proper token
   } else {
-    throw unauthorized();
+    throw unauthorized('Invalid token');
   }
 };
 
