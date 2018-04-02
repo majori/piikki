@@ -17,10 +17,8 @@ const API = new helper.Api(cfg, 'admin');
 
 describe('Admin API', () => {
 
-  before(async () => {
-    await helper.clearDbAndRunSeed();
-    await API.start();
-  });
+  beforeEach(helper.clearDbAndRunSeed);
+  before(() => API.start());
 
   it('create a restricted token', async () => {
     const res = await API.post(
@@ -56,21 +54,19 @@ describe('Admin API', () => {
     const res = await API.get('/tokens');
 
     helper.expectOk(res);
-    expect(res.body.result).to.have.length(seed.data.tokens.length + 3);
+    expect(res.body.result).to.have.length(seed.data.tokens.length);
   });
 
   it('delete token', async () => {
-
-    // Get one token
-    const res1 = await API.get('/tokens');
-    helper.expectOk(res1);
-
-    const lastToken: any = _.last(res1.body.result);
+    const res1 = await API.post(
+      '/tokens/restricted',
+      { groupName: GROUP.groupName, comment: 'Test token'},
+    );
 
     // Delete the token
     const res2 = await API.del(
       '/tokens',
-      { token: lastToken.token },
+      { token: res1.body.result },
     );
 
     helper.expectOk(res2);
@@ -79,7 +75,7 @@ describe('Admin API', () => {
     const res3 = await API.get('/tokens');
 
     helper.expectOk(res3);
-    expect(res3.body.result).to.have.length(res1.body.result.length - 1);
+    expect(res3.body.result).to.have.length(seed.data.tokens.length);
   });
 
   it('force reset password', async () => {

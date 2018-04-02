@@ -42,7 +42,7 @@ exports.up = (knex, Promise) => {
             .notNullable()
             .references('id')
             .inTable('groups');
-        table.decimal('saldo', 8, 2)
+        table.float('saldo')
             .notNullable()
             .defaultTo(0);
     }))
@@ -61,9 +61,9 @@ exports.up = (knex, Promise) => {
             .inTable('groups');
         table.timestamp('timestamp')
             .defaultTo(knex.fn.now());
-        table.decimal('old_saldo', 8, 2)
+        table.float('old_saldo')
             .notNullable();
-        table.decimal('new_saldo', 8, 2)
+        table.float('new_saldo')
             .notNullable();
         table.string('comment')
             .nullable();

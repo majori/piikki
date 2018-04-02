@@ -15,7 +15,6 @@ module.exports = (knex, Promise, data) => {
     // GROUPS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT groups ON;',
         'INSERT INTO groups(id, name) VALUES ',
         _.chain(data.groups)
           .map((group, i) =>
@@ -23,14 +22,13 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT groups OFF;'
+        `ALTER SEQUENCE groups_id_seq RESTART WITH ${data.groups.length};`
       ], ' ')
     ))
 
     // USERS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT users ON;',
         'INSERT INTO users(id, username, password, default_group) VALUES',
         _.chain(data.users)
           .map((user, i) =>
@@ -43,14 +41,13 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT users OFF;'
+        `ALTER SEQUENCE users_id_seq RESTART WITH ${data.users.length};`
       ], ' ')
     ))
 
     // USER SALDOS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT user_saldos ON;',
         'INSERT INTO user_saldos(id, user_id, group_id, saldo) VALUES ',
         _.chain(data.userSaldos)
           .map((saldo, i) =>
@@ -63,27 +60,25 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT user_saldos OFF;'
+        `ALTER SEQUENCE user_saldos_id_seq RESTART WITH ${data.userSaldos.length};`
       ], ' ')
     ))
 
     // TOKENS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT tokens ON;',
         'INSERT INTO tokens(id, token, role, comment) VALUES ',
         _.chain(data.tokens)
           .map((token, i) => `(${i},'${token.token}','${token.role}','${token.comment}')`)
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT tokens OFF;'
+          `ALTER SEQUENCE tokens_id_seq RESTART WITH ${data.tokens.length};`
       ], ' ')
     ))
 
     // TOKEN GROUP ACCESS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT token_group_access ON;',
         'INSERT INTO token_group_access(id, token_id, group_id) VALUES ',
         _.chain(data.tokenGroupAccess)
           .map((access, i) =>
@@ -95,14 +90,13 @@ module.exports = (knex, Promise, data) => {
           )
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT token_group_access OFF;'
+        `ALTER SEQUENCE token_group_access_id_seq RESTART WITH ${data.tokenGroupAccess.length};`
       ], ' ')
     ))
 
     // TRANSACTIONS
     .then(() => knex.raw(_.join(
       [
-        'SET IDENTITY_INSERT transactions ON;',
         'INSERT INTO transactions (id, user_id, group_id, token_id, timestamp, old_saldo, new_saldo) VALUES ',
         _.chain(data.transactions)
           .map((transaction, i) =>
@@ -111,14 +105,14 @@ module.exports = (knex, Promise, data) => {
               ${_.findIndex(data.users, ['username', transaction.username])},
               ${_.findIndex(data.groups, ['groupName', transaction.groupName])},
               ${_.findIndex(data.tokens, ['token', transaction.token])},
-              CAST(N'${transaction.timestamp}' AS DateTime),
+              '${transaction.timestamp}',
               ${transaction.oldSaldo},
               ${transaction.newSaldo}
             )`
           )
           .join(',')
           .value() + ';',
-        'SET IDENTITY_INSERT transactions OFF;'
+        `ALTER SEQUENCE transactions_id_seq RESTART WITH ${data.transactions.length};`
       ], ' ')
     ));
 };

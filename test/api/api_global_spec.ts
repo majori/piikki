@@ -19,8 +19,8 @@ const API = new helper.Api(cfg, 'global');
 
 describe('Global API', () => {
 
-  before(() => API.start());
   beforeEach(helper.clearDbAndRunSeed);
+  before(() => API.start());
 
   it('get users', async () => {
     const res = await API.get('/users');

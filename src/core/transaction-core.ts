@@ -20,19 +20,17 @@ export async function makeTransaction(newTrx: TransactionDto) {
   const saldo = await knex.transaction(async (trx) => {
     try {
       const result = await trx.raw(`
-        UPDATE S
-        SET S.[saldo] = S.[saldo] + ?
-        OUTPUT INSERTED.[saldo], INSERTED.[user_id], INSERTED.[group_id]
-        FROM [user_saldos] as S
-        INNER JOIN [users] as U
-          ON U.[id] = S.[user_id]
-        INNER JOIN [groups] AS G
-          ON G.[id] = S.[group_id]
-        WHERE U.[username] = ?
-          AND G.[name] = ?
+        UPDATE "user_saldos" as S
+        SET saldo = saldo + ?
+        FROM "users" as U, "groups" AS G
+          WHERE U.id = S.user_id
+          AND G.id = S.group_id
+          AND U.username = ?
+          AND G.name = ?
+        RETURNING saldo, user_id, group_id
       `, [amount, newTrx.username, newTrx.groupName]);
 
-      const newSaldo: QueryOutput | undefined = _.first(result);
+      const newSaldo: QueryOutput | undefined = _.first(result.rows);
 
       if (_.isUndefined(newSaldo)) {
         throw notFound(`User "${newTrx.username}" was not found in group "${newTrx.groupName}`);
@@ -55,7 +53,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
       logger.debug('New transaction', transaction);
       return trx.commit(newSaldo.saldo);
     } catch (err) {
-      trx.rollback();
+      logger.error(err);
+      await trx.rollback();
       throw err;
     }
   });
