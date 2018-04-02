@@ -17,8 +17,11 @@ const API = new helper.Api(cfg, 'admin');
 
 describe('Admin API', () => {
 
+  before(async () => {
+    await helper.clearDbAndRunSeed();
+    await API.start();
+  });
   beforeEach(helper.clearDbAndRunSeed);
-  before(() => API.start());
 
   it('create a restricted token', async () => {
     const res = await API.post(

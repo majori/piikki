@@ -18,8 +18,11 @@ const API = new helper.Api(cfg, 'restricted');
 
 describe('Restricted API', () => {
 
+  before(async () => {
+    await helper.clearDbAndRunSeed();
+    await API.start();
+  });
   beforeEach(helper.clearDbAndRunSeed);
-  before(() => API.start());
 
   it('create new user', async () => {
     const res = await API
