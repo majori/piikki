@@ -28,14 +28,11 @@ cfg.cors = {};
 // ### Database configs
 //
 let dbConnection = {
-  server: process.env.PIIKKI_DATABASE_HOSTNAME,
+  host: process.env.PIIKKI_DATABASE_HOSTNAME,
 	user: process.env.PIIKKI_DATABASE_USER,
 	password: process.env.PIIKKI_DATABASE_PASSWORD,
   database: process.env.PIIKKI_DATABASE_NAME,
-  port: process.env.PIIKKI_DATABASE_PORT ? parseInt(process.env.PIIKKI_DATABASE_PORT) : 1433,
-  options: {
-    encrypt: true,
-  }
+  port: process.env.PIIKKI_DATABASE_PORT ? parseInt(process.env.PIIKKI_DATABASE_PORT) : 5432,
 };
 
 cfg.db = {
