@@ -30,3 +30,8 @@ If you are interested of making your own Piikki client and use our hosted backen
 - Copy contents of `.env-sample` to new file called `.env`
 - Initialize database with `npm run init-db`
 - Run `npm run dev` to start the server
+
+## Acknowledgements
+
+This project is a grateful recipient of the
+[Futurice Open Source sponsorship program](http://futurice.com/blog/sponsoring-free-time-open-source-activities).
