@@ -19,7 +19,7 @@ declare interface AlternativeLoginDto {
 }
 
 declare interface AlternativeLoginForUserDto {
-  groupName: string;
+  groupName: string | null;
   username: string;
   type?: number;
 }
