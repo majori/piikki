@@ -184,13 +184,11 @@ export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<D
   const query = knex
     .select(
       'users.username',
-      'groups.name as group_name',
       'alternative_login.hashed_key',
       'alternative_login.type',
     )
     .from('alternative_login')
     .join('users', { 'alternative_login.user_id': 'users.id' })
-    .join('groups', { 'alternative_login.group_id': 'groups.id' })
     .join('tokens', { 'alternative_login.token_id': 'tokens.id' })
     .where({ 'alternative_login.hashed_key': hash })
     .where({ 'alternative_login.type': login.type || null });
@@ -200,7 +198,10 @@ export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<D
   }
 
   if (login.groupName) {
-    query.where({ 'groups.name': login.groupName });
+    query
+      .select('groups.name as group_name')
+      .join('groups', { 'alternative_login.group_id': 'groups.id' })
+      .where({ 'groups.name': login.groupName });
   }
 
   return await query.first();
