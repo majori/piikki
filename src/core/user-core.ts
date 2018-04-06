@@ -184,20 +184,24 @@ export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<D
   const query = knex
     .select(
       'users.username',
-      'groups.name as group_name',
       'alternative_login.hashed_key',
       'alternative_login.type',
     )
     .from('alternative_login')
     .join('users', { 'alternative_login.user_id': 'users.id' })
-    .join('groups', { 'alternative_login.group_id': 'groups.id' })
     .join('tokens', { 'alternative_login.token_id': 'tokens.id' })
-    .where({ 'groups.name': login.groupName })
     .where({ 'alternative_login.hashed_key': hash })
     .where({ 'alternative_login.type': login.type || null });
 
   if (login.username) {
     query.where({ 'users.username': login.username });
+  }
+
+  if (login.groupName) {
+    query
+      .select('groups.name as group_name')
+      .join('groups', { 'alternative_login.group_id': 'groups.id' })
+      .where({ 'groups.name': login.groupName });
   }
 
   return await query.first();
@@ -207,11 +211,14 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
   const query = knex('alternative_login as login')
     .join('users', { 'users.id': 'login.user_id'})
     .join('groups', { 'groups.id': 'login.group_id'})
-    .where({ 'groups.name': login.groupName })
     .andWhere({ 'users.username': login.username });
 
   if (login.type) {
     query.andWhere({ 'login.type': login.type });
+  }
+
+  if (login.groupName) {
+    query.where({ 'groups.name': login.groupName });
   }
 
   return query;
@@ -220,12 +227,12 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
 export async function createAlternativeLogin(login: AlternativeLoginDto) {
   const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
-  const group = await groupExists(login.groupName);
+  const group = login.groupName ? (await groupExists(login.groupName as string)).id : null;
 
   return knex('alternative_login')
     .insert({
       user_id: user.id,
-      group_id: group.id,
+      group_id: group,
       token_id: login.tokenId,
       type: login.type || null,
       hashed_key: hash,

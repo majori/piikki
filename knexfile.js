@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const _ = require('lodash');
 const cfg = require('./config');
 

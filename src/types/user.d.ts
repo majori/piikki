@@ -12,14 +12,14 @@ declare interface UserWithSaldo {
 
 declare interface AlternativeLoginDto {
   key: any;
-  groupName: string;
+  groupName: string | null;
   tokenId: number;
   type?: number;
   username?: string;
 }
 
 declare interface AlternativeLoginForUserDto {
-  groupName: string;
+  groupName: string | null;
   username: string;
   type?: number;
 }

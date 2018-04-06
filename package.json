@@ -1,16 +1,16 @@
 {
   "name": "piikki",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Advance payment system for small organizations",
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "dev": "env-cmd .env nodemon --inspect -r ts-node/register src/index.ts",
+    "dev": "nodemon --inspect -r dotenv/config -r ts-node/register src/index.ts",
     "lint": "tslint -p tsconfig.json src/**/*.ts",
     "lint:fix": "tslint --fix -p tsconfig.json src/**/*.ts",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
-    "init-db": "env-cmd .env npm run migrate && env-cmd .env npm run seed",
+    "init-db": "npm run migrate && npm run seed",
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
     "test": "npm run lint && mocha test/**/*_spec.ts"
@@ -52,7 +52,7 @@
     "chai-as-promised": "^7.1.1",
     "chai-http": "^3.0.0",
     "chai-subset": "^1.6.0",
-    "env-cmd": "^5.1.0",
+    "dotenv": "^5.0.1",
     "mocha": "^3.5.3",
     "nodemon": "^1.14.11",
     "ts-node": "^5.0.1",
