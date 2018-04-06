@@ -1,8 +1,10 @@
 node_modules/
-build/
 .vscode/
 .vs/
 .idea/
+
+build/
+!build/.gitkeep
 
 .DS_Store
 npm-debug.log.*

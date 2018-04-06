@@ -192,12 +192,15 @@ export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<D
     .join('users', { 'alternative_login.user_id': 'users.id' })
     .join('groups', { 'alternative_login.group_id': 'groups.id' })
     .join('tokens', { 'alternative_login.token_id': 'tokens.id' })
-    .where({ 'groups.name': login.groupName })
     .where({ 'alternative_login.hashed_key': hash })
     .where({ 'alternative_login.type': login.type || null });
 
   if (login.username) {
     query.where({ 'users.username': login.username });
+  }
+
+  if (login.groupName) {
+    query.where({ 'groups.name': login.groupName });
   }
 
   return await query.first();
@@ -220,7 +223,7 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
 export async function createAlternativeLogin(login: AlternativeLoginDto) {
   const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
-  const group = await groupExists(login.groupName);
+  const group = await groupExists(login.groupName as string);
 
   return knex('alternative_login')
     .insert({
