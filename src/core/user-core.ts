@@ -210,11 +210,14 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
   const query = knex('alternative_login as login')
     .join('users', { 'users.id': 'login.user_id'})
     .join('groups', { 'groups.id': 'login.group_id'})
-    .where({ 'groups.name': login.groupName })
     .andWhere({ 'users.username': login.username });
 
   if (login.type) {
     query.andWhere({ 'login.type': login.type });
+  }
+
+  if (login.groupName) {
+    query.where({ 'groups.name': login.groupName });
   }
 
   return query;
@@ -223,12 +226,12 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
 export async function createAlternativeLogin(login: AlternativeLoginDto) {
   const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
-  const group = await groupExists(login.groupName as string);
+  const group = login.groupName ? (await groupExists(login.groupName as string)).id : null;
 
   return knex('alternative_login')
     .insert({
       user_id: user.id,
-      group_id: group.id,
+      group_id: group,
       token_id: login.tokenId,
       type: login.type || null,
       hashed_key: hash,

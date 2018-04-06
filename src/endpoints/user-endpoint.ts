@@ -33,8 +33,7 @@ const endpoint: Endpoint = {
 
   alternativeAuthenticateUser: async (req) => {
     const type = req.body.type;
-    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ?
-      null :
+    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
       validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
     const key = validate.alternativeLoginKey(req.body.key);
 
@@ -56,9 +55,8 @@ const endpoint: Endpoint = {
   createAlternativeLogin: async (req) => {
     const type = req.body.type;
     const username = validate.username(req.body.username);
-    const groupName: string = validate.groupName(
-      (req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name,
-    );
+    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
+      validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
     const key = validate.alternativeLoginKey(req.body.key);
 
     await userCore.createAlternativeLogin({
@@ -75,9 +73,8 @@ const endpoint: Endpoint = {
   getAlternativeLoginCount: async (req) => {
     const type = req.query.type;
     const username = validate.username(req.query.username);
-    const groupName = validate.groupName(
-      (req.piikki.groupAccess.all) ? req.query.groupName : req.piikki.groupAccess.group.name,
-    );
+    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
+      validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
 
     const rows: DatabaseAlternativeLogin[] = await userCore.getAlternativeLoginsForUser({ groupName, username, type });
 
