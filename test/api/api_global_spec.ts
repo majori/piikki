@@ -197,7 +197,7 @@ describe('Global API', () => {
     expect(res.body.result).to.have.property('saldo');
   });
 
-  it('create group', async () => {
+  it('create a group', async () => {
     const newGroup = 'new_group';
 
     // Create new group
@@ -214,6 +214,24 @@ describe('Global API', () => {
 
     helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
+  });
+
+  it('create a private group', async () => {
+    const privateGroup = 'private_group';
+
+    // Create new private group
+    const res1 = await API.post(
+      '/groups/create',
+      { groupName: privateGroup, private: true },
+    );
+
+    helper.expectOk(res1);
+    expect(res1.body.result).to.equal(privateGroup);
+
+    // Check that the group doesn't show up in groups
+    const res2 = await API.get('/groups');
+    helper.expectOk(res2);
+    expect(res2.body.result).to.have.length(seed.data.groups.length);
   });
 
   it('add member to group', async () => {

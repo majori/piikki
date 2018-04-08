@@ -21,15 +21,25 @@ describe('Groups', () => {
   beforeEach(helper.clearDbAndRunSeed);
 
   it('create a new group', async () => {
-    await groupCore.createGroup(NEW_GROUP_NAME);
+    await groupCore.createGroup(NEW_GROUP_NAME, false);
     const group = await groupCore.groupExists(NEW_GROUP_NAME);
 
     expect(group).to.containSubset({ name: NEW_GROUP_NAME });
   });
 
+  it('create a new private group', async () => {
+    await groupCore.createGroup(NEW_GROUP_NAME, true);
+
+    const groups = await groupCore.getGroups(false);
+    expect(groups).to.have.length(seed.data.groups.length);
+
+    const allGroups = await groupCore.getGroups(true);
+    expect(allGroups).to.have.length(seed.data.groups.length + 1);
+  });
+
   it('not create a group with existing name', async () => {
     try {
-      await groupCore.createGroup(GROUP.groupName);
+      await groupCore.createGroup(GROUP.groupName, false);
       throw new Error('Group dublicate');
     } catch (err) {
       expect(isBoom(err)).to.be.true;

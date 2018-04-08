@@ -9,14 +9,14 @@ import { Logger } from '../logger';
 
 const logger = new Logger(__filename);
 
-export async function createGroup(groupName: string) {
+export async function createGroup(groupName: string, isPrivate: boolean) {
   const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
 
   if (!_.isEmpty(records)) {
     throw badRequest(`Group ${groupName} already exists`);
   }
 
-  await knex.from('groups').insert({ name: groupName });
+  await knex.from('groups').insert({ name: groupName, private: isPrivate});
   await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
   logger.info('Group created', { group_name: groupName });
@@ -78,14 +78,22 @@ export async function getUserFromGroup(groupName: string, username: string) {
   }
 }
 
-export function getGroups(): QueryBuilder {
-  return knex
+export function getGroups(all?: boolean): QueryBuilder {
+  const query = knex
     .from('groups')
     .select('name');
+
+  if (!all) {
+    query
+      .select('private')
+      .where({ private: false });
+  }
+
+  return query;
 }
 
 export function getGroup(groupName: string): QueryBuilder {
-  return getGroups()
+  return getGroups(true)
     .where({ name: groupName })
     .first();
 }
