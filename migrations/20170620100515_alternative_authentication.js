@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
       .references('id')
       .inTable('tokens');
     table.integer('group_id')
-      .notNullable()
+      .nullable()
       .references('id')
       .inTable('groups');
     table.integer('type')
