@@ -69,8 +69,9 @@ export async function deleteToken(token: string) {
   const result = await knex
     .from('tokens')
     .where({ token })
-    .del();
+    .update({ active: false });
 
+  await updateTokens();
   logger.info('Token deleted', { token });
 
   return result;
@@ -87,7 +88,8 @@ function _getTokens(): QueryBuilder {
     )
     .from('tokens')
     .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
-    .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' });
+    .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' })
+    .where({ active: true });
 }
 
 // Generates Base64 string from random bytes
