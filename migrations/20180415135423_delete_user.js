@@ -1,14 +1,13 @@
 exports.up = (knex, Promise) => {
   return knex.schema.alterTable('users', (t) => {
-    t.integer('default_group')
-      .references('id')
-      .inTable('groups')
-      .nullable();
+    t.dropColumn('active');
   });
 };
 
 exports.down = (knex, Promise) => {
   return knex.schema.alterTable('users', (t) => {
-    t.dropForeign('default_group');
+    t.boolean('active')
+      .notNullable()
+      .defaultTo(true);
   });
 };

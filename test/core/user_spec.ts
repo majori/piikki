@@ -23,6 +23,17 @@ describe('Users', () => {
     expect(user).to.containSubset({ username: user.username });
   });
 
+  it('delete user', async () => {
+    await userCore.deleteUser(USER.username);
+    try {
+      await userCore.userExists(USER.username);
+      throw new Error('Deleted user exists');
+    } catch (err) {
+      expect(isBoom(err)).to.be.true;
+      expect(err.output.payload.error).to.equal('Not Found');
+    }
+  });
+
   it('not create a user with existing name', async () => {
     try {
       await userCore.createUser(USER); // Seed data already contains this user

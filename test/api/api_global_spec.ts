@@ -40,6 +40,40 @@ describe('Global API', () => {
     expect(res.body.result).to.have.property('saldos');
   });
 
+  it('create a new user', async () => {
+    const username = 'someUser';
+    const res1 = await API.post(
+      '/users/create',
+      { username, password: 'hackme' },
+    );
+    helper.expectOk(res1);
+
+    const res2 = await API.get(`/users/${username}`);
+
+    helper.expectOk(res2);
+    expect(res2.body.result.saldos).to.be.empty;
+    expect(res2.body.result.defaultGroup).to.be.null;
+  });
+
+  it('delete user', async () => {
+    const res1 = await API.del(
+      '/users',
+      { username: USER.username},
+    );
+
+    helper.expectOk(res1);
+
+    // Check that user can not be found anymore
+    expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;
+
+    // The user is cannot be found in the group
+    const res2 = await API.get(`/groups/${GROUP.groupName}/members`);
+    expect(_(res2.body.result).map('username').includes(USER.username)).to.be.false;
+
+    // Try delete user which does not exist
+    expect(API.del('/users', { username: 'unknown_user' })).to.eventually.be.rejected;
+  });
+
   it('authenticate user', async () => {
     const res = await API.post(
       '/users/authenticate',
@@ -197,7 +231,7 @@ describe('Global API', () => {
     expect(res.body.result).to.have.property('saldo');
   });
 
-  it('create group', async () => {
+  it('create a group', async () => {
     const newGroup = 'new_group';
 
     // Create new group
@@ -214,6 +248,24 @@ describe('Global API', () => {
 
     helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
+  });
+
+  it('create a private group', async () => {
+    const privateGroup = 'private_group';
+
+    // Create new private group
+    const res1 = await API.post(
+      '/groups/create',
+      { groupName: privateGroup, private: true },
+    );
+
+    helper.expectOk(res1);
+    expect(res1.body.result).to.equal(privateGroup);
+
+    // Check that the group doesn't show up in groups
+    const res2 = await API.get('/groups');
+    helper.expectOk(res2);
+    expect(res2.body.result).to.have.length(seed.data.groups.length);
   });
 
   it('add member to group', async () => {
@@ -312,22 +364,5 @@ describe('Global API', () => {
     expect(res3.body.result).to.have.length(2);
     expect(res3.body.result[0].saldo).to.equal(0);
     expect(res3.body.result[1].saldo).to.equal(1); // Newest last
-  });
-
-  it('delete user', async () => {
-
-    // Delete user
-    const res1 = await API.del(
-      '/users',
-      { username: USER.username},
-    );
-
-    helper.expectOk(res1);
-
-    // Check that user can not be found anymore
-    expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;
-
-    // Try delete user which does not exist
-    expect(API.del('/users', { username: 'unknown_user' })).to.eventually.be.rejected;
   });
 });

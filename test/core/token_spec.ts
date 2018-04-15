@@ -46,4 +46,10 @@ describe('Tokens', () => {
     expect(admin).to.be.string;
     expect((await tokenCore.getToken(commentC))).to.containSubset({ token: admin });
   });
+
+  it('delete token', async () => {
+    await tokenCore.deleteToken(seed.data.tokens[0].token);
+    const tokens = await tokenCore.getTokens();
+    expect(tokens).to.have.length(seed.data.tokens.length - 1);
+  });
 });

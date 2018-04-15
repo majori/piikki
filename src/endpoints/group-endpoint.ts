@@ -7,8 +7,9 @@ import validate from '../utils/validators';
 const endpoint: Endpoint = {
   createGroup: async (req) => {
     const groupName = validate.groupName(req.body.groupName);
+    const isPrivate = Boolean(_.get(req, 'body.private', false));
 
-    return groupCore.createGroup(groupName);
+    return groupCore.createGroup(groupName, isPrivate);
   },
 
   addMember: async (req) => {

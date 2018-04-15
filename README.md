@@ -19,7 +19,7 @@ If you are interested of making your own Piikki client and use our hosted backen
 
 # API
 
-[API Definition](https://piikki.ddns.net/swagger/ui/)
+[API Definition](https://dev.piikki.net/swagger/ui/)
 
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 

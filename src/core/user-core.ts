@@ -82,12 +82,38 @@ export async function createUser(user: UserDto) {
   return user.username;
 }
 
-// Puts user's "active" -status to false
+// Delete user's transactions, saldos and the user itself
 export async function deleteUser(username: string) {
-  await userExists(username);
-  await knex.from('users').where({ username }).update({ active: false });
-  logger.info('User deleted', { username });
-  return;
+  const user = await userExists(username);
+
+  return await knex.transaction(async (trx) => {
+    try {
+      // Delete transactions
+      await knex('transactions')
+        .transacting(trx)
+        .where({ user_id: user.id })
+        .del();
+
+      // Delete user's group saldos
+      await knex('user_saldos')
+        .transacting(trx)
+        .where({ user_id: user.id })
+        .del();
+
+      // Delete the user
+      await knex('users')
+        .transacting(trx)
+        .where({ username })
+        .del();
+
+    } catch (err) {
+      await trx.rollback();
+      throw err;
+    }
+
+    logger.info('User deleted', { username });
+    return trx.commit(username);
+  });
 }
 
 // Compare raw password with the hashed one
@@ -112,7 +138,7 @@ export async function userExists(username?: string) {
   if (_.isUndefined(username)) {
     throw badRequest('Username was undefined');
   }
-  const row: DatabaseUser = await knex.from('users').where({ username, active: true }).first();
+  const row: DatabaseUser = await knex.from('users').where({ username }).first();
 
   if (row) {
     return row;
@@ -258,7 +284,7 @@ export async function resetDefaultGroup(username: string) {
 function _getUsersWithSaldos(): QueryBuilder {
   return knex.with('usr', (qb) => {
       qb
-        .select('users.id', 'users.username', 'users.active', 'groups.name AS defaultGroup')
+        .select('users.id', 'users.username', 'groups.name AS defaultGroup')
         .from('users')
         .leftJoin('groups', { 'groups.id': 'users.default_group' });
     })
@@ -266,8 +292,7 @@ function _getUsersWithSaldos(): QueryBuilder {
     .from('usr')
     .leftJoin('user_saldos', { 'user_saldos.user_id': 'usr.id' })
     .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })
-    .orderBy('usr.username')
-    .where({ 'usr.active': true });
+    .orderBy('usr.username');
 }
 
 // Hash passwords

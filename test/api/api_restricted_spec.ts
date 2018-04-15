@@ -24,9 +24,8 @@ describe('Restricted API', () => {
   });
   beforeEach(helper.clearDbAndRunSeed);
 
-  it('create new user', async () => {
-    const res = await API
-      .post(
+  it('create a new user', async () => {
+    const res = await API.post(
         '/users/create',
         { username: 'otherUser', password: 'hackme' },
       );
