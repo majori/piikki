@@ -1,5 +1,3 @@
 --require test/common.ts
 --async-only
 --compilers ts:ts-node/register
---no-timeouts
---slow 500
