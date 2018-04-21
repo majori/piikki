@@ -67,7 +67,7 @@ export function getUsersFromGroup(groupName: string): QueryBuilder {
 }
 
 export async function getUserFromGroup(groupName: string, username: string) {
-  const row: DatabaseUser = await getUsersFromGroup(groupName)
+  const row: { username: string; saldo: number } = await getUsersFromGroup(groupName)
     .andWhere({ 'users.username': username })
     .first();
 
