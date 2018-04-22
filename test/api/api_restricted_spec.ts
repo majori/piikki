@@ -117,11 +117,6 @@ describe('Restricted API', () => {
   });
 
   it('get alternative login count for user', async () => {
-    await API.post(
-      '/users/authenticate/alternative/create',
-      { key: 'key', username: USER.username },
-    );
-
     const res = await API.get('/users/authenticate/alternative/count', {
       username: USER.username,
       groupName: GROUP.groupName,

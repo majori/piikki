@@ -100,6 +100,12 @@ export async function deleteUser(username: string) {
         .where({ user_id: user.id })
         .del();
 
+      // Delete alternative logins
+      await knex('alternative_login')
+        .transacting(trx)
+        .where({ user_id: user.id })
+        .del();
+
       // Delete the user
       await knex('users')
         .transacting(trx)

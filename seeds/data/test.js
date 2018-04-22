@@ -100,6 +100,15 @@ const data = {
       newSaldo: -5,
       timestamp: moment().subtract(3, 'minute').toISOString()
     }
+  ],
+  alternativeLogins: [
+    {
+      username: 'testUser1',
+      groupName: 'group1',
+      token: 'global_token',
+      type: 10,
+      key: '1234'
+    }
   ]
 };
 

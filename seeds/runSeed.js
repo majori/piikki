@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const _ = require('lodash');
 
 module.exports = (knex, Promise, data) => {
@@ -114,5 +115,25 @@ module.exports = (knex, Promise, data) => {
           .value() + ';',
         `ALTER SEQUENCE transactions_id_seq RESTART WITH ${data.transactions.length};`
       ], ' ')
-    ));
+    ))
+
+  .then(() => knex.raw(_.join(
+    [
+      'INSERT INTO alternative_login (id, user_id, group_id, token_id, type, hashed_key) VALUES ',
+      _.chain(data.alternativeLogins)
+        .map((login, i) =>
+          `(
+            ${i},
+            ${_.findIndex(data.users, ['username', login.username])},
+            ${_.findIndex(data.groups, ['groupName', login.groupName])},
+            ${_.findIndex(data.tokens, ['token', login.token])},
+            ${login.type},
+            '${crypto.createHash('sha256').update(login.key).digest('hex')}'
+          )`
+        )
+        .join(',')
+        .value() + ';',
+      `ALTER SEQUENCE alternative_login_id_seq RESTART WITH ${data.alternativeLogins.length};`
+    ], ' ')
+  ));
 };
