@@ -25,7 +25,7 @@ const endpoint: Endpoint = {
   },
 
   authenticateUser: async (req) => {
-    const user = validate.user(req.body);
+    const user = validate.auth(req.body);
 
     const authenticated = await userCore.authenticateUser(user);
     return { username: user.username, authenticated };

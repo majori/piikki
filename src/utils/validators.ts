@@ -4,27 +4,56 @@ import { badRequest } from 'boom';
 import * as Joi from 'joi';
 
 namespace schemas {
-  export const username = Joi.string().token().empty().min(2).max(20).label('Username');
-  export const password = Joi.string().empty().min(4).max(255).label('Password');
-  export const user = Joi.object().keys({ username, password }).options({ stripUnknown: true }).label('User');
-  export const transactionAmount = Joi.number().precision(2).min(-1e+6).max(1e+6).label('Transaction amount');
-  export const groupName = Joi.string().min(4).max(30).label('Group name');
-  export const alternativeLoginKey = Joi.string().empty().label('Alternative login key');
-  export const timestamp = Joi.date().label('Timestamp');
+  export const username = Joi.string()
+    .token()
+    .label('Username');
+
+  export const password = Joi.string()
+    .label('Password');
+
+  export const user = Joi.object()
+    .keys({
+      username: username.required().min(2).max(20),
+      password: password.required().min(4).max(255),
+    })
+    .options({ stripUnknown: true })
+    .label('User');
+
+  export const transactionAmount = Joi.number()
+    .precision(2)
+    .min(-1e+6)
+    .max(1e+6)
+    .label('Transaction amount');
+
+  export const groupName = Joi.string()
+    .min(4)
+    .max(30)
+    .label('Group name');
+
+  export const alternativeLoginKey = Joi.string()
+    .empty()
+    .label('Alternative login key');
+
+  export const timestamp = Joi.date()
+    .label('Timestamp');
+
+  export const auth = Joi.object().keys({
+    username: username.required(),
+    password: password.required(),
+  }).options({ stripUnknown: true });
 }
 
 function validateSchema<T>(schema: Joi.Schema, value: T): T {
   const result = schema.validate(value);
-
   if (result.error) {
     throw badRequest(result.error.message, result.error.details);
   }
-
   return result.value;
 }
 
 export default {
   user: _.partial(validateSchema, schemas.user),
+  auth: _.partial(validateSchema, schemas.auth),
   username: _.partial(validateSchema, schemas.username),
   password: _.partial(validateSchema, schemas.password),
   transactionAmount: _.partial(validateSchema, schemas.transactionAmount),
