@@ -93,12 +93,16 @@ function _getTokens(): QueryBuilder {
 }
 
 // Generates Base64 string from random bytes
-async function _generateToken(length = 16) {
+async function _generateToken(length = 20) {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(length, (err, buf) => {
+    crypto.randomBytes(Math.ceil(length * 3 / 4), (err, buf) => {
       if (err) { reject(err); }
 
-      resolve(buf.toString('hex'));
+      resolve(buf.toString('base64')
+        .slice(0, length)
+        .replace(/\+/g, '0')
+        .replace(/\//g, '0'),
+      );
     });
   });
 }
