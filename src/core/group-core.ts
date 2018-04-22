@@ -17,11 +17,14 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
   }
 
   await knex.from('groups').insert({ name: groupName, private: isPrivate});
-  await createRestrictedToken(groupName, `Created for new group ${groupName}`);
+  const token = await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
   logger.info('Group created', { group_name: groupName });
 
-  return groupName;
+  return {
+    groupName,
+    token,
+  };
 }
 
 export async function groupExists(groupName: string) {

@@ -21,10 +21,11 @@ describe('Groups', () => {
   beforeEach(helper.clearDbAndRunSeed);
 
   it('create a new group', async () => {
-    await groupCore.createGroup(NEW_GROUP_NAME, false);
-    const group = await groupCore.groupExists(NEW_GROUP_NAME);
+    const group = await groupCore.createGroup(NEW_GROUP_NAME, false);
+    expect(group).to.have.property('groupName', NEW_GROUP_NAME);
+    expect(group).to.have.property('token');
 
-    expect(group).to.containSubset({ name: NEW_GROUP_NAME });
+    expect(await groupCore.groupExists(NEW_GROUP_NAME)).to.containSubset({ name: NEW_GROUP_NAME });
   });
 
   it('create a new private group', async () => {
