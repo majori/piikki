@@ -141,13 +141,13 @@ describe('Global API', () => {
       groupName: GROUP.groupName,
     });
 
+    helper.expectOk(res1);
+    expect(res1.body.result.count).to.equal(1);
+
     await API.post(
       '/users/authenticate/alternative/create',
       { key: ALTERNATIVE_KEY, groupName: GROUP.groupName, username: USER.username },
     );
-
-    helper.expectOk(res1);
-    expect(res1.body.result.count).to.equal(0);
 
     const res2 = await API.get('/users/authenticate/alternative/count', {
       username: USER.username,
@@ -155,7 +155,7 @@ describe('Global API', () => {
     });
 
     helper.expectOk(res2);
-    expect(res2.body.result.count).to.equal(1);
+    expect(res2.body.result.count).to.equal(2);
   });
 
   it('set user\'s default group', async () => {

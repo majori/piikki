@@ -75,6 +75,14 @@ const transactions = _.flatMap(users, (user) => {
     .value();
 });
 
+const alternativeLogins = _.map(userSaldos, saldo => ({
+  username: saldo.username,
+  groupName: saldo.groupName,
+  token: tokens[1].token,
+  type: 10,
+  key: '1234',
+}));
+
 module.exports = {
   users,
   groups,
@@ -82,4 +90,5 @@ module.exports = {
   transactions,
   tokens,
   tokenGroupAccess,
+  alternativeLogins,
 }
