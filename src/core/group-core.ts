@@ -17,11 +17,14 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
   }
 
   await knex.from('groups').insert({ name: groupName, private: isPrivate});
-  await createRestrictedToken(groupName, `Created for new group ${groupName}`);
+  const token = await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
   logger.info('Group created', { group_name: groupName });
 
-  return groupName;
+  return {
+    groupName,
+    token,
+  };
 }
 
 export async function groupExists(groupName: string) {
@@ -67,7 +70,7 @@ export function getUsersFromGroup(groupName: string): QueryBuilder {
 }
 
 export async function getUserFromGroup(groupName: string, username: string) {
-  const row: DatabaseUser = await getUsersFromGroup(groupName)
+  const row: { username: string; saldo: number } = await getUsersFromGroup(groupName)
     .andWhere({ 'users.username': username })
     .first();
 

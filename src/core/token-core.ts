@@ -12,7 +12,7 @@ const logger = new Logger(__filename);
 export async function createRestrictedToken(groupName: string, comment?: string) {
 
   const group = await groupExists(groupName);
-  const token = await _generateBase64Token();
+  const token = await _generateToken();
 
   const id = await knex
     .from('tokens')
@@ -30,7 +30,7 @@ export async function createRestrictedToken(groupName: string, comment?: string)
 }
 
 export async function createGlobalToken(comment?: string) {
-  const token = await _generateBase64Token();
+  const token = await _generateToken();
 
   await knex
     .from('tokens')
@@ -43,7 +43,7 @@ export async function createGlobalToken(comment?: string) {
 }
 
 export async function createAdminToken(comment?: string) {
-  const token = await _generateBase64Token(64);
+  const token = await _generateToken(64);
 
   await knex
     .from('tokens')
@@ -93,12 +93,16 @@ function _getTokens(): QueryBuilder {
 }
 
 // Generates Base64 string from random bytes
-async function _generateBase64Token(length = 32) {
+async function _generateToken(length = 20) {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(length, (err, buf) => {
+    crypto.randomBytes(Math.ceil(length * 3 / 4), (err, buf) => {
       if (err) { reject(err); }
 
-      resolve(buf.toString('base64'));
+      resolve(buf.toString('base64')
+        .slice(0, length)
+        .replace(/\+/g, '0')
+        .replace(/\//g, '0'),
+      );
     });
   });
 }

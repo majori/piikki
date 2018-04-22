@@ -241,7 +241,8 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
-    expect(res1.body.result).to.equal(newGroup);
+    expect(res1.body.result).to.have.property('groupName', newGroup);
+    expect(res1.body.result).to.have.property('token');
 
     // Check the group exists
     const res2 = await API.get('/groups');
@@ -260,7 +261,8 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
-    expect(res1.body.result).to.equal(privateGroup);
+    expect(res1.body.result).to.have.property('groupName', privateGroup);
+    expect(res1.body.result).to.have.property('token');
 
     // Check that the group doesn't show up in groups
     const res2 = await API.get('/groups');

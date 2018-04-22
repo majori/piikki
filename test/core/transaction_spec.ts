@@ -66,6 +66,11 @@ describe('Transactions', () => {
     expect(transactions[0]).to.containSubset({ comment });
   });
 
+  it('transaction with very small amount', async () => {
+    const trx = await makeTransaction(1e-10);
+    expect(trx.saldo).to.equal(seed.meta.saldos.testUser1.group1);
+  });
+
   it('can handle fast transactions', async () => {
 
     const start = moment();

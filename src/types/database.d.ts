@@ -3,7 +3,6 @@ declare interface DatabaseUser {
   username: string;
   password: string;
   timestamp: string;
-  active: boolean;
   default_group: number | null;
 }
 

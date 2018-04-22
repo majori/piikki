@@ -5,6 +5,7 @@ import { notFound } from 'boom';
 
 import { knex } from '../database';
 import { Logger } from '../logger';
+import { getUserFromGroup } from './group-core';
 
 const logger = new Logger(__filename);
 
@@ -13,8 +14,9 @@ export async function makeTransaction(newTrx: TransactionDto) {
 
   const amount = _.round(newTrx.amount, 2);
 
+  // Return users current saldo if amount is zero
   if (amount === 0) {
-    return;
+    return getUserFromGroup(newTrx.groupName, newTrx.username);
   }
 
   const saldo = await knex.transaction(async (trx) => {
