@@ -23,7 +23,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
     try {
       const result = await trx.raw(`
         UPDATE "user_saldos" as S
-        SET saldo = saldo + ?
+        SET saldo = round((saldo + ?)::numeric, 2)
         FROM "users" as U, "groups" AS G
           WHERE U.id = S.user_id
           AND G.id = S.group_id
