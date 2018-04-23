@@ -40,7 +40,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
 
       const transaction = {
         new_saldo: newSaldo.saldo,
-        old_saldo: newSaldo.saldo - amount,
+        old_saldo: _.round(newSaldo.saldo - amount, 2),
         group_id: newSaldo.group_id,
         user_id: newSaldo.user_id,
         token_id: newTrx.tokenId,
