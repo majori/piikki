@@ -27,7 +27,7 @@ const endpoint: Endpoint = {
   },
 
   getGroups: async (req) => {
-    return groupCore.getGroups();
+    return groupCore.getGroups(validate.bool(req.query.all));
   },
 
   getGroupMembers: async (req) => {

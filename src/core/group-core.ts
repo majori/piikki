@@ -16,7 +16,14 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
     throw badRequest(`Group ${groupName} already exists`);
   }
 
-  await knex.from('groups').insert({ name: groupName, private: isPrivate});
+  const password = Math.random().toString().substr(2, 4);
+
+  await knex('groups')
+    .insert({
+      name: groupName,
+      private: isPrivate,
+      password,
+    });
   const token = await createRestrictedToken(groupName, `Created for new group ${groupName}`);
 
   logger.info('Group created', { group_name: groupName });
@@ -24,6 +31,7 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
   return {
     groupName,
     token,
+    password: isPrivate ? password : undefined,
   };
 }
 
@@ -81,16 +89,12 @@ export async function getUserFromGroup(groupName: string, username: string) {
   }
 }
 
-export function getGroups(all?: boolean): QueryBuilder {
+export function getGroups(all: boolean): QueryBuilder {
   const query = knex
     .from('groups')
     .select('name');
 
-  if (!all) {
-    query
-      .select('private')
-      .where({ private: false });
-  }
+  all ? query.select('private') : query.where({ private: false });
 
   return query;
 }
@@ -101,8 +105,21 @@ export function getGroup(groupName: string): QueryBuilder {
     .first();
 }
 
-export async function addUserToGroup(username: string, groupName: string) {
+// TODO: Own endpoint for getting group password
+
+export async function addUserToGroup(username: string, groupName: string, password?: string) {
   const result = await userIsNotInGroup(username, groupName);
+  const group = await groupExists(groupName);
+
+  if (group.private) {
+    if (!password) {
+      throw badRequest('Group password is required when user is joining private group');
+    }
+
+    if (group.password !== password) {
+      throw badRequest('Invalid group password');
+    }
+  }
 
   await knex
     .from('user_saldos')

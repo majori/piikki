@@ -41,6 +41,8 @@ namespace schemas {
     username: username.required(),
     password: password.required(),
   }).options({ stripUnknown: true });
+
+  export const bool = Joi.boolean().default(false);
 }
 
 function validateSchema<T>(schema: Joi.Schema, value: T): T {
@@ -60,4 +62,5 @@ export default {
   groupName: _.partial(validateSchema, schemas.groupName),
   alternativeLoginKey: _.partial(validateSchema, schemas.alternativeLoginKey),
   timestamp: (time: any): moment.Moment => moment(validateSchema(schemas.timestamp, time)).utc(),
+  bool: _.partial(validateSchema, schemas.bool),
 };

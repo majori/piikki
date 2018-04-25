@@ -270,6 +270,8 @@ describe('Global API', () => {
     expect(res2.body.result).to.have.length(seed.data.groups.length);
   });
 
+  // TODO: Test private group authentication
+
   it('add member to group', async () => {
     const res1 = await API.get(`/groups/${GROUP.groupName}/members`);
     helper.expectOk(res1);

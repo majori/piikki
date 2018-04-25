@@ -19,6 +19,8 @@ declare interface DatabaseTransaction {
 declare interface DatabaseGroup {
   id: number;
   name: string;
+  private: boolean;
+  password: string;
 }
 
 declare interface DatabaseUserSaldo {
