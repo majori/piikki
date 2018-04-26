@@ -107,12 +107,12 @@ export function getGroup(groupName: string): QueryBuilder {
 
 // TODO: Own endpoint for getting group password
 
-export async function addUserToGroup(username: string, groupName: string, password?: string) {
+export async function addUserToGroup(username: string, groupName: string, password?: string | null) {
   const result = await userIsNotInGroup(username, groupName);
   const group = await groupExists(groupName);
 
-  if (group.private) {
-    if (!password) {
+  if (group.private && !_.isNull(password)) {
+    if (_.isUndefined(password)) {
       throw badRequest('Group password is required when user is joining private group');
     }
 

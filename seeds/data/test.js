@@ -24,8 +24,9 @@ const data = {
     }
   ],
   groups: [
-    { groupName: 'group1' },
-    { groupName: 'group2' }
+    { groupName: 'group1', private: false },
+    { groupName: 'group2', private: false },
+    { groupName: 'group3', private: true, password: '1234' }
   ],
   userSaldos: [
     {

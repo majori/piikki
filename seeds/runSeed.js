@@ -16,10 +16,10 @@ module.exports = (knex, Promise, data) => {
     // GROUPS
     .then(() => knex.raw(_.join(
       [
-        'INSERT INTO groups(id, name) VALUES ',
+        'INSERT INTO groups(id, name, private, password) VALUES ',
         _.chain(data.groups)
           .map((group, i) =>
-            `(${i}, '${group.groupName}')`
+            `(${i}, '${group.groupName}', ${group.private}, ${group.password || '1234'})`
           )
           .join(',')
           .value() + ';',

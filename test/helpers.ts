@@ -19,6 +19,7 @@ const cfg: Config = require('../config'); // tslint:disable-line
 
 export const user = seed.data.users[0];
 export const group = seed.data.groups[0];
+export const privateGroup = seed.data.groups[2];
 
 export const tokens = {
   admin: 'admin_token',

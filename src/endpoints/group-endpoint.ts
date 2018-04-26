@@ -16,7 +16,10 @@ const endpoint: Endpoint = {
     const username = validate.username(req.body.username);
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
 
-    return groupCore.addUserToGroup(username, groupName);
+    // Only requests with global tokens require group passwords for private groups
+    const password = req.piikki.groupAccess.all ? req.body.password : null;
+
+    return groupCore.addUserToGroup(username, groupName, password);
   },
 
   removeMember: async (req) => {

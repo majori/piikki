@@ -2,7 +2,10 @@ const _ = require('lodash');
 const moment = require('moment');
 
 const USER_AMOUNT = 50;
-const GROUP_AMOUNT = 3;
+
+const PRIVATE_GROUP_AMOUNT = 1;
+const PUBLIC_GROUP_AMOUNT = 3;
+
 const MAX_TRANSACTION_AMOUNT = 20;
 
 const users = _.times(USER_AMOUNT, (i) => ({
@@ -10,7 +13,10 @@ const users = _.times(USER_AMOUNT, (i) => ({
   password: '1234'
 }));
 
-const groups = _.times(GROUP_AMOUNT, (i) => ({ groupName: `group${i}` }));
+const groups = _.concat(
+  _.times(PUBLIC_GROUP_AMOUNT, (i) => ({ groupName: `group${i}`, private: false })),
+  _.times(PRIVATE_GROUP_AMOUNT, (i) => ({ groupName: `group${i + PUBLIC_GROUP_AMOUNT}`, private: true })),
+);
 
 const tokens = [
   {

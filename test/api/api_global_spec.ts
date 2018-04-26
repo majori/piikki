@@ -263,14 +263,13 @@ describe('Global API', () => {
     helper.expectOk(res1);
     expect(res1.body.result).to.have.property('groupName', privateGroup);
     expect(res1.body.result).to.have.property('token');
+    expect(res1.body.result).to.have.property('password');
 
     // Check that the group doesn't show up in groups
     const res2 = await API.get('/groups');
     helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.data.groups.length);
   });
-
-  // TODO: Test private group authentication
 
   it('add member to group', async () => {
     const res1 = await API.get(`/groups/${GROUP.groupName}/members`);
@@ -285,6 +284,23 @@ describe('Global API', () => {
     const res3 = await API.get(`/groups/${GROUP.groupName}/members`);
     helper.expectOk(res3);
     expect(res3.body.result).to.have.length(memberCount + 1);
+  });
+
+  it('add member to private group', async () => {
+    const group = helper.privateGroup.groupName;
+    const password = helper.privateGroup.password;
+
+    const res1 = await API.post(
+      `/groups/${group}/addMember`,
+      { username: USER.username, password },
+    );
+    helper.expectOk(res1);
+
+    expect(API.post(
+      `/groups/${group}/addMember`,
+      { username: seed.data.users[1].username, password: 'wrong' },
+    )).eventually.be.rejected;
+
   });
 
   it('remove member from group', async () => {
