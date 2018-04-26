@@ -32,10 +32,10 @@ describe('Groups', () => {
     await groupCore.createGroup(NEW_GROUP_NAME, true);
 
     const groups = await groupCore.getGroups(false);
-    expect(groups).to.have.length(seed.data.groups.length);
+    expect(groups).to.have.length(seed.meta.groups.public);
 
     const allGroups = await groupCore.getGroups(true);
-    expect(allGroups).to.have.length(seed.data.groups.length + 1);
+    expect(allGroups).to.have.length(seed.meta.groups.all + 1);
   });
 
   it('not create a group with existing name', async () => {

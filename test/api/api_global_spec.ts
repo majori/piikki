@@ -213,9 +213,13 @@ describe('Global API', () => {
   });
 
   it('get groups', async () => {
-    const res = await API.get('/groups');
-    helper.expectOk(res);
-    expect(res.body.result).to.have.length(seed.data.groups.length);
+    const res1 = await API.get('/groups');
+    helper.expectOk(res1);
+    expect(res1.body.result).to.have.length(seed.meta.groups.public);
+
+    const res2 = await API.get('/groups', { all: true });
+    helper.expectOk(res2);
+    expect(res2.body.result).to.have.length(seed.meta.groups.all);
   });
 
   it('get group members', async () => {
@@ -248,7 +252,7 @@ describe('Global API', () => {
     const res2 = await API.get('/groups');
 
     helper.expectOk(res2);
-    expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
+    expect(res2.body.result).to.have.length(seed.meta.groups.public + 1);
   });
 
   it('create a private group', async () => {
@@ -268,7 +272,7 @@ describe('Global API', () => {
     // Check that the group doesn't show up in groups
     const res2 = await API.get('/groups');
     helper.expectOk(res2);
-    expect(res2.body.result).to.have.length(seed.data.groups.length);
+    expect(res2.body.result).to.have.length(seed.meta.groups.public);
   });
 
   it('add member to group', async () => {

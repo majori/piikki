@@ -114,6 +114,11 @@ const data = {
 };
 
 const meta = {
+  groups: {
+    all: 3,
+    public: 2,
+    private: 1,
+  },
   membersInGroup: {
     group1: 2,
     group2: 2,
