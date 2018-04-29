@@ -10,6 +10,7 @@ ENV NODE_ENV production
 
 COPY . /usr/src/app
 RUN npm run build
+RUN npm prune
 
 EXPOSE 4000
 
