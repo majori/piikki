@@ -61,10 +61,10 @@ cfg.swagger = {
       description: 'API definition for Piikki API',
     },
     basePath: '/api/v1/',
-    schemes: ['https'],
+    schemes: ['https', 'http'],
     consumes: ['application/json'],
     produces: ['application/json'],
-    security: [{ api_key: [] }],
+    security: [{ token: [] }],
     securityDefinitions: {
       token: {
         type: 'apiKey',
