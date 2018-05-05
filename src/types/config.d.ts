@@ -41,4 +41,17 @@ export interface Config {
   };
 
   logLevel: CLILoggingLevel;
+
+  swagger: {
+    swaggerDefinition: {
+      info: {
+        title: string;
+        version: string;
+        description: string;
+      };
+      host: string;
+      basePath: string;
+    };
+    apis: string[];
+  };
 }

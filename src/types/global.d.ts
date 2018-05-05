@@ -1,3 +1,1 @@
-declare module 'swagger-ui-dist' {
-  export function getAbsoluteFSPath(): string;
-}
+declare module 'swagger-ui-express';

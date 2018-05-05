@@ -3,10 +3,11 @@ import * as express from 'express';
 import * as methodOverride from 'method-override';
 import * as cors from 'cors';
 import { isBoom } from 'boom';
+import swaggerJSDoc = require('swagger-jsdoc');
+import swaggerUi = require('swagger-ui-express');
 
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
-import swagger from './swagger';
 import { Logger } from './logger';
 import { Config } from './types/config';
 
@@ -30,7 +31,8 @@ export async function createServer(cfg: Config) {
   });
 
   // Setup API definitions (swagger)
-  app.use('/swagger', swagger(cfg));
+  const spec = swaggerJSDoc(cfg.swagger);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
 
   // Register currently used tokens
   await initTokens();

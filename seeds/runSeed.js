@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const _ = require('lodash');
 
 module.exports = (knex, Promise, data) => {
-
   // Deletes ALL existing entries
   return knex('token_group_access').del()
     .then(() => knex('alternative_login').del())

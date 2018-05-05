@@ -5,6 +5,17 @@ import transactionEndpoint from './endpoints/transaction-endpoint';
 import userEndpoint from './endpoints/user-endpoint';
 import adminEndpoint from './endpoints/admin-endpoint';
 
+/**
+ * @swagger
+ * tags:
+ * - name: Global
+ *   description: Endpoints which are authorized for global token
+ * - name: Restricted
+ *   description: Endpoints which are authorized for restricted token
+ * - name: Admin
+ *   description: Endpoints which are authorized for admin token
+ */
+
 export function initApiRoutes() {
   const mainRouter = Router();
 
@@ -18,9 +29,6 @@ export function initApiRoutes() {
 // These routes can be used from both gloabl and restricted routes
 function _commonRoutes() {
   const commonR = Router();
-
-  // Root is forbidden
-  commonR.get('/', (req, res) => res.status(403).send());
 
   commonR.post('/users/create', userEndpoint.createUser);
   commonR.post('/users/authenticate', userEndpoint.authenticateUser);
@@ -149,3 +157,42 @@ function _adminTokenRoutes() {
 
   return adminR;
 }
+
+/**
+ * @swagger
+ * definitions:
+ *   username:
+ *     required: true
+ *     type: string
+ *     example: mr_awesome
+ *   groupName:
+ *     required: true
+ *     type: string
+ *     example: group1
+ *   password:
+ *     required: true
+ *     type: string
+ *     example: p4ssw0rd
+ *   amount:
+ *     required: true
+ *     type: number
+ *     example: 4
+ *   comment:
+ *     properties:
+ *       comment:
+ *         required: false
+ *         type: string
+ *         example: This token is reserved for the special one
+ *   user:
+ *     properties:
+ *       username:
+ *         "$ref": "#/definitions/username"
+ *       password:
+ *         "$ref": "#/definitions/password"
+ *   userWithSaldo:
+ *     properties:
+ *       username:
+ *         "$ref": "#/definitions/username"
+ *       saldo:
+ *         type: number
+ */

@@ -8,7 +8,6 @@ cfg.dir = {
   build: path.join(__dirname, 'build'),
   migrations: path.join(__dirname, 'migrations'),
   seeds: path.join(__dirname, 'seeds'),
-  library: path.join(__dirname, 'lib'),
   documents: path.join(__dirname, 'docs'),
 };
 
@@ -50,5 +49,31 @@ cfg.db = {
 // ### Logger options
 //
 cfg.logLevel = process.env.LOG_LEVEL || 'info';
+
+
+// ### Swagger documentation
+//
+cfg.swagger = {
+  swaggerDefinition: {
+    info: {
+      title: 'Piikki',
+      version: require('./package.json').version,
+      description: 'API definition for Piikki API',
+    },
+    basePath: '/api/v1/',
+    schemes: ['https'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    security: [{ api_key: [] }],
+    securityDefinitions: {
+      token: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'Authorization',
+      }
+    }
+  },
+  apis: ['./src/router.ts'],
+};
 
 module.exports = cfg;
