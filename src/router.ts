@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { badRequest } from 'boom';
 
 import groupEndpoint from './endpoints/group-endpoint';
 import transactionEndpoint from './endpoints/transaction-endpoint';
@@ -108,8 +109,111 @@ function _commonRoutes() {
    */
   commonR.post('/users/authenticate', userEndpoint.authenticateUser);
 
+  /**
+   * @swagger
+   * /restricted/users/authenticate/alternative:
+   *   post:
+   *     tags:
+   *     - Restricted
+   *     summary: Find user with a login key
+   *     description: Find user with a login key (ex. card ID)
+   *     parameters:
+   *     - name: body
+   *       in: body
+   *       required: true
+   *       schema:
+   *         properties:
+   *           key:
+   *             type: string
+   *           type:
+   *             type: number
+   *             description: Categorize keys
+   *             required: false
+   *     responses:
+   *       '200':
+   *         description: Return user if found
+   *         schema:
+   *           properties:
+   *             ok:
+   *               type: boolean
+   *             result:
+   *               properties:
+   *                 authenticated:
+   *                   type: boolean
+   *                 username:
+   *                   type: string
+   *                 groupName:
+   *                   type: string
+   *                   nullable: true
+   *
+   * /global/users/authenticate/alternative:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: Find user with a login key
+   *     description: Find user with a login key (ex. card ID)
+   *     parameters:
+   *     - name: body
+   *       in: body
+   *       required: true
+   *       schema:
+   *         properties:
+   *           key:
+   *             type: string
+   *           type:
+   *             type: number
+   *             description: Categorize keys
+   *             required: false
+   *           groupName:
+   *             type: string
+   *             required: false
+   *     responses:
+   *       '200':
+   *         description: Return user if found
+   *         schema:
+   *           properties:
+   *             ok:
+   *               type: boolean
+   *             result:
+   *               properties:
+   *                 authenticated:
+   *                   type: boolean
+   *                 username:
+   *                   type: string
+   *                 groupName:
+   *                   type: string
+   *                   nullable: true
+   */
   commonR.post('/users/authenticate/alternative', userEndpoint.alternativeAuthenticateUser);
+
+  /**
+   * @swagger
+   * /restricted/users/authenticate/alternative/create:
+   *   post:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   * /global/users/authenticate/alternative/create:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   commonR.post('/users/authenticate/alternative/create', userEndpoint.createAlternativeLogin);
+
+  /**
+   * @swagger
+   * /restricted/users/authenticate/alternative/count:
+   *   post:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   * /global/users/authenticate/alternative/count:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   commonR.get('/users/authenticate/alternative/count', userEndpoint.getAlternativeLoginCount);
 
   /**
@@ -308,13 +412,7 @@ function _restrictedTokenRoutes() {
     if (!req.piikki.groupAccess.all) {
       next();
     } else {
-      res.status(403).json({
-        ok: false,
-        error: {
-          type: 'AuthorizationError',
-          message: 'You tried to access restricted routes without a proper token',
-        },
-      });
+      throw badRequest('You tried to access restricted routes without a proper token');
     }
   });
 
@@ -400,10 +498,55 @@ function _restrictedTokenRoutes() {
    *               type: string
    */
   restrictedR.delete('/group/removeMember', groupEndpoint.removeMember);
+
+  /**
+   * @swagger
+   * /restricted/group/addMember:
+   *   post:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   */
   restrictedR.post('/group/addMember', groupEndpoint.addMember);
+
+  /**
+   * @swagger
+   * /restricted/group/transactions:
+   *   get:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   */
   restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
+
+  /**
+   * @swagger
+   * /restricted/group/transactions/{username}:
+   *   get:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   */
   restrictedR.get('/group/transactions/:username', transactionEndpoint.getUserTransactionsFromGroup);
+
+  /**
+   * @swagger
+   * /restricted/group/saldo:
+   *   get:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   */
   restrictedR.get('/group/saldo', transactionEndpoint.getGroupSaldo);
+
+  /**
+   * @swagger
+   * /restricted/group/daily:
+   *   get:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
+   */
   restrictedR.get('/group/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
 
   return restrictedR;
@@ -418,13 +561,7 @@ function _globalTokenRoutes() {
     if (req.piikki.groupAccess.all) {
       next();
     } else {
-      res.status(403).json({
-        ok: false,
-        error: {
-          type: 'AuthorizationError',
-          message: 'You tried to access global routes without a proper token',
-        },
-      });
+      throw badRequest('You tried to access global routes without a proper token');
     }
   });
 
@@ -529,8 +666,34 @@ function _globalTokenRoutes() {
    */
   globalR.get('/users/:username', userEndpoint.getUser);
 
+  /**
+   * @swagger
+   * /global/users/{username}/defaultgroup:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.post('/users/:username/defaultGroup', userEndpoint.setDefaultGroup);
+
+  /**
+   * @swagger
+   * /global/users/{username}/defaultgroup:
+   *   delete:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.delete('/users/:username/defaultGroup', userEndpoint.resetDefaultGroup);
+
+  /**
+   * @swagger
+   * /global/users/{username}/defaultgroup:
+   *   delete:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.delete('/users', userEndpoint.deleteUser);
 
   /**
@@ -691,10 +854,44 @@ function _globalTokenRoutes() {
    */
   globalR.delete('/groups/:groupName/removeMember', groupEndpoint.removeMember);
 
+  /**
+   * @swagger
+   * /global/groups/{groupName}/saldo:
+   *   get:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.get('/groups/:groupName/saldo', transactionEndpoint.getGroupSaldo);
+
+  /**
+   * @swagger
+   * /global/groups/{groupName}/saldo/daily:
+   *   get:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.get('/groups/:groupName/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
 
+  /**
+   * @swagger
+   * /global/transactions/user/{username}:
+   *   get:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
+
+  /**
+   * @swagger
+   * /global/transactions/group/{groupName}:
+   *   get:
+   *     tags:
+   *     - Global
+   *     summary: TODO
+   */
   globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
 
   return globalR;
@@ -709,13 +906,7 @@ function _adminTokenRoutes() {
     if (req.piikki.admin.isAdmin) {
       next();
     } else {
-      res.status(403).json({
-        ok: false,
-        error: {
-          type: 'AuthorizationError',
-          message: 'You tried to access admin routes without a proper token',
-        },
-      });
+      throw badRequest('You tried to access admin routes without a proper token');
     }
   });
 
