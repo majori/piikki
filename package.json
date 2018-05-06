@@ -13,7 +13,8 @@
     "init-db": "npm run migrate && npm run seed",
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
-    "test": "npm run lint && mocha test/**/*_spec.ts"
+    "test": "npm run lint && mocha test/**/*_spec.ts",
+    "test:watch": "mocha --inspect -w --watch-extensions ts test/**/*_spec.ts"
   },
   "repository": {
     "type": "git",

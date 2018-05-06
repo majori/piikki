@@ -18,17 +18,19 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
 
   const password = Math.random().toString().substr(2, 4);
 
-  await knex('groups')
+  const ids = await knex('groups')
     .insert({
       name: groupName,
       private: isPrivate,
       password,
-    });
-  const token = await createRestrictedToken(groupName, `Created for new group ${groupName}`);
+    })
+    .returning('id');
+  const token = await createRestrictedToken(groupName, 'Initial');
 
   logger.info('Group created', { group_name: groupName });
 
   return {
+    id: _.first(ids),
     groupName,
     token,
     password: isPrivate ? password : undefined,
@@ -92,17 +94,23 @@ export async function getUserFromGroup(groupName: string, username: string) {
 export function getGroups(all: boolean): QueryBuilder {
   const query = knex
     .from('groups')
-    .select('name');
+    .select('id', 'name');
 
   all ? query.select('private') : query.where({ private: false });
 
   return query;
 }
 
-export function getGroup(groupName: string): QueryBuilder {
-  return getGroups(true)
-    .where({ name: groupName })
+export async function getGroup(filter: { groupName?: string; id?: number }): Promise<any> {
+  const group = await getGroups(true)
+    .where(filter)
     .first();
+
+  if (_.isEmpty(group)) {
+    throw notFound(`Group with ${JSON.stringify(filter)} not found`);
+  }
+
+  return group;
 }
 
 // TODO: Own endpoint for getting group password

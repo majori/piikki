@@ -34,7 +34,7 @@ const endpoint: Endpoint = {
   alternativeAuthenticateUser: async (req) => {
     const type = req.body.type;
     const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
-      validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
+      validate.groupName(req.piikki.groupAccess.all ? req.body.groupName : req.piikki.groupAccess.group.name);
     const key = validate.alternativeLoginKey(req.body.key);
 
     const found = await userCore.getAlternativeLogin({

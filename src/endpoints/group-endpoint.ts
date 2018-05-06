@@ -33,6 +33,21 @@ const endpoint: Endpoint = {
     return groupCore.getGroups(validate.bool(req.query.all));
   },
 
+  getGroup: async (req) => {
+    const filter = !_.isNaN(+req.params.identifier) ?
+      { id: validate.id(+req.params.identifier) } :
+      { name: validate.groupName(req.params.identifier) };
+    return groupCore.getGroup(filter);
+  },
+
+  getCurrentGroup: async (req) => {
+    const groupName = req.piikki.groupAccess.group.name;
+
+    if (groupName) {
+      return await groupCore.getGroup({ groupName });
+    }
+  },
+
   getGroupMembers: async (req) => {
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     await groupCore.groupExists(groupName);
@@ -46,14 +61,6 @@ const endpoint: Endpoint = {
 
     const result = await groupCore.userIsInGroup(username, groupName);
     return groupCore.getUserFromGroup(result.group.name, result.user.username);
-  },
-
-  getCurrentGroup: async (req) => {
-    const groupName = req.piikki.groupAccess.group.name;
-
-    if (groupName) {
-      return await groupCore.getGroup(groupName);
-    }
   },
 };
 

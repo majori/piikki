@@ -32,6 +32,7 @@ export async function createServer(cfg: Config) {
 
   // Setup API definitions (swagger)
   const spec = swaggerJSDoc(cfg.swagger);
+  app.get('/api-doc.json', (req, res) => res.json(spec));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
 
   // Register currently used tokens

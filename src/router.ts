@@ -715,10 +715,43 @@ function _globalTokenRoutes() {
    *               type: array
    *               items:
    *                 properties:
+   *                   id:
+   *                     type: integer
    *                   groupName:
    *                     type: string
    */
   globalR.get('/groups', groupEndpoint.getGroups);
+
+  /**
+   * @swagger
+   * /global/groups/{identifier}:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: Get group
+   *     description: Get group by name or ID
+   *     parameters:
+   *     - name: identifier
+   *       in: path
+   *       description: Group name or ID
+   *       required: true
+   *       type: string
+   *     responses:
+   *        '200':
+   *          schema:
+   *            properties:
+   *              ok:
+   *                type: boolean
+   *              result:
+   *                properties:
+   *                  id:
+   *                    type: integer
+   *                  name:
+   *                    type: string
+   *                  private:
+   *                    type: boolean
+   */
+  globalR.get('/groups/:identifier', groupEndpoint.getGroup);
 
   /**
    * @swagger

@@ -220,6 +220,26 @@ describe('Global API', () => {
     const res2 = await API.get('/groups', { all: true });
     helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.meta.groups.all);
+    res2.body.result.forEach((group) => {
+      expect(group).to.have.property('id');
+      expect(group).to.have.property('name');
+      expect(group).to.have.property('private');
+    });
+  });
+
+  it('get group', async () => {
+    const res1 = await API.get(`/groups/${GROUP.groupName}`);
+    helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id');
+    expect(res1.body.result).to.have.property('name', GROUP.groupName);
+    expect(res1.body.result).to.have.property('private');
+
+    // Try fetch group with ID
+    const res2 = await API.get('/groups/1');
+    helper.expectOk(res2);
+
+    expect(API.get('/groups/-1')).eventually.be.rejected;
+    expect(API.get('/groups/NOT_FOUND')).eventually.be.rejected;
   });
 
   it('get group members', async () => {
@@ -245,8 +265,10 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id', seed.data.groups.length);
     expect(res1.body.result).to.have.property('groupName', newGroup);
     expect(res1.body.result).to.have.property('token');
+    expect(res1.body.result).to.not.have.property('password');
 
     // Check the group exists
     const res2 = await API.get('/groups');
@@ -265,6 +287,7 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id', seed.data.groups.length);
     expect(res1.body.result).to.have.property('groupName', privateGroup);
     expect(res1.body.result).to.have.property('token');
     expect(res1.body.result).to.have.property('password');
