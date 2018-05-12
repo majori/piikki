@@ -1,8 +1,11 @@
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const _ = require('lodash');
+import Knex from 'knex';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import * as _ from 'lodash';
 
-module.exports = (knex, Promise, data) => {
+import { SeedData } from './data/seed';
+
+export default (knex: Knex, Promise: PromiseConstructor, data: SeedData) => {
   // Deletes ALL existing entries
   return knex('token_group_access').del()
     .then(() => knex('alternative_login').del())
@@ -18,12 +21,12 @@ module.exports = (knex, Promise, data) => {
         'INSERT INTO groups(id, name, private, password) VALUES ',
         _.chain(data.groups)
           .map((group, i) =>
-            `(${i}, '${group.groupName}', ${group.private}, ${group.password || '1234'})`
+            `(${i}, '${group.groupName}', ${group.private}, ${group.password || '1234'})`,
           )
           .join(',')
           .value() + ';',
-        `ALTER SEQUENCE groups_id_seq RESTART WITH ${data.groups.length};`
-      ], ' ')
+        `ALTER SEQUENCE groups_id_seq RESTART WITH ${data.groups.length};`,
+      ], ' '),
     ))
 
     // USERS
@@ -37,12 +40,12 @@ module.exports = (knex, Promise, data) => {
               '${user.username}',
               '${bcrypt.hashSync(user.password, 6)}',
               ${user.defaultGroup ? _.findIndex(data.groups, ['groupName', user.defaultGroup]) : null}
-            )`
+            )`,
           )
           .join(',')
           .value() + ';',
-        `ALTER SEQUENCE users_id_seq RESTART WITH ${data.users.length};`
-      ], ' ')
+        `ALTER SEQUENCE users_id_seq RESTART WITH ${data.users.length};`,
+      ], ' '),
     ))
 
     // USER SALDOS
@@ -56,12 +59,12 @@ module.exports = (knex, Promise, data) => {
               ${_.findIndex(data.users, ['username', saldo.username])},
               ${_.findIndex(data.groups, ['groupName', saldo.groupName])},
               ${saldo.saldo}
-            )`
+            )`,
           )
           .join(',')
           .value() + ';',
-        `ALTER SEQUENCE user_saldos_id_seq RESTART WITH ${data.userSaldos.length};`
-      ], ' ')
+        `ALTER SEQUENCE user_saldos_id_seq RESTART WITH ${data.userSaldos.length};`,
+      ], ' '),
     ))
 
     // TOKENS
@@ -72,8 +75,8 @@ module.exports = (knex, Promise, data) => {
           .map((token, i) => `(${i},'${token.token}','${token.role}','${token.comment}')`)
           .join(',')
           .value() + ';',
-          `ALTER SEQUENCE tokens_id_seq RESTART WITH ${data.tokens.length};`
-      ], ' ')
+          `ALTER SEQUENCE tokens_id_seq RESTART WITH ${data.tokens.length};`,
+      ], ' '),
     ))
 
     // TOKEN GROUP ACCESS
@@ -86,12 +89,12 @@ module.exports = (knex, Promise, data) => {
               ${i},
               ${_.findIndex(data.tokens, ['token', access.token])},
               ${_.findIndex(data.groups, ['groupName', access.groupName])}
-            )`
+            )`,
           )
           .join(',')
           .value() + ';',
-        `ALTER SEQUENCE token_group_access_id_seq RESTART WITH ${data.tokenGroupAccess.length};`
-      ], ' ')
+        `ALTER SEQUENCE token_group_access_id_seq RESTART WITH ${data.tokenGroupAccess.length};`,
+      ], ' '),
     ))
 
     // TRANSACTIONS
@@ -108,12 +111,12 @@ module.exports = (knex, Promise, data) => {
               '${transaction.timestamp}',
               ${transaction.oldSaldo},
               ${transaction.newSaldo}
-            )`
+            )`,
           )
           .join(',')
           .value() + ';',
-        `ALTER SEQUENCE transactions_id_seq RESTART WITH ${data.transactions.length};`
-      ], ' ')
+        `ALTER SEQUENCE transactions_id_seq RESTART WITH ${data.transactions.length};`,
+      ], ' '),
     ))
 
   .then(() => knex.raw(_.join(
@@ -128,11 +131,11 @@ module.exports = (knex, Promise, data) => {
             ${_.findIndex(data.tokens, ['token', login.token])},
             ${login.type},
             '${crypto.createHash('sha256').update(login.key).digest('hex')}'
-          )`
+          )`,
         )
         .join(',')
         .value() + ';',
-      `ALTER SEQUENCE alternative_login_id_seq RESTART WITH ${data.alternativeLogins.length};`
-    ], ' ')
+      `ALTER SEQUENCE alternative_login_id_seq RESTART WITH ${data.alternativeLogins.length};`,
+    ], ' '),
   ));
 };
