@@ -6,11 +6,13 @@ import * as Joi from 'joi';
 namespace schemas {
   export const username = Joi.string()
     .token()
+    .regex(/^\d+$/, { invert: true }) // Can't be a number
     .label('Username');
 
   export const password = Joi.string()
     .label('Password');
 
+  // Used when creating a new user
   export const user = Joi.object()
     .keys({
       username: username.required().min(2).max(20),
@@ -26,6 +28,8 @@ namespace schemas {
     .label('Transaction amount');
 
   export const groupName = Joi.string()
+    .token()
+    .regex(/^\d+$/, { invert: true }) // Can't be a number
     .min(4)
     .max(30)
     .label('Group name');
@@ -37,9 +41,11 @@ namespace schemas {
   export const timestamp = Joi.date()
     .label('Timestamp');
 
+  // Used for user authorization. Keep validation loose
+  // since new user's username and password validation can change
   export const auth = Joi.object().keys({
-    username: username.required(),
-    password: password.required(),
+    username: Joi.string().required(),
+    password: Joi.string().required(),
   }).options({ stripUnknown: true });
 
   export const id = Joi.number().integer().positive();
