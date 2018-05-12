@@ -9,11 +9,11 @@ import swaggerUi = require('swagger-ui-express');
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
 import { Logger } from './logger';
-import { Config } from './types/config';
+import { IConfig } from './types/config';
 
 const logger = new Logger(__filename);
 
-export async function createServer(cfg: Config) {
+export async function createServer(cfg: IConfig) {
   const app = express();
 
   // 3rd party middleware

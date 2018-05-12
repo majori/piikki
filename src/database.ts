@@ -1,4 +1,4 @@
 import * as _knex from 'knex';
-const cfg: any = require('../config'); // tslint:disable-line
+import cfg from '../config';
 
 export const knex = _knex(cfg.db);

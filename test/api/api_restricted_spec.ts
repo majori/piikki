@@ -4,12 +4,10 @@ import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 
-import { Config } from '../../src/types/config';
+import cfg from '../../config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 import * as transactionCore from '../../src/core/transaction-core';
-
-const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);

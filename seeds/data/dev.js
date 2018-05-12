@@ -86,7 +86,7 @@ const alternativeLogins = _.map(userSaldos, saldo => ({
   groupName: saldo.groupName,
   token: tokens[1].token,
   type: 10,
-  key: '1234',
+  key: saldo.username,
 }));
 
 module.exports = {

@@ -4,11 +4,9 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import { Config } from '../../src/types/config';
+import cfg from '../../config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
-
-const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);

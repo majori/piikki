@@ -1,11 +1,10 @@
 import { CLILoggingLevel } from 'winston';
 
-export interface Config {
+export interface IConfig {
   dir: {
     source: string;
     build: string;
     migrations: string;
-    library: string;
     documents: string;
     seeds: string;
   };
@@ -22,13 +21,13 @@ export interface Config {
   db: {
     client: string;
     connection: {
-      server: string;
+      host: string;
+      port: number;
       user: string;
       password: string;
-      options: {
-        port: number;
-        database: string;
-        encrypt: boolean;
+      database: string;
+      options?: {
+        encrypt?: boolean;
       };
     };
     migrations: {
@@ -49,8 +48,12 @@ export interface Config {
         version: string;
         description: string;
       };
-      host: string;
       basePath: string;
+      schemes: string[];
+      consumes: string[];
+      produces: string[];
+      security: any[];
+      securityDefinitions: any;
     };
     apis: string[];
   };
