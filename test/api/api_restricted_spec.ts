@@ -31,6 +31,10 @@ describe('Restricted API', () => {
       );
 
     helper.expectOk(res);
+
+    // Username can not be a number
+    expect(API.post('/users/create', { username: '12345', password: 'hackme' }))
+      .eventually.be.rejected;
   });
 
   it('authenticate user', async () => {

@@ -53,6 +53,10 @@ describe('Global API', () => {
     helper.expectOk(res2);
     expect(res2.body.result.saldos).to.be.empty;
     expect(res2.body.result.defaultGroup).to.be.null;
+
+    // Username can not be a number
+    expect(API.post('/users/create', { username: '12345', password: 'hackme' }))
+      .eventually.be.rejected;
   });
 
   it('delete user', async () => {
@@ -275,6 +279,9 @@ describe('Global API', () => {
 
     helper.expectOk(res2);
     expect(res2.body.result).to.have.length(seed.meta.groups.public + 1);
+
+    // Group name can not be a number
+    expect(API.post('/groups/create', { groupName: '12345'})).eventually.to.be.rejected;
   });
 
   it('create a private group', async () => {
