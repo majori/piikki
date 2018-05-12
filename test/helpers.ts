@@ -2,7 +2,7 @@
 import { expect, request } from 'chai';
 import * as path from 'path';
 
-import cfg from '../config';
+import cfg from '../src/config';
 import { IConfig } from '../src/types/config';
 import { createServer } from '../src/server';
 import { knex } from '../src/database';

@@ -4,7 +4,7 @@ import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
 
-import cfg from '../../config';
+import cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 

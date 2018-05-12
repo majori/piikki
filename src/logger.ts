@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { isBoom } from 'boom';
 
 import { getTokenInfo } from './tokenHandler';
-import config from '../config';
+import config from './config';
 
 export class Logger extends Winston {
 

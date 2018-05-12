@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import { IConfig } from './src/types/config';
+import { IConfig } from './types/config';
 
 export const Config: IConfig = {
   dir: {
-    source: path.join(__dirname, 'src'),
-    build: path.join(__dirname, 'build'),
-    migrations: path.join(__dirname, 'migrations'),
-    seeds: path.join(__dirname, 'seeds'),
-    documents: path.join(__dirname, 'docs'),
+    source: path.join(__dirname, '..', 'src'),
+    build: path.join(__dirname, '..', 'build'),
+    migrations: path.join(__dirname, '..', 'migrations'),
+    seeds: path.join(__dirname, '..', 'seeds'),
+    documents: path.join(__dirname, '..', 'docs'),
   },
 
   // ## Environment configs
@@ -53,7 +53,7 @@ export const Config: IConfig = {
     swaggerDefinition: {
       info: {
         title: 'Piikki',
-        version: require('./package.json').version,
+        version: require('../package.json').version,
         description: 'API definition for Piikki API',
       },
       basePath: '/api/v1/',

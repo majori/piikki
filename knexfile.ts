@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import cfg from './config';
+import cfg from './src/config';
 
 module.exports = {
   development: _.cloneDeep(cfg.db),

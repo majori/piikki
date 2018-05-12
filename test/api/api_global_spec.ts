@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as BBPromise from 'bluebird';
 
-import cfg from '../../config';
+import cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 import * as transactionCore from '../../src/core/transaction-core';
