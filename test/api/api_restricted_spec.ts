@@ -33,8 +33,10 @@ describe('Restricted API', () => {
     helper.expectOk(res);
 
     // Username can not be a number
-    expect(API.post('/users/create', { username: '12345', password: 'hackme' }))
-      .eventually.be.rejected;
+    helper.expectError(
+      await API.post('/users/create', { username: '12345', password: 'hackme' }),
+      400,
+    );
   });
 
   it('authenticate user', async () => {
@@ -139,10 +141,12 @@ describe('Restricted API', () => {
       newPassword,
     }));
 
-    expect(API.get('/users/authenticate', {
-      username: USER.username,
+    // User can't be authenticated with the old password
+    const res = await API.post('/users/authenticate', {
       password: USER.password,
-    })).to.eventually.be.rejected;
+      username: USER.username,
+    });
+    expect(res.body.result.authenticated).to.be.false;
 
     helper.expectOk(await API.post('/users/authenticate', {
       username: USER.username,
@@ -167,7 +171,11 @@ describe('Restricted API', () => {
     }));
 
     helper.expectOk(await API.get(`/group/members/${newUsername}`));
-    expect(API.get(`/group/members/${USER.username}`)).to.eventually.be.rejected;
+
+    helper.expectError(
+      await API.get(`/group/members/${USER.username}`),
+      404,
+    );
 
     // Reset username back to original
     await API.put('/users/reset/username', {

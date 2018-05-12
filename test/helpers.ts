@@ -60,6 +60,15 @@ export function expectOk(res: ChaiHttp.Response) {
   expect(res.body).to.have.property('result');
 }
 
+export function expectError(res: any, status?: number) {
+  expect(res).to.have.property('error', true);
+  expect(res.status).not.to.equal(200);
+  expect(res.body).to.have.property('ok', false);
+  expect(res.body).to.have.property('error');
+
+  status && expect(res.status).to.equal(status);
+}
+
 export class Api {
   private config: Config;
   private role: 'admin' | 'global' | 'restricted';
@@ -106,19 +115,21 @@ export class Api {
     });
   }
 
-  private makeRequest(options: RequestOptions) {
+  private async makeRequest(options: RequestOptions) {
     const req: ChaiHttp.Request = this.api[options.method](`/api/v1/${this.role}${options.url}`);
 
     req.set('Authorization', tokens[this.role]);
+    options.query && req.query(options.query);
+    options.body && req.send(options.body);
 
-    if (options.query) {
-      req.query(options.query);
+    try {
+      return await req;
+    } catch (err) {
+      return {
+        ...err.response,
+        body: JSON.parse(err.response.text),
+        error: true,
+      };
     }
-
-    if (options.body) {
-      req.send(options.body);
-    }
-
-    return req;
   }
 }

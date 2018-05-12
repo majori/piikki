@@ -106,6 +106,30 @@ function _commonRoutes() {
    *               properties:
    *                 authenticated:
    *                   type: boolean
+   * /global/users/authenticate:
+   *   post:
+   *     tags:
+   *     - Global
+   *     summary: Authenticate user
+   *     description: ''
+   *     parameters:
+   *     - name: body
+   *       in: body
+   *       description: User to authenticate
+   *       required: true
+   *       schema:
+   *         "$ref": "#/definitions/user"
+   *     responses:
+   *       '200':
+   *         description: Returns if password was right/wrong
+   *         schema:
+   *           properties:
+   *             ok:
+   *               type: boolean
+   *             result:
+   *               properties:
+   *                 authenticated:
+   *                   type: boolean
    */
   commonR.post('/users/authenticate', userEndpoint.authenticateUser);
 
