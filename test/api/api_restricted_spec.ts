@@ -183,6 +183,20 @@ describe('Restricted API', () => {
     });
   });
 
+  it('get current group', async () => {
+    const res = await API.get('/group');
+    helper.expectOk(res);
+
+    expect(res.body.result).to.have.property('id');
+    expect(res.body.result).to.have.property('name');
+    expect(res.body.result).to.have.property('private');
+    expect(res.body.result).to.have.property('members');
+    for (const member of res.body.result.members) {
+      expect(member).to.have.property('username');
+      expect(member).to.have.property('saldo');
+    }
+  });
+
   it('get group members', async () => {
     const res = await API.get('/group/members');
     helper.expectOk(res);

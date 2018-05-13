@@ -444,7 +444,12 @@ function _restrictedTokenRoutes() {
   restrictedR.use(_commonRoutes());
 
   /**
-   *
+   * @swagger
+   * /restricted/group:
+   *   get:
+   *     tags:
+   *     - Restricted
+   *     summary: TODO
    */
   restrictedR.get('/group', groupEndpoint.getCurrentGroup);
 

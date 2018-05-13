@@ -250,6 +250,12 @@ describe('Global API', () => {
     expect(res1.body.result).to.have.property('id');
     expect(res1.body.result).to.have.property('name', GROUP.groupName);
     expect(res1.body.result).to.have.property('private');
+    expect(res1.body.result).to.have.property('members');
+    expect(res1.body.result.members).to.have.length(seed.meta.membersInGroup.group1);
+    for (const member of res1.body.result.members) {
+      expect(member).to.property('username');
+      expect(member).to.property('saldo');
+    }
 
     // Try fetch group with ID
     const res2 = await API.get('/groups/1');

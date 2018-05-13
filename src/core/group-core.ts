@@ -101,7 +101,7 @@ export function getGroups(all: boolean): QueryBuilder {
   return query;
 }
 
-export async function getGroup(filter: { groupName?: string; id?: number }): Promise<any> {
+export async function getGroup(filter: { name?: string; id?: number }): Promise<any> {
   const group = await getGroups(true)
     .where(filter)
     .first();
@@ -110,7 +110,10 @@ export async function getGroup(filter: { groupName?: string; id?: number }): Pro
     throw notFound(`Group with ${JSON.stringify(filter)} not found`);
   }
 
-  return group;
+  return {
+    ...group,
+    members: await getUsersFromGroup(group.name),
+  };
 }
 
 // TODO: Own endpoint for getting group password

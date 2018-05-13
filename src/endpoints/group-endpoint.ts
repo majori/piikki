@@ -44,7 +44,7 @@ const endpoint: Endpoint = {
     const groupName = req.piikki.groupAccess.group.name;
 
     if (groupName) {
-      return await groupCore.getGroup({ groupName });
+      return await groupCore.getGroup({ name: groupName });
     }
   },
 
