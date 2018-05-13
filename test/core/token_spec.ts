@@ -4,12 +4,9 @@ import { expect, assert, should } from 'chai';
 import * as _ from 'lodash';
 
 import * as helper from '../helpers';
-import { Config } from '../../src/types/config';
-
 import * as tokenCore from '../../src/core/token-core';
 import * as groupCore from '../../src/core/group-core';
 import * as userCore from '../../src/core/user-core';
-
 import * as seed from '../../seeds/data/test';
 
 describe('Tokens', () => {
