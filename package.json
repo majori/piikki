@@ -61,9 +61,7 @@
     "nodemon": "^1.14.11",
     "swagger-jsdoc": "^1.9.7",
     "swagger-ui-express": "^3.0.8",
-    "ts-node": "^5.0.1",
-    "tslint": "^5.9.1",
-    "typescript": "^2.8.1"
+    "tslint": "^5.9.1"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
@@ -78,6 +76,8 @@
     "method-override": "^2.3.10",
     "moment": "^2.20.1",
     "pg": "^7.4.1",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.8.1",
     "winston": "^2.4.0"
   }
 }
