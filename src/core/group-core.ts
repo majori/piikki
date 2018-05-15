@@ -1,7 +1,7 @@
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 
-import { badRequest, notFound } from 'boom';
+import { badRequest, notFound, conflict } from 'boom';
 import * as userCore from './user-core';
 import { createRestrictedToken } from './token-core';
 import { knex } from '../database';
@@ -53,7 +53,7 @@ export async function userIsNotInGroup(username: string, groupName: string) {
   if (!result.found) {
     return { user: result.user, group: result.group };
   } else {
-    throw badRequest(`User ${result.user.username} is already in group ${result.group.name}`);
+    throw conflict(`User ${result.user.username} is already in group ${result.group.name}`);
   }
 }
 
