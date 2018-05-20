@@ -13,7 +13,7 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
   const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
 
   if (!_.isEmpty(records)) {
-    throw badRequest(`Group ${groupName} already exists`);
+    throw conflict(`Group ${groupName} already exists`);
   }
 
   const password = Math.random().toString().substr(2, 4);

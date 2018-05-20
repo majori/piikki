@@ -2,8 +2,6 @@ import * as _ from 'lodash';
 
 import cfg from './src/config';
 
-module.exports = {
-  development: _.cloneDeep(cfg.db),
-  production: _.cloneDeep(cfg.db),
-  test: _.cloneDeep(cfg.db),
-};
+export const development = _.cloneDeep(cfg.db);
+export const production = _.cloneDeep(cfg.db);
+export const test = _.cloneDeep(cfg.db);
