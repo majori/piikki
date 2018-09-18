@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-export const up = (knex: Knex, Promise: PromiseConstructor) => {
+export const up = (knex: Knex) => {
   return knex.schema.createTable('alternative_login', (table) => {
     table.increments('id')
       .primary();
@@ -25,6 +25,6 @@ export const up = (knex: Knex, Promise: PromiseConstructor) => {
   });
 };
 
-export const down = (knex: Knex, Promise: PromiseConstructor) => {
+export const down = (knex: Knex) => {
   return knex.schema.dropTable('alternative_login');
 };

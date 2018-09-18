@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-export const up = (knex: Knex, Promise: PromiseConstructor) => {
+export const up = (knex: Knex) => {
   return knex.schema.alterTable('transactions', (t) => {
     t.integer('token_id')
         .unsigned()
@@ -10,7 +10,7 @@ export const up = (knex: Knex, Promise: PromiseConstructor) => {
   });
 };
 
-export const down = (knex: Knex, Promise: PromiseConstructor) => {
+export const down = (knex: Knex) => {
   return knex.schema.alterTable('transactions', (t) => {
     t.dropForeign(['token_id']);
   });

@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-export const up = (knex: Knex, Promise: PromiseConstructor) => {
+export const up = (knex: Knex) => {
   return knex.schema.createTable('users', (table) => {
         table.increments('id')
             .primary();

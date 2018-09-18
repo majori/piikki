@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-export const up = (knex: Knex, Promise: PromiseConstructor) => {
+export const up = (knex: Knex) => {
   return knex.schema.alterTable('groups', (t) => {
     t.string('password')
       .notNullable()
@@ -8,7 +8,7 @@ export const up = (knex: Knex, Promise: PromiseConstructor) => {
   });
 };
 
-export const down = (knex: Knex, Promise: PromiseConstructor) => {
+export const down = (knex: Knex) => {
   return knex.schema.alterTable('groups', (t) => {
     t.dropColumn('password');
   });
