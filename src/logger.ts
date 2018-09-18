@@ -5,9 +5,7 @@ import { Request, Response } from 'express';
 import { isBoom } from 'boom';
 
 import { getTokenInfo } from './tokenHandler';
-import { Config } from './types/config';
-
-const config: Config = require('../config'); // tslint:disable-line
+import config from './config';
 
 export class Logger extends Winston {
 

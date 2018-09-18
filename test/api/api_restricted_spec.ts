@@ -4,12 +4,10 @@ import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 
-import { Config } from '../../src/types/config';
+import cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 import * as transactionCore from '../../src/core/transaction-core';
-
-const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
@@ -31,6 +29,12 @@ describe('Restricted API', () => {
       );
 
     helper.expectOk(res);
+
+    // Username can not be a number
+    helper.expectError(
+      await API.post('/users/create', { username: '12345', password: 'hackme' }),
+      400,
+    );
   });
 
   it('authenticate user', async () => {
@@ -135,10 +139,12 @@ describe('Restricted API', () => {
       newPassword,
     }));
 
-    expect(API.get('/users/authenticate', {
-      username: USER.username,
+    // User can't be authenticated with the old password
+    const res = await API.post('/users/authenticate', {
       password: USER.password,
-    })).to.eventually.be.rejected;
+      username: USER.username,
+    });
+    expect(res.body.result.authenticated).to.be.false;
 
     helper.expectOk(await API.post('/users/authenticate', {
       username: USER.username,
@@ -163,7 +169,11 @@ describe('Restricted API', () => {
     }));
 
     helper.expectOk(await API.get(`/group/members/${newUsername}`));
-    expect(API.get(`/group/members/${USER.username}`)).to.eventually.be.rejected;
+
+    helper.expectError(
+      await API.get(`/group/members/${USER.username}`),
+      404,
+    );
 
     // Reset username back to original
     await API.put('/users/reset/username', {
@@ -171,6 +181,20 @@ describe('Restricted API', () => {
       newUsername: USER.username,
       password: USER.password,
     });
+  });
+
+  it('get current group', async () => {
+    const res = await API.get('/group');
+    helper.expectOk(res);
+
+    expect(res.body.result).to.have.property('id');
+    expect(res.body.result).to.have.property('name');
+    expect(res.body.result).to.have.property('private');
+    expect(res.body.result).to.have.property('members');
+    for (const member of res.body.result.members) {
+      expect(member).to.have.property('username');
+      expect(member).to.have.property('saldo');
+    }
   });
 
   it('get group members', async () => {

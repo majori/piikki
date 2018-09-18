@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { QueryBuilder } from 'knex';
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
-import { badRequest, notFound } from 'boom';
+import { badRequest, notFound, conflict, badData } from 'boom';
 
 import { knex} from '../database';
 import { groupExists, userIsInGroup } from './group-core';
@@ -68,7 +68,7 @@ export async function createUser(user: UserDto) {
   const results = await knex.from('users').where({ username: user.username });
 
   if (!_.isEmpty(results)) {
-    throw badRequest(`Username ${user.username} already exists`);
+    throw conflict(`Username ${user.username} already exists`);
   }
 
   const hash = await _hashPassword(user.password);
@@ -156,7 +156,7 @@ export async function userExists(username?: string) {
 export async function userNotExists(username: string) {
   try {
     await userExists(username);
-    throw badRequest(`User ${username} already exists`);
+    throw conflict(`User ${username} already exists`);
   } catch (err) {
     if (err.isBoom && err.typeof(notFound)) {
       return true;
@@ -172,7 +172,7 @@ export async function resetPassword(user: UserDto, newPassword: string) {
   const isSame = await authenticateUser(user);
 
   if (!isSame) {
-    throw badRequest('Old password did not match');
+    throw badData('Old password did not match');
   }
 
   const hash = await _hashPassword(newPassword);

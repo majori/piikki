@@ -1,40 +1,48 @@
-const _ = require('lodash');
-const moment = require('moment');
+import * as _ from 'lodash';
+import * as moment from 'moment';
+
+import { Seed, SeedData } from './seed';
 
 const USER_AMOUNT = 50;
-const GROUP_AMOUNT = 3;
+
+const PRIVATE_GROUP_AMOUNT = 1;
+const PUBLIC_GROUP_AMOUNT = 3;
+
 const MAX_TRANSACTION_AMOUNT = 20;
 
 const users = _.times(USER_AMOUNT, (i) => ({
   username: `user${i}`,
-  password: '1234'
+  password: '1234',
 }));
 
-const groups = _.times(GROUP_AMOUNT, (i) => ({ groupName: `group${i}` }));
+const groups = _.concat(
+  _.times(PUBLIC_GROUP_AMOUNT, (i) => ({ groupName: `group${i}`, private: false })),
+  _.times(PRIVATE_GROUP_AMOUNT, (i) => ({ groupName: `group${i + PUBLIC_GROUP_AMOUNT}`, private: true })),
+);
 
 const tokens = [
   {
     token: 'restricted_token',
     role: 'restricted',
-    comment: 'For restricted'
+    comment: 'For restricted',
   },
   {
     token: 'global_token',
     role: 'global',
-    comment: 'For global'
+    comment: 'For global',
   },
   {
     token: 'admin_token',
     role: 'admin',
-    comment: 'For admin'
-  }
+    comment: 'For admin',
+  },
 ];
 
 const tokenGroupAccess = [
   {
     groupName: _.first(groups).groupName,
-    token: 'restricted_token'
-  }
+    token: 'restricted_token',
+  },
 ];
 
 const userSaldos = [];
@@ -51,8 +59,8 @@ const transactions = _.flatMap(users, (user) => {
       token: tokens[_.random(1)].token,
       groupName,
       oldSaldo: current,
-      newSaldo
-    })
+      newSaldo,
+    });
 
     return current + value;
   }, 0);
@@ -60,30 +68,30 @@ const transactions = _.flatMap(users, (user) => {
   userSaldos.push({
     username: user.username,
     groupName,
-    saldo: finalSaldo
+    saldo: finalSaldo,
   });
 
   const time = moment().utc();
   return _.chain(saldos)
     .reverse()
-    .map(saldo => _.set(saldo, 'timestamp', time
-        .subtract(_.random(1,24), 'hours')
+    .map((saldo) => _.set(saldo, 'timestamp', time
+        .subtract(_.random(1, 24), 'hours')
         .subtract(_.random(60), 'minutes')
-        .format()
-      )
+        .format(),
+      ),
     )
     .value();
 });
 
-const alternativeLogins = _.map(userSaldos, saldo => ({
+const alternativeLogins = _.map(userSaldos, (saldo) => ({
   username: saldo.username,
   groupName: saldo.groupName,
   token: tokens[1].token,
   type: 10,
-  key: '1234',
+  key: saldo.username,
 }));
 
-module.exports = {
+export const data: SeedData = {
   users,
   groups,
   userSaldos,
@@ -91,4 +99,8 @@ module.exports = {
   tokens,
   tokenGroupAccess,
   alternativeLogins,
-}
+};
+
+export default {
+  data,
+} as Seed;

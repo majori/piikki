@@ -1,10 +1,12 @@
-exports.up = (knex, Promise) => {
+import Knex from 'knex';
+
+export const up = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
     t.dropColumn('active');
   });
 };
 
-exports.down = (knex, Promise) => {
+export const down = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
     t.boolean('active')
       .notNullable()

@@ -1,5 +1,7 @@
-exports.up = (knex, Promise) => {
-  return knex.schema.createTable('users', table => {
+import Knex from 'knex';
+
+export const up = (knex: Knex) => {
+  return knex.schema.createTable('users', (table) => {
         table.increments('id')
             .primary();
         table.string('username', 20)
@@ -13,14 +15,14 @@ exports.up = (knex, Promise) => {
             .notNullable()
             .defaultTo(true);
     })
-    .then(() => knex.schema.createTable('groups', table => {
+    .then(() => knex.schema.createTable('groups', (table) => {
         table.increments('id')
             .primary();
         table.string('name')
             .notNullable()
             .unique();
     }))
-    .then(() => knex.schema.createTable('tokens', table => {
+    .then(() => knex.schema.createTable('tokens', (table) => {
         table.increments('id')
             .primary();
         table.string('token')
@@ -31,7 +33,7 @@ exports.up = (knex, Promise) => {
             .defaultTo('restricted');
         table.string('comment');
     }))
-    .then(() => knex.schema.createTable('user_saldos', table => {
+    .then(() => knex.schema.createTable('user_saldos', (table) => {
         table.increments('id')
             .primary();
         table.integer('user_id')
@@ -46,7 +48,7 @@ exports.up = (knex, Promise) => {
             .notNullable()
             .defaultTo(0);
     }))
-    .then(() => knex.schema.createTable('transactions', table => {
+    .then(() => knex.schema.createTable('transactions', (table) => {
         table.increments('id')
             .primary();
         table.integer('user_id')
@@ -80,11 +82,11 @@ exports.up = (knex, Promise) => {
             .notNullable()
             .references('id')
             .inTable('groups');
-    }))
+    })),
   );
 };
 
-exports.down = (knex, Promise) => knex.schema.dropTableIfExists('user_saldos')
+export const down = (knex: Knex, Promise: PromiseConstructor) => knex.schema.dropTableIfExists('user_saldos')
     .then(() => knex.schema.dropTableIfExists('transactions'))
     .then(() => knex.schema.dropTableIfExists('token_group_access'))
     .then(() => knex.schema.dropTableIfExists('users'))

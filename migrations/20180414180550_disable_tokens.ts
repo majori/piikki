@@ -1,11 +1,13 @@
-exports.up = (knex, Promise) => {
+import Knex from 'knex';
+
+export const up = (knex: Knex) => {
   return knex.schema.alterTable('tokens', (t) => {
     t.boolean('active')
       .defaultTo(true);
   });
 };
 
-exports.down = (knex, Promise) => {
+export const down = (knex: Knex) => {
   return knex.schema.alterTable('tokens', (t) => {
     t.dropColumn('active');
   });

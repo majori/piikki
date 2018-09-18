@@ -2,13 +2,12 @@ import * as process from 'process';
 import * as _ from 'lodash';
 import { createServer } from './server';
 import { Logger } from './logger';
-import { Config } from './types/config';
+import config from './config';
+import { IConfig } from './types/config';
 
 const logger = new Logger(__filename);
 
-const config: Config = require('../config'); // tslint:disable-line
-
-async function startServer(cfg: Config) {
+async function startServer(cfg: IConfig) {
   const server = await createServer(cfg);
 
   // Start server

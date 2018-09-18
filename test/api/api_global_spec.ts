@@ -5,12 +5,10 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as BBPromise from 'bluebird';
 
-import { Config } from '../../src/types/config';
+import cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 import * as transactionCore from '../../src/core/transaction-core';
-
-const cfg: Config = require('../../config'); // tslint:disable-line
 
 const USER = _.clone(helper.user);
 const GROUP = _.clone(helper.group);
@@ -53,6 +51,12 @@ describe('Global API', () => {
     helper.expectOk(res2);
     expect(res2.body.result.saldos).to.be.empty;
     expect(res2.body.result.defaultGroup).to.be.null;
+
+    // Username can not be a number
+    helper.expectError(
+      await API.post('/users/create', { username: '12345', password: 'hackme' }),
+      400,
+    );
   });
 
   it('delete user', async () => {
@@ -64,14 +68,20 @@ describe('Global API', () => {
     helper.expectOk(res1);
 
     // Check that user can not be found anymore
-    expect(API.get(`/users/${USER.username}`)).to.eventually.be.rejected;
+    helper.expectError(
+      await API.get(`/users/${USER.username}`),
+      404,
+    );
 
     // The user is cannot be found in the group
     const res2 = await API.get(`/groups/${GROUP.groupName}/members`);
     expect(_(res2.body.result).map('username').includes(USER.username)).to.be.false;
 
     // Try delete user which does not exist
-    expect(API.del('/users', { username: 'unknown_user' })).to.eventually.be.rejected;
+    helper.expectError(
+      await API.del('/users', { username: 'unknown_user' }),
+      404,
+    );
   });
 
   it('authenticate user', async () => {
@@ -174,10 +184,13 @@ describe('Global API', () => {
       newPassword,
     }));
 
-    expect(API.get('/users/authenticate', {
-      username: USER.username,
-      password: USER.password,
-    })).to.eventually.be.rejected;
+    helper.expectError(
+      await API.get('/users/authenticate', {
+        username: USER.username,
+        password: USER.password,
+      }),
+      404,
+    );
 
     helper.expectOk(await API.post('/users/authenticate', {
       username: USER.username,
@@ -202,7 +215,11 @@ describe('Global API', () => {
     }));
 
     helper.expectOk(await API.get(`/groups/${GROUP.groupName}/members/${newUsername}`));
-    expect(API.get(`/groups/${GROUP.groupName}/members/${USER.username}`)).to.eventually.be.rejected;
+
+    helper.expectError(
+      await API.get(`/groups/${GROUP.groupName}/members/${USER.username}`),
+      404,
+    );
 
     // Reset username back to original
     await API.put('/users/reset/username', {
@@ -213,9 +230,46 @@ describe('Global API', () => {
   });
 
   it('get groups', async () => {
-    const res = await API.get('/groups');
-    helper.expectOk(res);
-    expect(res.body.result).to.have.length(seed.data.groups.length);
+    const res1 = await API.get('/groups');
+    helper.expectOk(res1);
+    expect(res1.body.result).to.have.length(seed.meta.groups.public);
+
+    const res2 = await API.get('/groups', { all: true });
+    helper.expectOk(res2);
+    expect(res2.body.result).to.have.length(seed.meta.groups.all);
+    res2.body.result.forEach((group) => {
+      expect(group).to.have.property('id');
+      expect(group).to.have.property('name');
+      expect(group).to.have.property('private');
+    });
+  });
+
+  it('get group', async () => {
+    const res1 = await API.get(`/groups/${GROUP.groupName}`);
+    helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id');
+    expect(res1.body.result).to.have.property('name', GROUP.groupName);
+    expect(res1.body.result).to.have.property('private');
+    expect(res1.body.result).to.have.property('members');
+    expect(res1.body.result.members).to.have.length(seed.meta.membersInGroup.group1);
+    for (const member of res1.body.result.members) {
+      expect(member).to.property('username');
+      expect(member).to.property('saldo');
+    }
+
+    // Try fetch group with ID
+    const res2 = await API.get('/groups/1');
+    helper.expectOk(res2);
+
+    helper.expectError(
+      await API.get('/groups/-1'),
+      400,
+    );
+
+    helper.expectError(
+      await API.get('/groups/NOT_FOUND'),
+      404,
+    );
   });
 
   it('get group members', async () => {
@@ -241,14 +295,22 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id', seed.data.groups.length);
     expect(res1.body.result).to.have.property('groupName', newGroup);
     expect(res1.body.result).to.have.property('token');
+    expect(res1.body.result).to.not.have.property('password');
 
     // Check the group exists
     const res2 = await API.get('/groups');
 
     helper.expectOk(res2);
-    expect(res2.body.result).to.have.length(seed.data.groups.length + 1);
+    expect(res2.body.result).to.have.length(seed.meta.groups.public + 1);
+
+    // Group name can not be a number
+    helper.expectError(
+      await API.post('/groups/create', { groupName: '12345'}),
+      400,
+    );
   });
 
   it('create a private group', async () => {
@@ -261,13 +323,15 @@ describe('Global API', () => {
     );
 
     helper.expectOk(res1);
+    expect(res1.body.result).to.have.property('id', seed.data.groups.length);
     expect(res1.body.result).to.have.property('groupName', privateGroup);
     expect(res1.body.result).to.have.property('token');
+    expect(res1.body.result).to.have.property('password');
 
     // Check that the group doesn't show up in groups
     const res2 = await API.get('/groups');
     helper.expectOk(res2);
-    expect(res2.body.result).to.have.length(seed.data.groups.length);
+    expect(res2.body.result).to.have.length(seed.meta.groups.public);
   });
 
   it('add member to group', async () => {
@@ -283,6 +347,26 @@ describe('Global API', () => {
     const res3 = await API.get(`/groups/${GROUP.groupName}/members`);
     helper.expectOk(res3);
     expect(res3.body.result).to.have.length(memberCount + 1);
+  });
+
+  it('add member to private group', async () => {
+    const group = helper.privateGroup.groupName;
+    const password = helper.privateGroup.password;
+
+    const res1 = await API.post(
+      `/groups/${group}/addMember`,
+      { username: USER.username, password },
+    );
+    helper.expectOk(res1);
+
+    helper.expectError(
+      await API.post(
+        `/groups/${group}/addMember`,
+        { username: seed.data.users[1].username, password: 'wrong' },
+      ),
+      400,
+    );
+
   });
 
   it('remove member from group', async () => {

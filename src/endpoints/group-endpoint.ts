@@ -16,7 +16,10 @@ const endpoint: Endpoint = {
     const username = validate.username(req.body.username);
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
 
-    return groupCore.addUserToGroup(username, groupName);
+    // Only requests with global tokens require group passwords for private groups
+    const password = req.piikki.groupAccess.all ? req.body.password : null;
+
+    return groupCore.addUserToGroup(username, groupName, password);
   },
 
   removeMember: async (req) => {
@@ -27,7 +30,22 @@ const endpoint: Endpoint = {
   },
 
   getGroups: async (req) => {
-    return groupCore.getGroups();
+    return groupCore.getGroups(validate.bool(req.query.all));
+  },
+
+  getGroup: async (req) => {
+    const filter = !_.isNaN(+req.params.identifier) ?
+      { id: validate.id(+req.params.identifier) } :
+      { name: validate.groupName(req.params.identifier) };
+    return groupCore.getGroup(filter);
+  },
+
+  getCurrentGroup: async (req) => {
+    const groupName = req.piikki.groupAccess.group.name;
+
+    if (groupName) {
+      return await groupCore.getGroup({ name: groupName });
+    }
   },
 
   getGroupMembers: async (req) => {
@@ -43,14 +61,6 @@ const endpoint: Endpoint = {
 
     const result = await groupCore.userIsInGroup(username, groupName);
     return groupCore.getUserFromGroup(result.group.name, result.user.username);
-  },
-
-  getCurrentGroup: async (req) => {
-    const groupName = req.piikki.groupAccess.group.name;
-
-    if (groupName) {
-      return await groupCore.getGroup(groupName);
-    }
   },
 };
 

@@ -1,4 +1,6 @@
-exports.up = (knex, Promise) => {
+import Knex from 'knex';
+
+export const up = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
     t.integer('default_group')
       .references('id')
@@ -7,8 +9,8 @@ exports.up = (knex, Promise) => {
   });
 };
 
-exports.down = (knex, Promise) => {
+export const down = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
-    t.dropForeign('default_group');
+    t.dropForeign(['default_group']);
   });
 };
