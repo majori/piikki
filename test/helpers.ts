@@ -56,7 +56,7 @@ export function expectOk(res: ChaiHttp.Response) {
 }
 
 export function expectError(res: any, status?: number) {
-  expect(res).to.have.property('error', true);
+  expect(res.error).not.to.be.null;
   expect(res.status).not.to.equal(200);
   expect(res.body).to.have.property('ok', false);
   expect(res.body).to.have.property('error');
@@ -67,7 +67,7 @@ export function expectError(res: any, status?: number) {
 export class Api {
   private config: IConfig;
   private role: 'admin' | 'global' | 'restricted';
-  private api: ChaiHttp.Agent;
+  private api: any;
 
   constructor(config: IConfig, role: 'admin' | 'global' | 'restricted') {
     this.config = config;
@@ -75,7 +75,7 @@ export class Api {
   }
 
   public async start() {
-    this.api = request(await createServer(this.config));
+    this.api = await createServer(this.config);
   }
 
   public get(url: string, query?: any) {
@@ -111,7 +111,7 @@ export class Api {
   }
 
   private async makeRequest(options: RequestOptions) {
-    const req: ChaiHttp.Request = this.api[options.method](`/api/v1/${this.role}${options.url}`);
+    const req: ChaiHttp.Request = request(this.api)[options.method](`/api/v1/${this.role}${options.url}`);
 
     req.set('Authorization', tokens[this.role]);
     options.query && req.query(options.query);

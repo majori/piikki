@@ -9,7 +9,7 @@ export interface IConfig {
     seeds: string;
   };
 
-  env: 'production' | 'development' | 'test';
+  env: string;
   isProduction: boolean;
   isTest: boolean;
 

@@ -1,7 +1,16 @@
 language: node_js
-
 node_js:
-  - "8"
+  - "10"
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-5
+env:
+  - CXX=g++-5
+services:
+  - postgresql
 
 before_install:
   - npm install -g node-gyp
@@ -9,15 +18,9 @@ before_install:
 before_script:
   - psql -c 'create database "piikki-test";' -U postgres
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-5
-
-env:
-  - CXX=g++-5
-
-services:
-  - postgresql
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - export REPO=$DOCKER_USERNAME/piikki
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -t $REPO:$TAG .
+  - docker push $REPO

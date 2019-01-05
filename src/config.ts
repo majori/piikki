@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as path from 'path';
 import { IConfig } from './types/config';
+import { CLILoggingLevel } from 'winston';
 
 export const Config: IConfig = {
   dir: {
@@ -20,7 +21,7 @@ export const Config: IConfig = {
   // ### HTTP-server configs
   //
   hostname: process.env.PIIKKI_HTTP_HOSTNAME || 'localhost',
-  port: process.env.PIIKKI_HTTP_PORT || process.env.port || 4000,
+  port: parseInt(process.env.PIIKKI_HTTP_PORT! || process.env.port!, 10) || 4000,
   cors: {},
 
   // ### Database configs
@@ -28,11 +29,11 @@ export const Config: IConfig = {
   db: {
     client: process.env.PIIKKI_DATABASE_CLIENT || 'pg',
     connection: {
-      host: process.env.PIIKKI_DATABASE_HOSTNAME,
-      user: process.env.PIIKKI_DATABASE_USER,
-      password: process.env.PIIKKI_DATABASE_PASSWORD,
-      database: process.env.PIIKKI_DATABASE_NAME,
-      port: parseInt(process.env.PIIKKI_DATABASE_PORT, 10) || 5432,
+      host: process.env.PIIKKI_DATABASE_HOSTNAME!,
+      user: process.env.PIIKKI_DATABASE_USER!,
+      password: process.env.PIIKKI_DATABASE_PASSWORD!,
+      database: process.env.PIIKKI_DATABASE_NAME!,
+      port: parseInt(process.env.PIIKKI_DATABASE_PORT!, 10) || 5432,
     },
     migrations: {
       disableTransactions: true,
@@ -45,7 +46,7 @@ export const Config: IConfig = {
 
   // ### Logger options
   //
-  logLevel: process.env.LOG_LEVEL || 'info',
+  logLevel: (process.env.LOG_LEVEL as CLILoggingLevel) || 'info',
 
   // ### Swagger documentation
   //
