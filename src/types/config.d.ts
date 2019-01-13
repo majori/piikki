@@ -29,7 +29,7 @@ export interface IConfig {
       options?: {
         encrypt?: boolean;
       };
-    };
+    } | string;
     migrations: {
       disableTransactions: boolean;
       tableName: string;

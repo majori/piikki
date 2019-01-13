@@ -20,21 +20,15 @@ export const Config: IConfig = {
 
   // ### HTTP-server configs
   //
-  hostname: process.env.PIIKKI_HTTP_HOSTNAME || 'localhost',
-  port: parseInt(process.env.PIIKKI_HTTP_PORT! || process.env.port!, 10) || 4000,
+  hostname: process.env.PIIKKI_HOSTNAME || '0.0.0.0',
+  port: parseInt(process.env.PORT! || process.env.port!, 10) || 4000,
   cors: {},
 
   // ### Database configs
   //
   db: {
-    client: process.env.PIIKKI_DATABASE_CLIENT || 'pg',
-    connection: {
-      host: process.env.PIIKKI_DATABASE_HOSTNAME!,
-      user: process.env.PIIKKI_DATABASE_USER!,
-      password: process.env.PIIKKI_DATABASE_PASSWORD!,
-      database: process.env.PIIKKI_DATABASE_NAME!,
-      port: parseInt(process.env.PIIKKI_DATABASE_PORT!, 10) || 5432,
-    },
+    client: 'pg',
+    connection: process.env.DATABASE_URL!,
     migrations: {
       disableTransactions: true,
       tableName: 'knex_migrations',

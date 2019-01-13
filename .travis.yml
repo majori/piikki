@@ -15,9 +15,6 @@ services:
 before_install:
   - npm install -g node-gyp
 
-before_script:
-  - psql -c 'create database "piikki-test";' -U postgres
-
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - export REPO=$DOCKER_USERNAME/piikki
