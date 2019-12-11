@@ -30,7 +30,7 @@ namespace schemas {
   export const groupName = Joi.string()
     .token()
     .regex(/^\d+$/, { invert: true }) // Can't be a number
-    .min(4)
+    .min(3)
     .max(30)
     .label('Group name');
 
