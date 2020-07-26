@@ -1,19 +1,30 @@
 language: node_js
 node_js:
   - '12'
+services:
+  - docker
+
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
       - g++-5
+      - postgresql-12
+      - postgresql-client-12
+      - postgresql-server-dev-12
+      - postgresql-client-common
+      - postgresql-common
 env:
-  - CXX=g++-5
-services:
-  - postgresql
+  global:
+    - PGPORT=5433
+    - PGVERSION=12
+    - CXX=g++-5
 
 before_install:
   - npm install -g node-gyp
+  - 'if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi'
+  - 'if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi'
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
