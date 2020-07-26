@@ -5,11 +5,9 @@ services:
   - docker
 
 addons:
+  postgresql: '12'
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
-      - g++-5
       - postgresql-12
       - postgresql-client-12
       - postgresql-server-dev-12
@@ -19,10 +17,8 @@ env:
   global:
     - PGPORT=5433
     - PGVERSION=12
-    - CXX=g++-5
 
 before_install:
-  - npm install -g node-gyp
   - 'if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi'
   - 'if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi'
 
