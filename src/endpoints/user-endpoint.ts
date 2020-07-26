@@ -7,7 +7,6 @@ import { createJsonRoute } from '../utils/endpoint';
 import validate from '../utils/validators';
 
 const endpoint: Endpoint = {
-
   getUsers: async (req) => {
     return userCore.getUsers();
   },
@@ -33,8 +32,14 @@ const endpoint: Endpoint = {
 
   alternativeAuthenticateUser: async (req) => {
     const type = req.body.type;
-    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
-      validate.groupName(req.piikki.groupAccess.all ? req.body.groupName : req.piikki.groupAccess.group.name);
+    const groupName: string | null =
+      req.piikki.groupAccess.all && !_.has(req, 'body.groupName')
+        ? null
+        : validate.groupName(
+            req.piikki.groupAccess.all
+              ? req.body.groupName
+              : req.piikki.groupAccess.group.name,
+          );
     const key = validate.alternativeLoginKey(req.body.key);
 
     const found = await userCore.getAlternativeLogin({
@@ -43,20 +48,26 @@ const endpoint: Endpoint = {
       groupName,
       tokenId: req.piikki.token.id,
     });
-    return _.isEmpty(found) ?
-      { authenticated: false } :
-      {
-        authenticated: true,
-        username: found.username,
-        groupName,
-      };
+    return _.isEmpty(found)
+      ? { authenticated: false }
+      : {
+          authenticated: true,
+          username: found.username,
+          groupName,
+        };
   },
 
   createAlternativeLogin: async (req) => {
     const type = req.body.type;
     const username = validate.username(req.body.username);
-    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
-      validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
+    const groupName: string | null =
+      req.piikki.groupAccess.all && !_.has(req, 'body.groupName')
+        ? null
+        : validate.groupName(
+            req.piikki.groupAccess.all
+              ? req.body.groupName
+              : req.piikki.groupAccess.group.name,
+          );
     const key = validate.alternativeLoginKey(req.body.key);
 
     await userCore.createAlternativeLogin({
@@ -67,16 +78,24 @@ const endpoint: Endpoint = {
       tokenId: req.piikki.token.id,
     });
 
-    return { type, key, username, groupName  };
+    return { type, key, username, groupName };
   },
 
   getAlternativeLoginCount: async (req) => {
-    const type = req.query.type;
-    const username = validate.username(req.query.username);
-    const groupName: string | null = req.piikki.groupAccess.all && !_.has(req, 'body.groupName') ? null :
-      validate.groupName((req.piikki.groupAccess.all) ? req.body.groupName : req.piikki.groupAccess.group.name);
+    const type = _.toNumber(req.query.type);
+    const username = validate.username(req.query.username as string);
+    const groupName: string | null =
+      req.piikki.groupAccess.all && !_.has(req, 'body.groupName')
+        ? null
+        : validate.groupName(
+            req.piikki.groupAccess.all
+              ? req.body.groupName
+              : req.piikki.groupAccess.group.name,
+          );
 
-    const rows: DatabaseAlternativeLogin[] = await userCore.getAlternativeLoginsForUser({ groupName, username, type });
+    const rows: DatabaseAlternativeLogin[] = await userCore.getAlternativeLoginsForUser(
+      { groupName, username, type },
+    );
 
     return {
       count: _.size(rows),
@@ -111,7 +130,10 @@ const endpoint: Endpoint = {
     const newUsername = validate.username(req.body.newUsername);
     const password = validate.password(req.body.password);
 
-    const auth = await userCore.authenticateUser({ username: oldUsername, password });
+    const auth = await userCore.authenticateUser({
+      username: oldUsername,
+      password,
+    });
     if (auth) {
       return userCore.resetUsername(oldUsername, newUsername);
     } else {

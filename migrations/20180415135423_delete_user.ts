@@ -8,8 +8,6 @@ export const up = (knex: Knex) => {
 
 export const down = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
-    t.boolean('active')
-      .notNullable()
-      .defaultTo(true);
+    t.boolean('active').notNullable().defaultTo(true);
   });
 };

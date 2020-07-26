@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-expression */
-import 'mocha';
+// import 'mocha';
 import { expect, assert, should, request } from 'chai';
 import * as _ from 'lodash';
 import { Express } from 'express';
@@ -14,7 +14,6 @@ const GROUP = _.clone(helper.group);
 const API = new helper.Api(cfg, 'admin');
 
 describe('Admin API', () => {
-
   before(async () => {
     await helper.clearDbAndRunSeed();
     await API.start();
@@ -22,30 +21,24 @@ describe('Admin API', () => {
   beforeEach(helper.clearDbAndRunSeed);
 
   it('create a restricted token', async () => {
-    const res = await API.post(
-      '/tokens/restricted',
-      { groupName: GROUP.groupName, comment: 'Test token'},
-    );
+    const res = await API.post('/tokens/restricted', {
+      groupName: GROUP.groupName,
+      comment: 'Test token',
+    });
 
     helper.expectOk(res);
     expect(res.body.result).to.be.string;
   });
 
   it('create a global token', async () => {
-    const res = await API.post(
-      '/tokens/global',
-      { comment: 'Test token' },
-    );
+    const res = await API.post('/tokens/global', { comment: 'Test token' });
 
     helper.expectOk(res);
     expect(res.body.result).to.be.string;
   });
 
   it('create a admin token', async () => {
-    const res = await API.post(
-      '/tokens/admin',
-      { comment: 'Test token' },
-    );
+    const res = await API.post('/tokens/admin', { comment: 'Test token' });
 
     helper.expectOk(res);
     expect(res.body.result).to.be.string;
@@ -59,16 +52,13 @@ describe('Admin API', () => {
   });
 
   it('delete token', async () => {
-    const res1 = await API.post(
-      '/tokens/restricted',
-      { groupName: GROUP.groupName, comment: 'Test token'},
-    );
+    const res1 = await API.post('/tokens/restricted', {
+      groupName: GROUP.groupName,
+      comment: 'Test token',
+    });
 
     // Delete the token
-    const res2 = await API.del(
-      '/tokens',
-      { token: res1.body.result },
-    );
+    const res2 = await API.del('/tokens', { token: res1.body.result });
 
     helper.expectOk(res2);
 
@@ -86,27 +76,27 @@ describe('Admin API', () => {
     await API_RESTRICTED.start();
 
     // Test with old password
-    const res1 = await API_RESTRICTED.post(
-      '/users/authenticate',
-      { username: USER.username, password: USER.password },
-    );
+    const res1 = await API_RESTRICTED.post('/users/authenticate', {
+      username: USER.username,
+      password: USER.password,
+    });
 
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // Do the force-reset
-    const res2 = await API.put(
-      '/users/force-reset/password',
-      { username: USER.username, newPassword },
-    );
+    const res2 = await API.put('/users/force-reset/password', {
+      username: USER.username,
+      newPassword,
+    });
 
     helper.expectOk(res2);
 
     // Try to authenticate with the new password
-    const res3 = await API_RESTRICTED.post(
-      '/users/authenticate',
-      { username: USER.username, password: newPassword },
-    );
+    const res3 = await API_RESTRICTED.post('/users/authenticate', {
+      username: USER.username,
+      password: newPassword,
+    });
 
     helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.true;

@@ -15,8 +15,12 @@ export const Config: IConfig = {
   // ## Environment configs
   //
   env: process.env.NODE_ENV || 'development',
-  get isProduction() { return this.env === 'production'; },
-  get isTest() { return this.env === 'test'; },
+  get isProduction() {
+    return this.env === 'production';
+  },
+  get isTest() {
+    return this.env === 'test';
+  },
 
   // ### HTTP-server configs
   //

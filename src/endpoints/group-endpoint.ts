@@ -34,9 +34,9 @@ const endpoint: Endpoint = {
   },
 
   getGroup: async (req) => {
-    const filter = !_.isNaN(+req.params.identifier) ?
-      { id: validate.id(+req.params.identifier) } :
-      { name: validate.groupName(req.params.identifier) };
+    const filter = !_.isNaN(+req.params.identifier)
+      ? { id: validate.id(+req.params.identifier) }
+      : { name: validate.groupName(req.params.identifier) };
     return groupCore.getGroup(filter);
   },
 

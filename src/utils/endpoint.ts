@@ -21,7 +21,7 @@ export function createJsonRoute(func: EndpointFunction): RequestHandler {
       // Send the response
       res.json(response);
 
-    // Pass error to error handler
+      // Pass error to error handler
     } catch (err) {
       next(err);
     }

@@ -208,7 +208,10 @@ function _commonRoutes() {
    *                   type: string
    *                   nullable: true
    */
-  commonR.post('/users/authenticate/alternative', userEndpoint.alternativeAuthenticateUser);
+  commonR.post(
+    '/users/authenticate/alternative',
+    userEndpoint.alternativeAuthenticateUser,
+  );
 
   /**
    * @swagger
@@ -223,7 +226,10 @@ function _commonRoutes() {
    *     - Global
    *     summary: TODO
    */
-  commonR.post('/users/authenticate/alternative/create', userEndpoint.createAlternativeLogin);
+  commonR.post(
+    '/users/authenticate/alternative/create',
+    userEndpoint.createAlternativeLogin,
+  );
 
   /**
    * @swagger
@@ -238,7 +244,10 @@ function _commonRoutes() {
    *     - Global
    *     summary: TODO
    */
-  commonR.get('/users/authenticate/alternative/count', userEndpoint.getAlternativeLoginCount);
+  commonR.get(
+    '/users/authenticate/alternative/count',
+    userEndpoint.getAlternativeLoginCount,
+  );
 
   /**
    * @swagger
@@ -436,7 +445,9 @@ function _restrictedTokenRoutes() {
     if (!req.piikki.groupAccess.all) {
       next();
     } else {
-      throw badRequest('You tried to access restricted routes without a proper token');
+      throw badRequest(
+        'You tried to access restricted routes without a proper token',
+      );
     }
   });
 
@@ -546,7 +557,10 @@ function _restrictedTokenRoutes() {
    *     - Restricted
    *     summary: TODO
    */
-  restrictedR.get('/group/transactions', transactionEndpoint.getGroupTransactions);
+  restrictedR.get(
+    '/group/transactions',
+    transactionEndpoint.getGroupTransactions,
+  );
 
   /**
    * @swagger
@@ -556,7 +570,10 @@ function _restrictedTokenRoutes() {
    *     - Restricted
    *     summary: TODO
    */
-  restrictedR.get('/group/transactions/:username', transactionEndpoint.getUserTransactionsFromGroup);
+  restrictedR.get(
+    '/group/transactions/:username',
+    transactionEndpoint.getUserTransactionsFromGroup,
+  );
 
   /**
    * @swagger
@@ -576,7 +593,10 @@ function _restrictedTokenRoutes() {
    *     - Restricted
    *     summary: TODO
    */
-  restrictedR.get('/group/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
+  restrictedR.get(
+    '/group/saldo/daily',
+    transactionEndpoint.getDailyGroupSaldos,
+  );
 
   return restrictedR;
 }
@@ -590,7 +610,9 @@ function _globalTokenRoutes() {
     if (req.piikki.groupAccess.all) {
       next();
     } else {
-      throw badRequest('You tried to access global routes without a proper token');
+      throw badRequest(
+        'You tried to access global routes without a proper token',
+      );
     }
   });
 
@@ -713,7 +735,10 @@ function _globalTokenRoutes() {
    *     - Global
    *     summary: TODO
    */
-  globalR.delete('/users/:username/defaultGroup', userEndpoint.resetDefaultGroup);
+  globalR.delete(
+    '/users/:username/defaultGroup',
+    userEndpoint.resetDefaultGroup,
+  );
 
   /**
    * @swagger
@@ -862,7 +887,10 @@ function _globalTokenRoutes() {
    *             result:
    *               "$ref": "#/definitions/userWithSaldo"
    */
-  globalR.get('/groups/:groupName/members/:username', groupEndpoint.getGroupMember);
+  globalR.get(
+    '/groups/:groupName/members/:username',
+    groupEndpoint.getGroupMember,
+  );
 
   /**
    * @swagger
@@ -934,7 +962,10 @@ function _globalTokenRoutes() {
    *     - Global
    *     summary: TODO
    */
-  globalR.get('/groups/:groupName/saldo/daily', transactionEndpoint.getDailyGroupSaldos);
+  globalR.get(
+    '/groups/:groupName/saldo/daily',
+    transactionEndpoint.getDailyGroupSaldos,
+  );
 
   /**
    * @swagger
@@ -944,7 +975,10 @@ function _globalTokenRoutes() {
    *     - Global
    *     summary: TODO
    */
-  globalR.get('/transactions/user/:username', transactionEndpoint.getUserTransactions);
+  globalR.get(
+    '/transactions/user/:username',
+    transactionEndpoint.getUserTransactions,
+  );
 
   /**
    * @swagger
@@ -954,7 +988,10 @@ function _globalTokenRoutes() {
    *     - Global
    *     summary: TODO
    */
-  globalR.get('/transactions/group/:groupName', transactionEndpoint.getGroupTransactions);
+  globalR.get(
+    '/transactions/group/:groupName',
+    transactionEndpoint.getGroupTransactions,
+  );
 
   return globalR;
 }
@@ -968,7 +1005,9 @@ function _adminTokenRoutes() {
     if (req.piikki.admin.isAdmin) {
       next();
     } else {
-      throw badRequest('You tried to access admin routes without a proper token');
+      throw badRequest(
+        'You tried to access admin routes without a proper token',
+      );
     }
   });
 

@@ -34,13 +34,14 @@ export async function migrateAllDown(): Promise<void> {
   }
 }
 
-export const runSeed = async () => knex.seed.run({
-  directory: path.join(cfg.dir.seeds, 'test'),
-});
+export const runSeed = async () =>
+  knex.seed.run({
+    directory: path.join(cfg.dir.seeds, 'test'),
+  });
 
 export const clearDb = async () => {
   await migrateAllDown();
-  await knex.migrate.latest({directory: cfg.dir.migrations});
+  await knex.migrate.latest({ directory: cfg.dir.migrations });
 };
 
 export const clearDbAndRunSeed = async () => {
@@ -111,7 +112,9 @@ export class Api {
   }
 
   private async makeRequest(options: RequestOptions) {
-    const req: ChaiHttp.Request = request(this.api)[options.method](`/api/v1/${this.role}${options.url}`);
+    const req: ChaiHttp.Request = request(this.api)[options.method](
+      `/api/v1/${this.role}${options.url}`,
+    );
 
     req.set('Authorization', tokens[this.role]);
     options.query && req.query(options.query);

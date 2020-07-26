@@ -16,8 +16,14 @@ const users = _.times(USER_AMOUNT, (i) => ({
 }));
 
 const groups = _.concat(
-  _.times(PUBLIC_GROUP_AMOUNT, (i) => ({ groupName: `group${i}`, private: false })),
-  _.times(PRIVATE_GROUP_AMOUNT, (i) => ({ groupName: `group${i + PUBLIC_GROUP_AMOUNT}`, private: true })),
+  _.times(PUBLIC_GROUP_AMOUNT, (i) => ({
+    groupName: `group${i}`,
+    private: false,
+  })),
+  _.times(PRIVATE_GROUP_AMOUNT, (i) => ({
+    groupName: `group${i + PUBLIC_GROUP_AMOUNT}`,
+    private: true,
+  })),
 );
 
 const tokens = [
@@ -48,22 +54,28 @@ const tokenGroupAccess = [
 const userSaldos = [];
 
 const transactions = _.flatMap(users, (user) => {
-  const quantity = _.times(_.random(1, MAX_TRANSACTION_AMOUNT), () => _.round(_.random(-10, 10, true), 2));
+  const quantity = _.times(_.random(1, MAX_TRANSACTION_AMOUNT), () =>
+    _.round(_.random(-10, 10, true), 2),
+  );
   const groupName = _.sample(_.initial(groups)).groupName;
   const saldos = [];
 
-  const finalSaldo = _.reduce(quantity, (current, value) => {
-    const newSaldo = current + value;
-    saldos.push({
-      username: user.username,
-      token: tokens[_.random(1)].token,
-      groupName,
-      oldSaldo: current,
-      newSaldo,
-    });
+  const finalSaldo = _.reduce(
+    quantity,
+    (current, value) => {
+      const newSaldo = current + value;
+      saldos.push({
+        username: user.username,
+        token: tokens[_.random(1)].token,
+        groupName,
+        oldSaldo: current,
+        newSaldo,
+      });
 
-    return current + value;
-  }, 0);
+      return current + value;
+    },
+    0,
+  );
 
   userSaldos.push({
     username: user.username,
@@ -74,10 +86,14 @@ const transactions = _.flatMap(users, (user) => {
   const time = moment().utc();
   return _.chain(saldos)
     .reverse()
-    .map((saldo) => _.set(saldo, 'timestamp', time
-        .subtract(_.random(1, 24), 'hours')
-        .subtract(_.random(60), 'minutes')
-        .format(),
+    .map((saldo) =>
+      _.set(
+        saldo,
+        'timestamp',
+        time
+          .subtract(_.random(1, 24), 'hours')
+          .subtract(_.random(60), 'minutes')
+          .format(),
       ),
     )
     .value();

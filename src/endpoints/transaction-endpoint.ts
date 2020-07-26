@@ -15,31 +15,34 @@ const endpoint: Endpoint = {
     }
 
     // TODO: If only one transaction fails, tell about the succeed ones
-    const results = await Promise.all(_.map(transactions, (trx: TransactionDto) => {
+    const results = await Promise.all(
+      _.map(transactions, (trx: TransactionDto) => {
+        // If request comes from group specific token, use token related group name
+        trx.groupName = req.piikki.groupAccess.group.name
+          ? req.piikki.groupAccess.group.name
+          : trx.groupName;
 
-      // If request comes from group specific token, use token related group name
-      trx.groupName = (req.piikki.groupAccess.group.name) ?
-        req.piikki.groupAccess.group.name :
-        trx.groupName;
+        const transaction = {
+          username: validate.username(trx.username),
+          amount: validate.transactionAmount(trx.amount),
+          groupName: validate.groupName(trx.groupName),
+          comment: trx.comment,
+          tokenId: req.piikki.token.id,
+        };
 
-      const transaction = {
-        username: validate.username(trx.username),
-        amount: validate.transactionAmount(trx.amount),
-        groupName: validate.groupName(trx.groupName),
-        comment: trx.comment,
-        tokenId: req.piikki.token.id,
-      };
+        return transCore.makeTransaction(transaction);
+      }),
+    );
 
-      return transCore.makeTransaction(transaction);
-    }));
-
-    return (_.size(results) === 1) ? _.first(results) : results;
+    return _.size(results) === 1 ? _.first(results) : results;
   },
 
   getUserTransactions: async (req) => {
     const username = validate.username(req.params.username);
     const from = validate.timestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
+    const to = _.isUndefined(req.query.to)
+      ? undefined
+      : validate.timestamp(req.query.to);
 
     return transCore.getUserTransactions(username, from, to);
   },
@@ -47,7 +50,9 @@ const endpoint: Endpoint = {
   getGroupTransactions: async (req) => {
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     const from = validate.timestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
+    const to = _.isUndefined(req.query.to)
+      ? undefined
+      : validate.timestamp(req.query.to);
 
     return transCore.getGroupTransactions(groupName, from, to);
   },
@@ -56,29 +61,40 @@ const endpoint: Endpoint = {
     const username = validate.username(req.params.username);
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     const from = validate.timestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
+    const to = _.isUndefined(req.query.to)
+      ? undefined
+      : validate.timestamp(req.query.to);
 
-    return transCore.getUserTransactionsFromGroup(username, groupName, from, to);
+    return transCore.getUserTransactionsFromGroup(
+      username,
+      groupName,
+      from,
+      to,
+    );
   },
 
   getGroupSaldo: async (req) => {
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     // Default to present if from-date is not given
-    const from = req.query.from ? validate.timestamp(req.query.from) : moment().utc();
+    const from = req.query.from
+      ? validate.timestamp(req.query.from)
+      : moment().utc();
 
     const result = await transCore.getGroupSaldo(groupName, from);
 
     return {
       groupName,
       timestamp: from.format('YYYY-MM-DD'),
-      saldo: result.saldo || 0,
+      saldo: result?.saldo || 0,
     };
   },
 
   getDailyGroupSaldos: async (req) => {
     const groupName = validate.groupName(req.piikki.groupAccess.group.name);
     const from = validate.timestamp(req.query.from);
-    const to = (_.isUndefined(req.query.to)) ? undefined : validate.timestamp(req.query.to);
+    const to = _.isUndefined(req.query.to)
+      ? undefined
+      : validate.timestamp(req.query.to);
 
     return transCore.getDailyGroupSaldosSince(groupName, from, to);
   },

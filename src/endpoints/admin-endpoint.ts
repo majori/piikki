@@ -31,7 +31,6 @@ const endpoint: Endpoint = {
   },
 
   getTokens: async (req) => tokenCore.getTokens(),
-
 };
 
 // Wrap endpoint to produce JSON route

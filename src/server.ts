@@ -47,7 +47,9 @@ export async function createServer(cfg: IConfig) {
   // Setup error responder
   const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
     const status = isBoom(err) ? err.output.statusCode : 500;
-    const payload = isBoom(err) ? err.output.payload : { error: 'Internal Server Error', message: '' };
+    const payload = isBoom(err)
+      ? err.output.payload
+      : { error: 'Internal Server Error', message: '' };
 
     const response = {
       ok: false,

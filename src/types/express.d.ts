@@ -11,11 +11,11 @@ declare namespace Express {
         all: boolean;
         group: {
           name: string | null;
-        },
-      },
+        };
+      };
       admin: {
         isAdmin: boolean;
-      },
+      };
     };
   }
 }

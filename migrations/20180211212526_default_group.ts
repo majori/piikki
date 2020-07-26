@@ -2,10 +2,7 @@ import Knex from 'knex';
 
 export const up = (knex: Knex) => {
   return knex.schema.alterTable('users', (t) => {
-    t.integer('default_group')
-      .references('id')
-      .inTable('groups')
-      .nullable();
+    t.integer('default_group').references('id').inTable('groups').nullable();
   });
 };
 

@@ -20,23 +20,25 @@ export interface IConfig {
 
   db: {
     client: string;
-    connection: {
-      host: string;
-      port: number;
-      user: string;
-      password: string;
-      database: string;
-      options?: {
-        encrypt?: boolean;
-      };
-    } | string;
+    connection:
+      | {
+          host: string;
+          port: number;
+          user: string;
+          password: string;
+          database: string;
+          options?: {
+            encrypt?: boolean;
+          };
+        }
+      | string;
     migrations: {
       disableTransactions: boolean;
       tableName: string;
     };
     seeds: {
       directory: string;
-    }
+    };
   };
 
   logLevel: CLILoggingLevel;

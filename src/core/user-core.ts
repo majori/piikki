@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import { badRequest, notFound, conflict, badData } from 'boom';
 
-import { knex} from '../database';
+import { knex } from '../database';
 import { groupExists, userIsInGroup } from './group-core';
 
 import { Logger } from '../logger';
@@ -19,20 +19,24 @@ export async function getUsers() {
 
   return _.chain(results)
     .groupBy((user) => user.username)
-    .map((users: UserWithSaldo[], key: string) => _.reduce(users, (user: any, value: UserWithSaldo) => {
-      if (value.groupName) {
-        user.saldos[value.groupName] = value.saldo;
-      }
-      if (value.defaultGroup && !user.defaultGroup) {
-        user.defaultGroup = value.defaultGroup;
-      }
-      return user;
-    },
-      {
-        username: key,
-        defaultGroup: null,
-        saldos: {},
-      }),
+    .map((users: UserWithSaldo[], key: string) =>
+      _.reduce(
+        users,
+        (user: any, value: UserWithSaldo) => {
+          if (value.groupName) {
+            user.saldos[value.groupName] = value.saldo;
+          }
+          if (value.defaultGroup && !user.defaultGroup) {
+            user.defaultGroup = value.defaultGroup;
+          }
+          return user;
+        },
+        {
+          username: key,
+          defaultGroup: null,
+          saldos: {},
+        },
+      ),
     )
     .value();
 }
@@ -47,20 +51,28 @@ export async function getUser(username: string) {
   };
 
   // Fetch possible saldos in groups
-  const results = await _getUsersWithSaldos().andWhere({ 'usr.username': username });
+  const results = await _getUsersWithSaldos().andWhere({
+    'usr.username': username,
+  });
   // There was no saldos, return only user info
-  if (_.isEmpty(results)) { return user; }
+  if (_.isEmpty(results)) {
+    return user;
+  }
 
   // Parse database rows to saldos object
-  return _.reduce(results, (result: any, value: any) => {
-    if (value.groupName) {
-      result.saldos[value.groupName] = value.saldo;
-    }
-    if (value.defaultGroup && !result.defaultGroup) {
-      result.defaultGroup = value.defaultGroup;
-    }
-    return result;
-  }, user);
+  return _.reduce(
+    results,
+    (result: any, value: any) => {
+      if (value.groupName) {
+        result.saldos[value.groupName] = value.saldo;
+      }
+      if (value.defaultGroup && !result.defaultGroup) {
+        result.defaultGroup = value.defaultGroup;
+      }
+      return result;
+    },
+    user,
+  );
 }
 
 // Create new user
@@ -107,11 +119,7 @@ export async function deleteUser(username: string) {
         .del();
 
       // Delete the user
-      await knex('users')
-        .transacting(trx)
-        .where({ username })
-        .del();
-
+      await knex('users').transacting(trx).where({ username }).del();
     } catch (err) {
       await trx.rollback();
       throw err;
@@ -132,7 +140,7 @@ export async function authenticateUser(user: UserDto) {
     if (err.isBoom && err.typeof(notFound)) {
       return false;
 
-    // Some other error occured, pass the exception
+      // Some other error occured, pass the exception
     } else {
       throw err;
     }
@@ -144,7 +152,10 @@ export async function userExists(username?: string) {
   if (_.isUndefined(username)) {
     throw badRequest('Username was undefined');
   }
-  const row: DatabaseUser = await knex.from('users').where({ username }).first();
+  const row: DatabaseUser = await knex
+    .from('users')
+    .where({ username })
+    .first();
 
   if (row) {
     return row;
@@ -190,10 +201,7 @@ export async function resetPassword(user: UserDto, newPassword: string) {
 export async function forceResetPassword(username: string, password: string) {
   await userExists(username);
   const hash = await _hashPassword(password);
-  await knex
-    .from('users')
-    .where({ username })
-    .update({ password: hash });
+  await knex.from('users').where({ username }).update({ password: hash });
 
   return;
 }
@@ -210,7 +218,9 @@ export async function resetUsername(oldUsername: string, newUsername: string) {
   return { username: newUsername };
 }
 
-export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<DatabaseAlternativeLogin> {
+export async function getAlternativeLogin(
+  login: AlternativeLoginDto,
+): Promise<DatabaseAlternativeLogin> {
   const hash = _hashString(login.key);
 
   const query = knex
@@ -239,10 +249,12 @@ export async function getAlternativeLogin(login: AlternativeLoginDto): Promise<D
   return await query.first();
 }
 
-export async function getAlternativeLoginsForUser(login: AlternativeLoginForUserDto): Promise<QueryBuilder> {
+export async function getAlternativeLoginsForUser(
+  login: AlternativeLoginForUserDto,
+): Promise<QueryBuilder> {
   const query = knex('alternative_login as login')
-    .join('users', { 'users.id': 'login.user_id'})
-    .join('groups', { 'groups.id': 'login.group_id'})
+    .join('users', { 'users.id': 'login.user_id' })
+    .join('groups', { 'groups.id': 'login.group_id' })
     .andWhere({ 'users.username': login.username });
 
   if (login.type) {
@@ -259,16 +271,17 @@ export async function getAlternativeLoginsForUser(login: AlternativeLoginForUser
 export async function createAlternativeLogin(login: AlternativeLoginDto) {
   const hash = _hashString(_.toString(login.key));
   const user = await userExists(login.username);
-  const group = login.groupName ? (await groupExists(login.groupName as string)).id : null;
+  const group = login.groupName
+    ? (await groupExists(login.groupName as string)).id
+    : null;
 
-  return knex('alternative_login')
-    .insert({
-      user_id: user.id,
-      group_id: group,
-      token_id: login.tokenId,
-      type: login.type || null,
-      hashed_key: hash,
-    });
+  return knex('alternative_login').insert({
+    user_id: user.id,
+    group_id: group,
+    token_id: login.tokenId,
+    type: login.type || null,
+    hashed_key: hash,
+  });
 }
 
 export async function setDefaultGroup(username: string, groupName: string) {
@@ -280,21 +293,23 @@ export async function setDefaultGroup(username: string, groupName: string) {
 }
 
 export async function resetDefaultGroup(username: string) {
-  await knex
-    .from('users')
-    .where({ username })
-    .update({ default_group: null });
+  await knex.from('users').where({ username }).update({ default_group: null });
 }
 
 // Get all users in group
 function _getUsersWithSaldos(): QueryBuilder {
-  return knex.with('usr', (qb) => {
-      qb
-        .select('users.id', 'users.username', 'groups.name AS defaultGroup')
+  return knex
+    .with('usr', (qb) => {
+      qb.select('users.id', 'users.username', 'groups.name AS defaultGroup')
         .from('users')
         .leftJoin('groups', { 'groups.id': 'users.default_group' });
     })
-    .select('usr.username', 'usr.defaultGroup', 'groups.name AS groupName', 'user_saldos.saldo')
+    .select(
+      'usr.username',
+      'usr.defaultGroup',
+      'groups.name AS groupName',
+      'user_saldos.saldo',
+    )
     .from('usr')
     .leftJoin('user_saldos', { 'user_saldos.user_id': 'usr.id' })
     .leftJoin('groups', { 'groups.id': 'user_saldos.group_id' })

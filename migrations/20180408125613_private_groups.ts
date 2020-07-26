@@ -2,8 +2,7 @@ import Knex from 'knex';
 
 export const up = (knex: Knex) => {
   return knex.schema.alterTable('groups', (t) => {
-    t.boolean('private')
-      .defaultTo(false);
+    t.boolean('private').defaultTo(false);
   });
 };
 

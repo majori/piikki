@@ -9,8 +9,7 @@ namespace schemas {
     .regex(/^\d+$/, { invert: true }) // Can't be a number
     .label('Username');
 
-  export const password = Joi.string()
-    .label('Password');
+  export const password = Joi.string().label('Password');
 
   // Used when creating a new user
   export const user = Joi.object()
@@ -23,8 +22,8 @@ namespace schemas {
 
   export const transactionAmount = Joi.number()
     .precision(2)
-    .min(-1e+6)
-    .max(1e+6)
+    .min(-1e6)
+    .max(1e6)
     .label('Transaction amount');
 
   export const groupName = Joi.string()
@@ -38,15 +37,16 @@ namespace schemas {
     .empty()
     .label('Alternative login key');
 
-  export const timestamp = Joi.date()
-    .label('Timestamp');
+  export const timestamp = Joi.date().label('Timestamp');
 
   // Used for user authorization. Keep validation loose
   // since new user's username and password validation can change
-  export const auth = Joi.object().keys({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
-  }).options({ stripUnknown: true });
+  export const auth = Joi.object()
+    .keys({
+      username: Joi.string().required(),
+      password: Joi.string().required(),
+    })
+    .options({ stripUnknown: true });
 
   export const id = Joi.number().integer().positive();
 
@@ -68,10 +68,17 @@ export default {
   auth: _.partial(validateSchema, schemas.auth) as Validator<UserDto>,
   username: _.partial(validateSchema, schemas.username) as Validator<string>,
   password: _.partial(validateSchema, schemas.password) as Validator<string>,
-  transactionAmount: _.partial(validateSchema, schemas.transactionAmount) as Validator<number>,
+  transactionAmount: _.partial(
+    validateSchema,
+    schemas.transactionAmount,
+  ) as Validator<number>,
   groupName: _.partial(validateSchema, schemas.groupName) as Validator<string>,
-  alternativeLoginKey: _.partial(validateSchema, schemas.alternativeLoginKey) as Validator<string>,
-  timestamp: (time: any): moment.Moment => moment(validateSchema(schemas.timestamp, time)).utc(),
-  bool: _.partial(validateSchema, schemas.bool) as Validator<boolean>,
+  alternativeLoginKey: _.partial(
+    validateSchema,
+    schemas.alternativeLoginKey,
+  ) as Validator<string>,
+  timestamp: (time: any): moment.Moment =>
+    moment(validateSchema(schemas.timestamp, time)).utc(),
+  bool: _.partial(validateSchema, schemas.bool) as Validator<any>,
   id: _.partial(validateSchema, schemas.id) as Validator<number>,
 };

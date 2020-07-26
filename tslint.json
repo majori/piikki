@@ -1,13 +1,11 @@
 {
-    "extends": [
-        "tslint:recommended"
-    ],
-    "rules": {
-      "no-namespace": [false],
-      "interface-name": ["always-prefix"],
-      "quotemark": [true, "single"],
-      "ordered-imports": [false],
-      "object-literal-sort-keys": false,
-      "linebreak-style": [true, "lf"]
-    }
+  "extends": ["tslint:recommended"],
+  "rules": {
+    "no-namespace": [false],
+    "interface-name": ["always-prefix"],
+    "quotemark": [true, "single"],
+    "ordered-imports": [false],
+    "object-literal-sort-keys": false,
+    "linebreak-style": [true, "lf"]
+  }
 }

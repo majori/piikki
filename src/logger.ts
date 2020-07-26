@@ -8,7 +8,6 @@ import { getTokenInfo } from './tokenHandler';
 import config from './config';
 
 export class Logger extends Winston {
-
   constructor(filePath: string) {
     super();
 
@@ -51,7 +50,9 @@ export class Logger extends Winston {
     return {
       url: req.originalUrl,
       ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      response_time: _.get(req, 'insights.startTime') ? (Date.now() - req.insights.startTime) : 0,
+      response_time: _.get(req, 'insights.startTime')
+        ? Date.now() - req.insights.startTime
+        : 0,
       token: getTokenInfo(req),
     };
   }
@@ -63,16 +64,16 @@ export class Logger extends Winston {
   }
 
   private getErrorMetadata(err: Error) {
-    return isBoom(err) ?
-      {
-        error: err.output.payload.error,
-        message: err.output.payload.message,
-        ...err.data,
-      } :
-      {
-        error: 'Internal Server Error',
-        message: err.message,
-      };
+    return isBoom(err)
+      ? {
+          error: err.output.payload.error,
+          message: err.output.payload.message,
+          ...err.data,
+        }
+      : {
+          error: 'Internal Server Error',
+          message: err.message,
+        };
   }
 
   private setLevelForTransports(level: CLILoggingLevel) {
