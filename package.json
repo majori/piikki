@@ -14,8 +14,8 @@
     "build": "tsc --listEmittedFiles",
     "build:watch": "tsc --watch",
     "build:test": "tsc --noEmit",
-    "mocha": "mocha -r ts-node/register --exit test/**/*.ts",
-    "mocha:watch": "mocha -r ts-node/register --inspect -w --watch-extensions ts test/**/*.ts",
+    "mocha": "mocha",
+    "mocha:watch": "mocha --inspect -w",
     "test": "npm run lint && npm run build:test && npm run mocha"
   },
   "repository": {
