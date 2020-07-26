@@ -29,7 +29,9 @@ export const tokens = {
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();
   if (version !== 'none') {
-    await knex.migrate.rollback();
+    await knex.migrate.rollback({
+      directory: cfg.dir.migrations,
+    });
     return migrateAllDown();
   }
 }

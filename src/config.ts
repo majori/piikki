@@ -7,7 +7,7 @@ export const Config: IConfig = {
   dir: {
     source: path.join(__dirname, '..', 'src'),
     build: path.join(__dirname, '..', 'build'),
-    migrations: path.join(__dirname, '..', 'migrations'),
+    migrations: path.join(__dirname, 'migrations'),
     seeds: path.join(__dirname, '..', 'seeds'),
     documents: path.join(__dirname, '..', 'docs'),
   },

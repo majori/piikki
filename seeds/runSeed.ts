@@ -1,4 +1,4 @@
-import Knex from 'knex';
+import * as Knex from 'knex';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as _ from 'lodash';

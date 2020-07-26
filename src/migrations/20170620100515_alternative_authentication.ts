@@ -1,7 +1,7 @@
-import Knex from 'knex';
+import * as Knex from 'knex';
 
-export const up = (knex: Knex) => {
-  return knex.schema.createTable('alternative_login', (table) => {
+export async function up(knex: Knex) {
+  await knex.schema.createTable('alternative_login', (table) => {
     table.increments('id').primary();
     table.integer('user_id').notNullable().references('id').inTable('users');
     table.integer('token_id').notNullable().references('id').inTable('tokens');
@@ -10,8 +10,8 @@ export const up = (knex: Knex) => {
     table.string('hashed_key').notNullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
   });
-};
+}
 
-export const down = (knex: Knex) => {
-  return knex.schema.dropTable('alternative_login');
-};
+export async function down(knex: Knex) {
+  await knex.schema.dropTable('alternative_login');
+}

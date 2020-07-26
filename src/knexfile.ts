@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import cfg from './src/config';
+import cfg from './config';
 
 export const development = _.cloneDeep(cfg.db);
 export const production = _.cloneDeep(cfg.db);
