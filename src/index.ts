@@ -2,7 +2,7 @@ import * as process from 'process';
 import * as _ from 'lodash';
 import { createServer } from './server';
 import { Logger } from './logger';
-import config from './config';
+import * as config from './config';
 import { IConfig } from './types/config';
 
 const logger = new Logger(__filename);
