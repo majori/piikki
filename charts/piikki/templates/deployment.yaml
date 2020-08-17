@@ -66,14 +66,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.postgres.passwordSecret.name }}
                   key: {{ .Values.postgres.passwordSecret.key }}
-          # livenessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

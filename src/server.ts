@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as methodOverride from 'method-override';
 import * as cors from 'cors';
 import { isBoom } from 'boom';
+import { knex } from './database';
 import swaggerJSDoc = require('swagger-jsdoc');
 import swaggerUi = require('swagger-ui-express');
 
@@ -34,6 +35,16 @@ export async function createServer(cfg: IConfig) {
   const spec = swaggerJSDoc(cfg.swagger);
   app.get('/api-doc.json', (req, res) => res.json(spec));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
+
+  // Health endpoint
+  app.get('/health', async (req, res) => {
+    try {
+      await knex.raw('SELECT 1');
+      res.send('ok');
+    } catch (err) {
+      res.status(500);
+    }
+  });
 
   // Register currently used tokens
   await initTokens();
