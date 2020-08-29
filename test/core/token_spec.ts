@@ -10,7 +10,6 @@ import * as userCore from '../../src/core/user-core';
 import * as seed from '../../seeds/data/test';
 
 describe('Tokens', () => {
-
   const GROUPNAME = seed.data.groups[0].groupName;
 
   beforeEach(helper.clearDbAndRunSeed);
@@ -29,19 +28,28 @@ describe('Tokens', () => {
 
   it('create a new token', async () => {
     const commentA = 'Organization A';
-    const restricted = await tokenCore.createRestrictedToken(GROUPNAME, commentA);
+    const restricted = await tokenCore.createRestrictedToken(
+      GROUPNAME,
+      commentA,
+    );
     expect(restricted).to.be.string;
-    expect((await tokenCore.getToken(commentA))).to.containSubset({ token: restricted });
+    expect(await tokenCore.getToken(commentA)).to.containSubset({
+      token: restricted,
+    });
 
     const commentB = 'For my buddy Bob';
     const global = await tokenCore.createGlobalToken(commentB);
     expect(global).to.be.string;
-    expect((await tokenCore.getToken(commentB))).to.containSubset({ token: global });
+    expect(await tokenCore.getToken(commentB)).to.containSubset({
+      token: global,
+    });
 
     const commentC = 'For the allmighty';
     const admin = await tokenCore.createAdminToken(commentC);
     expect(admin).to.be.string;
-    expect((await tokenCore.getToken(commentC))).to.containSubset({ token: admin });
+    expect(await tokenCore.getToken(commentC)).to.containSubset({
+      token: admin,
+    });
   });
 
   it('delete token', async () => {

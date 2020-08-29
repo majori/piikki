@@ -11,10 +11,10 @@ import * as transactionCore from '../../src/core/transaction-core';
 import * as userCore from '../../src/core/user-core';
 
 describe('Transactions', () => {
-
   const USER = _.clone(helper.user);
   const GROUP = _.clone(helper.group);
-  const ORIGINAL_SALDO: number = seed.meta.saldos[USER.username][GROUP.groupName];
+  const ORIGINAL_SALDO: number =
+    seed.meta.saldos[USER.username][GROUP.groupName];
 
   async function makeTransaction(amount: number, comment?: string) {
     return transactionCore.makeTransaction({
@@ -47,7 +47,9 @@ describe('Transactions', () => {
     expect(trx1).to.have.property('saldo', ORIGINAL_SALDO + amount);
 
     const user1 = await userCore.getUser(USER.username);
-    expect(user1).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO + amount } });
+    expect(user1).to.containSubset({
+      saldos: { [GROUP.groupName]: ORIGINAL_SALDO + amount },
+    });
 
     const trx2 = await makeTransaction(-amount);
 
@@ -55,14 +57,18 @@ describe('Transactions', () => {
     expect(trx2).to.have.property('saldo', ORIGINAL_SALDO);
 
     const user2 = await userCore.getUser(USER.username);
-    expect(user2).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
+    expect(user2).to.containSubset({
+      saldos: { [GROUP.groupName]: ORIGINAL_SALDO },
+    });
   });
 
   it('make a transaction with a comment', async () => {
     const comment = 'test_comment';
     await makeTransaction(5, comment);
 
-    const transactions = await transactionCore.getUserTransactions(USER.username);
+    const transactions = await transactionCore.getUserTransactions(
+      USER.username,
+    );
     expect(transactions[0]).to.containSubset({ comment });
   });
 
@@ -72,14 +78,15 @@ describe('Transactions', () => {
   });
 
   it('can handle fast transactions', async () => {
-
     const start = moment();
     const count = 30;
     await makeMultipleTransactions(count);
 
     // Final user saldo stays consistent
     const user = await userCore.getUser(USER.username);
-    expect(user).to.containSubset({ saldos: { [GROUP.groupName]: ORIGINAL_SALDO } });
+    expect(user).to.containSubset({
+      saldos: { [GROUP.groupName]: ORIGINAL_SALDO },
+    });
 
     // Transactions has to stay in chronological order
     const transactions = await transactionCore.getUserTransactions(
@@ -94,6 +101,8 @@ describe('Transactions', () => {
       (old: number, transaction: any) => {
         expect(transaction.oldSaldo).to.equal(old);
         return transaction.newSaldo;
-      }, ORIGINAL_SALDO);
+      },
+      ORIGINAL_SALDO,
+    );
   });
 });

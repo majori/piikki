@@ -1,4 +1,5 @@
-import { CLILoggingLevel } from 'winston';
+import type { CLILoggingLevel } from 'winston';
+import type * as Knex from 'knex';
 
 export interface IConfig {
   dir: {
@@ -9,7 +10,7 @@ export interface IConfig {
     seeds: string;
   };
 
-  env: 'production' | 'development' | 'test';
+  env: string;
   isProduction: boolean;
   isTest: boolean;
 
@@ -19,24 +20,9 @@ export interface IConfig {
   cors: any;
 
   db: {
-    client: string;
-    connection: {
-      host: string;
-      port: number;
-      user: string;
-      password: string;
-      database: string;
-      options?: {
-        encrypt?: boolean;
-      };
-    };
-    migrations: {
-      disableTransactions: boolean;
-      tableName: string;
-    };
-    seeds: {
-      directory: string;
-    }
+    production: Knex.Config;
+    development: Knex.Config;
+    test: Knex.Config;
   };
 
   logLevel: CLILoggingLevel;

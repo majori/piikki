@@ -10,7 +10,9 @@ import { Logger } from '../logger';
 const logger = new Logger(__filename);
 
 export async function createGroup(groupName: string, isPrivate: boolean) {
-  const records: DatabaseGroup[] = await knex.from('groups').where({ name: groupName });
+  const records: DatabaseGroup[] = await knex
+    .from('groups')
+    .where({ name: groupName });
 
   if (!_.isEmpty(records)) {
     throw conflict(`Group ${groupName} already exists`);
@@ -38,7 +40,9 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
 }
 
 export async function groupExists(groupName: string) {
-  const row: DatabaseGroup = await knex('groups').where({ name: groupName }).first();
+  const row: DatabaseGroup = await knex('groups')
+    .where({ name: groupName })
+    .first();
 
   if (row) {
     return row;
@@ -53,7 +57,9 @@ export async function userIsNotInGroup(username: string, groupName: string) {
   if (!result.found) {
     return { user: result.user, group: result.group };
   } else {
-    throw conflict(`User ${result.user.username} is already in group ${result.group.name}`);
+    throw conflict(
+      `User ${result.user.username} is already in group ${result.group.name}`,
+    );
   }
 }
 
@@ -66,7 +72,9 @@ export async function userIsInGroup(username: string, groupName: string) {
       group: result.group,
     };
   } else {
-    throw notFound(`User ${result.user.username} is not in group ${result.group.name}`);
+    throw notFound(
+      `User ${result.user.username} is not in group ${result.group.name}`,
+    );
   }
 }
 
@@ -80,7 +88,9 @@ export function getUsersFromGroup(groupName: string): QueryBuilder {
 }
 
 export async function getUserFromGroup(groupName: string, username: string) {
-  const row: { username: string; saldo: number } = await getUsersFromGroup(groupName)
+  const row: { username: string; saldo: number } = await getUsersFromGroup(
+    groupName,
+  )
     .andWhere({ 'users.username': username })
     .first();
 
@@ -92,19 +102,18 @@ export async function getUserFromGroup(groupName: string, username: string) {
 }
 
 export function getGroups(all: boolean): QueryBuilder {
-  const query = knex
-    .from('groups')
-    .select('id', 'name');
+  const query = knex.from('groups').select('id', 'name');
 
   all ? query.select('private') : query.where({ private: false });
 
   return query;
 }
 
-export async function getGroup(filter: { name?: string; id?: number }): Promise<any> {
-  const group = await getGroups(true)
-    .where(filter)
-    .first();
+export async function getGroup(filter: {
+  name?: string;
+  id?: number;
+}): Promise<any> {
+  const group = await getGroups(true).where(filter).first();
 
   if (_.isEmpty(group)) {
     throw notFound(`Group with ${JSON.stringify(filter)} not found`);
@@ -118,13 +127,19 @@ export async function getGroup(filter: { name?: string; id?: number }): Promise<
 
 // TODO: Own endpoint for getting group password
 
-export async function addUserToGroup(username: string, groupName: string, password?: string | null) {
+export async function addUserToGroup(
+  username: string,
+  groupName: string,
+  password?: string | null,
+) {
   const result = await userIsNotInGroup(username, groupName);
   const group = await groupExists(groupName);
 
   if (group.private && !_.isNull(password)) {
     if (_.isUndefined(password)) {
-      throw badRequest('Group password is required when user is joining private group');
+      throw badRequest(
+        'Group password is required when user is joining private group',
+      );
     }
 
     if (group.password !== password) {
@@ -132,12 +147,10 @@ export async function addUserToGroup(username: string, groupName: string, passwo
     }
   }
 
-  await knex
-    .from('user_saldos')
-    .insert({
-      group_id: result.group.id,
-      user_id: result.user.id,
-    });
+  await knex.from('user_saldos').insert({
+    group_id: result.group.id,
+    user_id: result.user.id,
+  });
 
   // If the user isn't in other groups, set the group as user's default
   const saldos = await knex

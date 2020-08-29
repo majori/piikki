@@ -9,7 +9,6 @@ import * as userCore from '../../src/core/user-core';
 import * as groupCore from '../../src/core/group-core';
 
 describe('Users', () => {
-
   const USER = _.clone(helper.user);
   const GROUP = 'new_group';
 
@@ -50,12 +49,18 @@ describe('Users', () => {
   });
 
   it('not authenticate user with wrong password', async () => {
-    const auth = await userCore.authenticateUser({ username: USER.username, password: 'wrong' });
+    const auth = await userCore.authenticateUser({
+      username: USER.username,
+      password: 'wrong',
+    });
     expect(auth).to.equal(false);
   });
 
   it('does not throw an error even if user was not found', async () => {
-    const auth = await userCore.authenticateUser({ username: 'unknown_user', password: 'wrong' });
+    const auth = await userCore.authenticateUser({
+      username: 'unknown_user',
+      password: 'wrong',
+    });
     expect(auth).to.equal(false);
   });
 });

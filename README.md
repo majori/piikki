@@ -1,5 +1,4 @@
-![Piikki Logo](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki-logo-title.png)
-------
+## ![Piikki Logo](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki-logo-title.png)
 
 [![Build Status](https://travis-ci.org/majori/piikki.svg?branch=development)](https://travis-ci.org/majori/piikki)
 
@@ -10,6 +9,7 @@ _Piikki_ is designed to handle multiple user groups with one backend service. Th
 This github project only includes server backend and api of the Piikki pre-payment system.
 
 **Clients currently under development:**
+
 - [Desktop](https://github.com/majori/piikki-client-desktop) by [majori](https://github.com/majori) (in production)
 - [Telegram bot](https://github.com/majori/piikki-client-tg) by [majori](https://github.com/majori) (in production)
 - [RFID-reader](https://github.com/juilijoel/piikki-client-rfid) by [juilijoel](https://github.com/juilijoel)
@@ -24,6 +24,7 @@ If you are interested of making your own Piikki client and use our hosted backen
 [Postman collection](https://raw.githubusercontent.com/majori/piikki/development/docs/piikki.postman_collection.json)
 
 # Development
+
 - Install [node.js](https://nodejs.org/en/) and [Docker](https://www.docker.com/community-edition)
 - Run `npm install`
 - Create local database with `docker-compose up -d`

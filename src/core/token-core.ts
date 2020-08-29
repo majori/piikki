@@ -9,8 +9,10 @@ import { Logger } from '../logger';
 
 const logger = new Logger(__filename);
 
-export async function createRestrictedToken(groupName: string, comment?: string) {
-
+export async function createRestrictedToken(
+  groupName: string,
+  comment?: string,
+) {
   const group = await groupExists(groupName);
   const token = await _generateToken();
 
@@ -32,9 +34,7 @@ export async function createRestrictedToken(groupName: string, comment?: string)
 export async function createGlobalToken(comment?: string) {
   const token = await _generateToken();
 
-  await knex
-    .from('tokens')
-    .insert({ token, role: 'global', comment });
+  await knex.from('tokens').insert({ token, role: 'global', comment });
 
   updateTokens(); // Inform token handler about new token
   logger.info('Global token created', { comment });
@@ -45,9 +45,7 @@ export async function createGlobalToken(comment?: string) {
 export async function createAdminToken(comment?: string) {
   const token = await _generateToken(64);
 
-  await knex
-    .from('tokens')
-    .insert({ token, role: 'admin', comment });
+  await knex.from('tokens').insert({ token, role: 'admin', comment });
 
   updateTokens(); // Inform token handler about new token
   logger.info('Admin token created', { comment });
@@ -59,10 +57,10 @@ export async function getTokens(): Promise<DatabaseToken[]> {
   return _getTokens();
 }
 
-export async function getToken(comment: string): Promise<DatabaseToken | undefined> {
-  return await _getTokens()
-    .where({ comment })
-    .first();
+export async function getToken(
+  comment: string,
+): Promise<DatabaseToken | undefined> {
+  return await _getTokens().where({ comment }).first();
 }
 
 export async function deleteToken(token: string) {
@@ -87,7 +85,9 @@ function _getTokens(): QueryBuilder {
       'tokens.comment',
     )
     .from('tokens')
-    .leftJoin('token_group_access', { 'token_group_access.token_id': 'tokens.id' })
+    .leftJoin('token_group_access', {
+      'token_group_access.token_id': 'tokens.id',
+    })
     .leftJoin('groups', { 'groups.id': 'token_group_access.group_id' })
     .where({ active: true });
 }
@@ -95,13 +95,17 @@ function _getTokens(): QueryBuilder {
 // Generates Base64 string from random bytes
 async function _generateToken(length = 20) {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(Math.ceil(length * 3 / 4), (err, buf) => {
-      if (err) { reject(err); }
+    crypto.randomBytes(Math.ceil((length * 3) / 4), (err, buf) => {
+      if (err) {
+        reject(err);
+      }
 
-      resolve(buf.toString('base64')
-        .slice(0, length)
-        .replace(/\+/g, '0')
-        .replace(/\//g, '0'),
+      resolve(
+        buf
+          .toString('base64')
+          .slice(0, length)
+          .replace(/\+/g, '0')
+          .replace(/\//g, '0'),
       );
     });
   });

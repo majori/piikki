@@ -2,7 +2,7 @@
 import { expect, request } from 'chai';
 import * as path from 'path';
 
-import cfg from '../src/config';
+import * as cfg from '../src/config';
 import { IConfig } from '../src/types/config';
 import { createServer } from '../src/server';
 import { knex } from '../src/database';
@@ -29,18 +29,21 @@ export const tokens = {
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();
   if (version !== 'none') {
-    await knex.migrate.rollback();
+    await knex.migrate.rollback({
+      directory: cfg.dir.migrations,
+    });
     return migrateAllDown();
   }
 }
 
-export const runSeed = async () => knex.seed.run({
-  directory: path.join(cfg.dir.seeds, 'test'),
-});
+export const runSeed = async () =>
+  knex.seed.run({
+    directory: path.join(cfg.dir.seeds, 'test'),
+  });
 
 export const clearDb = async () => {
   await migrateAllDown();
-  await knex.migrate.latest({directory: cfg.dir.migrations});
+  await knex.migrate.latest({ directory: cfg.dir.migrations });
 };
 
 export const clearDbAndRunSeed = async () => {
@@ -56,7 +59,7 @@ export function expectOk(res: ChaiHttp.Response) {
 }
 
 export function expectError(res: any, status?: number) {
-  expect(res).to.have.property('error', true);
+  expect(res.error).not.to.be.null;
   expect(res.status).not.to.equal(200);
   expect(res.body).to.have.property('ok', false);
   expect(res.body).to.have.property('error');
@@ -67,7 +70,7 @@ export function expectError(res: any, status?: number) {
 export class Api {
   private config: IConfig;
   private role: 'admin' | 'global' | 'restricted';
-  private api: ChaiHttp.Agent;
+  private api: any;
 
   constructor(config: IConfig, role: 'admin' | 'global' | 'restricted') {
     this.config = config;
@@ -75,7 +78,7 @@ export class Api {
   }
 
   public async start() {
-    this.api = request(await createServer(this.config));
+    this.api = await createServer(this.config);
   }
 
   public get(url: string, query?: any) {
@@ -111,7 +114,9 @@ export class Api {
   }
 
   private async makeRequest(options: RequestOptions) {
-    const req: ChaiHttp.Request = this.api[options.method](`/api/v1/${this.role}${options.url}`);
+    const req: ChaiHttp.Request = request(this.api)[options.method](
+      `/api/v1/${this.role}${options.url}`,
+    );
 
     req.set('Authorization', tokens[this.role]);
     options.query && req.query(options.query);

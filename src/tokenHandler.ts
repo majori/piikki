@@ -62,8 +62,10 @@ export const handleTokens: RequestHandler = (req, res, next) => {
 
 // Fetch current tokens from database
 export async function updateTokens(newTokens?: DatabaseToken[]) {
-  registeredTokens = (newTokens) ? newTokens : await getTokens();
-  logger.debug('Refreshing tokens', { tokens: JSON.stringify(registeredTokens) });
+  registeredTokens = newTokens ? newTokens : await getTokens();
+  logger.debug('Refreshing tokens', {
+    tokens: JSON.stringify(registeredTokens),
+  });
 }
 
 export function getTokenInfo(req: Request) {

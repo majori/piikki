@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 
-import cfg from '../../src/config';
+import * as cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
 import * as helper from '../helpers';
 import * as transactionCore from '../../src/core/transaction-core';
@@ -15,7 +15,6 @@ const GROUP = _.clone(helper.group);
 const API = new helper.Api(cfg, 'restricted');
 
 describe('Restricted API', () => {
-
   before(async () => {
     await helper.clearDbAndRunSeed();
     await API.start();
@@ -23,48 +22,44 @@ describe('Restricted API', () => {
   beforeEach(helper.clearDbAndRunSeed);
 
   it('create a new user', async () => {
-    const res = await API.post(
-        '/users/create',
-        { username: 'otherUser', password: 'hackme' },
-      );
+    const res = await API.post('/users/create', {
+      username: 'otherUser',
+      password: 'hackme',
+    });
 
     helper.expectOk(res);
 
     // Username can not be a number
     helper.expectError(
-      await API.post('/users/create', { username: '12345', password: 'hackme' }),
+      await API.post('/users/create', {
+        username: '12345',
+        password: 'hackme',
+      }),
       400,
     );
   });
 
   it('authenticate user', async () => {
-
     // With right password
-    const res1 = await API
-      .post(
-        '/users/authenticate',
-        USER,
-      );
+    const res1 = await API.post('/users/authenticate', USER);
 
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
 
     // With wrong password
-    const res2 = await API
-      .post(
-        '/users/authenticate',
-        { username: USER.username, password: 'wrong_password' },
-      );
+    const res2 = await API.post('/users/authenticate', {
+      username: USER.username,
+      password: 'wrong_password',
+    });
 
     helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
     // With wrong username
-    const res3 = await API
-      .post(
-        '/users/authenticate',
-        { username: 'wrong_username', password: USER.password },
-      );
+    const res3 = await API.post('/users/authenticate', {
+      username: 'wrong_username',
+      password: USER.password,
+    });
 
     helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
@@ -72,11 +67,10 @@ describe('Restricted API', () => {
 
   it('create alternative login', async () => {
     const ALTERNATIVE_KEY = 'some_kind_of_id';
-    const res = await API
-      .post(
-        '/users/authenticate/alternative/create',
-        { key: ALTERNATIVE_KEY, username: USER.username },
-      );
+    const res = await API.post('/users/authenticate/alternative/create', {
+      key: ALTERNATIVE_KEY,
+      username: USER.username,
+    });
 
     helper.expectOk(res);
     expect(res.body.result.key).to.equal(ALTERNATIVE_KEY);
@@ -84,37 +78,35 @@ describe('Restricted API', () => {
 
   it('authenticate with alternative login', async () => {
     const ALTERNATIVE_KEY = 'some_kind_of_id';
-    await API.post(
-      '/users/authenticate/alternative/create',
-      { key: ALTERNATIVE_KEY, username: USER.username, type: 20 },
-    );
+    await API.post('/users/authenticate/alternative/create', {
+      key: ALTERNATIVE_KEY,
+      username: USER.username,
+      type: 20,
+    });
 
     // Right username with right key
-    const res1 = await API
-      .post(
-        '/users/authenticate/alternative',
-        { key: ALTERNATIVE_KEY, type: 20 },
-      );
+    const res1 = await API.post('/users/authenticate/alternative', {
+      key: ALTERNATIVE_KEY,
+      type: 20,
+    });
     helper.expectOk(res1);
     expect(res1.body.result.authenticated).to.be.true;
     expect(res1.body.result.username).to.equal(USER.username);
 
     // Wrong key with right type
-    const res2 = await API
-      .post(
-        '/users/authenticate/alternative',
-        { key: 'wrong_key', type: 20 },
-      );
+    const res2 = await API.post('/users/authenticate/alternative', {
+      key: 'wrong_key',
+      type: 20,
+    });
 
     helper.expectOk(res2);
     expect(res2.body.result.authenticated).to.be.false;
 
     // Right key with wrong type
-    const res3 = await API
-      .post(
-        '/users/authenticate/alternative',
-        { key: ALTERNATIVE_KEY, type: 10 },
-      );
+    const res3 = await API.post('/users/authenticate/alternative', {
+      key: ALTERNATIVE_KEY,
+      type: 10,
+    });
 
     helper.expectOk(res3);
     expect(res3.body.result.authenticated).to.be.false;
@@ -133,11 +125,13 @@ describe('Restricted API', () => {
   it('reset password', async () => {
     const newPassword = 'new_password';
 
-    helper.expectOk(await API.put('/users/reset/password', {
-      username: USER.username,
-      oldPassword: USER.password,
-      newPassword,
-    }));
+    helper.expectOk(
+      await API.put('/users/reset/password', {
+        username: USER.username,
+        oldPassword: USER.password,
+        newPassword,
+      }),
+    );
 
     // User can't be authenticated with the old password
     const res = await API.post('/users/authenticate', {
@@ -146,10 +140,12 @@ describe('Restricted API', () => {
     });
     expect(res.body.result.authenticated).to.be.false;
 
-    helper.expectOk(await API.post('/users/authenticate', {
-      username: USER.username,
-      password: newPassword,
-    }));
+    helper.expectOk(
+      await API.post('/users/authenticate', {
+        username: USER.username,
+        password: newPassword,
+      }),
+    );
 
     // Reset password back to original
     await API.put('/users/reset/password', {
@@ -162,18 +158,17 @@ describe('Restricted API', () => {
   it('reset username', async () => {
     const newUsername = 'new_username';
 
-    helper.expectOk(await API.put('/users/reset/username', {
-      oldUsername: USER.username,
-      newUsername,
-      password: USER.password,
-    }));
+    helper.expectOk(
+      await API.put('/users/reset/username', {
+        oldUsername: USER.username,
+        newUsername,
+        password: USER.password,
+      }),
+    );
 
     helper.expectOk(await API.get(`/group/members/${newUsername}`));
 
-    helper.expectError(
-      await API.get(`/group/members/${USER.username}`),
-      404,
-    );
+    helper.expectError(await API.get(`/group/members/${USER.username}`), 404);
 
     // Reset username back to original
     await API.put('/users/reset/username', {
@@ -200,7 +195,9 @@ describe('Restricted API', () => {
   it('get group members', async () => {
     const res = await API.get('/group/members');
     helper.expectOk(res);
-    expect(res.body.result).to.have.length(seed.meta.membersInGroup[GROUP.groupName]);
+    expect(res.body.result).to.have.length(
+      seed.meta.membersInGroup[GROUP.groupName],
+    );
   });
 
   it('get group member', async () => {
@@ -226,23 +223,23 @@ describe('Restricted API', () => {
   });
 
   it('remove member from group', async () => {
-      const res1 = await API.post('/group/addMember', {
-        username: seed.data.users[3].username,
-      });
-      helper.expectOk(res1);
+    const res1 = await API.post('/group/addMember', {
+      username: seed.data.users[3].username,
+    });
+    helper.expectOk(res1);
 
-      const res2 = await API.get('/group/members');
-      helper.expectOk(res2);
-      const memberCount = _.size(res2.body.result);
+    const res2 = await API.get('/group/members');
+    helper.expectOk(res2);
+    const memberCount = _.size(res2.body.result);
 
-      const res3 = await API.del('/group/removeMember', {
-        username: seed.data.users[3].username,
-      });
-      helper.expectOk(res3);
+    const res3 = await API.del('/group/removeMember', {
+      username: seed.data.users[3].username,
+    });
+    helper.expectOk(res3);
 
-      const res4 = await API.get('/group/members');
-      helper.expectOk(res4);
-      expect(res4.body.result).to.have.length(memberCount - 1);
+    const res4 = await API.get('/group/members');
+    helper.expectOk(res4);
+    expect(res4.body.result).to.have.length(memberCount - 1);
   });
 
   it('make a transaction', async () => {
@@ -253,7 +250,9 @@ describe('Restricted API', () => {
     });
 
     helper.expectOk(res);
-    expect(res.body.result.saldo).to.equal(seed.meta.saldos[USER.username][GROUP.groupName] + amount);
+    expect(res.body.result.saldo).to.equal(
+      seed.meta.saldos[USER.username][GROUP.groupName] + amount,
+    );
   });
 
   it('get group transactions', async () => {
@@ -288,7 +287,9 @@ describe('Restricted API', () => {
 
     helper.expectOk(res1);
     expect(res1.body.result[0].saldo).to.equal(0);
-    expect(res1.body.result[0].timestamp).to.equal(moment().format('YYYY-MM-DD'));
+    expect(res1.body.result[0].timestamp).to.equal(
+      moment().format('YYYY-MM-DD'),
+    );
 
     await transactionCore.makeTransaction({
       username: USER.username,
@@ -306,6 +307,5 @@ describe('Restricted API', () => {
     expect(res3.body.result).to.have.length(2);
     expect(res3.body.result[0].saldo).to.equal(0);
     expect(res3.body.result[1].saldo).to.equal(1);
-
   });
 });

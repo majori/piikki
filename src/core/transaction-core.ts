@@ -10,7 +10,11 @@ import { getUserFromGroup } from './group-core';
 const logger = new Logger(__filename);
 
 export async function makeTransaction(newTrx: TransactionDto) {
-  interface QueryOutput { 'user_id': string; 'group_id': string; saldo: number; }
+  interface QueryOutput {
+    user_id: string;
+    group_id: string;
+    saldo: number;
+  }
 
   const amount = _.round(newTrx.amount, 2);
 
@@ -21,7 +25,8 @@ export async function makeTransaction(newTrx: TransactionDto) {
 
   const saldo = await knex.transaction(async (trx) => {
     try {
-      const result = await trx.raw(`
+      const result = await trx.raw(
+        `
         UPDATE "user_saldos" as S
         SET saldo = round((saldo + ?)::numeric, 2)
         FROM "users" as U, "groups" AS G
@@ -30,12 +35,16 @@ export async function makeTransaction(newTrx: TransactionDto) {
           AND U.username = ?
           AND G.name = ?
         RETURNING saldo, user_id, group_id
-      `, [amount, newTrx.username, newTrx.groupName]);
+      `,
+        [amount, newTrx.username, newTrx.groupName],
+      );
 
       const newSaldo: QueryOutput | undefined = _.first(result.rows);
 
       if (_.isUndefined(newSaldo)) {
-        throw notFound(`User "${newTrx.username}" was not found in group "${newTrx.groupName}`);
+        throw notFound(
+          `User "${newTrx.username}" was not found in group "${newTrx.groupName}`,
+        );
       }
 
       const transaction = {
@@ -48,9 +57,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
         timestamp: newTrx.timestamp,
       };
 
-      await knex('transactions')
-        .transacting(trx)
-        .insert(transaction);
+      await knex('transactions').transacting(trx).insert(transaction);
 
       logger.debug('New transaction', transaction);
       return trx.commit(newSaldo.saldo);
@@ -65,27 +72,43 @@ export async function makeTransaction(newTrx: TransactionDto) {
 }
 
 // Get user's all transactions
-export async function getUserTransactions(username: string, from?: moment.Moment, to?: moment.Moment) {
+export async function getUserTransactions(
+  username: string,
+  from?: moment.Moment,
+  to?: moment.Moment,
+) {
   return _getTransactions({ 'users.username': username }, from, to);
 }
 
 // Get all group's member transactions
-export async function getGroupTransactions(groupName: string, from?: moment.Moment, to?: moment.Moment) {
+export async function getGroupTransactions(
+  groupName: string,
+  from?: moment.Moment,
+  to?: moment.Moment,
+) {
   return _getTransactions({ 'groups.name': groupName }, from, to);
 }
 
 // Get transactions of the single member in group
 // tslint:disable-next-line:max-line-length
-export async function getUserTransactionsFromGroup(username: string, groupName: string, from?: moment.Moment, to?: moment.Moment) {
-  return _getTransactions({ 'users.username': username, 'groups.name': groupName }, from, to);
+export async function getUserTransactionsFromGroup(
+  username: string,
+  groupName: string,
+  from?: moment.Moment,
+  to?: moment.Moment,
+) {
+  return _getTransactions(
+    { 'users.username': username, 'groups.name': groupName },
+    from,
+    to,
+  );
 }
 
 // Returns group's absolute saldo in given date
-export async function getGroupSaldo(groupName: string, from: moment.Moment): Promise<{ saldo: number | null }> {
+export async function getGroupSaldo(groupName: string, from: moment.Moment) {
   return knex
     .with('T1', (qb: QueryBuilder) => {
-      qb
-        .select('user_id')
+      qb.select('user_id')
         .max('timestamp as latest_transaction')
         .from('transactions')
         .join('groups', { 'transactions.group_id': 'groups.id' })
@@ -96,23 +119,33 @@ export async function getGroupSaldo(groupName: string, from: moment.Moment): Pro
     .sum('new_saldo as saldo')
     .from('T1')
     .join('transactions', (qb: JoinClause) => {
-      qb
-        .on('T1.user_id', '=', 'transactions.user_id')
-        .andOn('T1.latest_transaction', '=', 'transactions.timestamp');
+      qb.on('T1.user_id', '=', 'transactions.user_id').andOn(
+        'T1.latest_transaction',
+        '=',
+        'transactions.timestamp',
+      );
     })
     .first();
 }
 
 // Get absolute saldo for each day between [from] -> [to]
-export async function getDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
+export async function getDailyGroupSaldosSince(
+  groupName: string,
+  from: moment.Moment,
+  to?: moment.Moment,
+) {
   const toMoment = to ? to : moment().utc();
 
   // Calculate absolute saldo of the first day
-  const startSaldo = (await getGroupSaldo(groupName, from)).saldo || 0;
+  const startSaldo = (await getGroupSaldo(groupName, from))?.saldo || 0;
 
   // How much change happened in each day
-  const deltaSaldos = _.chain(await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment))
-    .map((transaction: any) => _.update(transaction, 'timestamp', (date: string) => moment(date)))
+  const deltaSaldos = _.chain(
+    await _getDeltaDailyGroupSaldosSince(groupName, from, toMoment),
+  )
+    .map((transaction: any) =>
+      _.update(transaction, 'timestamp', (date: string) => moment(date)),
+    )
     .groupBy((transaction: any) => transaction.timestamp.format('YYYY-MM-DD'))
     .mapValues((transactions: any) => _.sumBy(transactions, 'saldo_change'))
     .value();
@@ -137,22 +170,31 @@ export async function getDailyGroupSaldosSince(groupName: string, from: moment.M
 }
 
 // Get changes in saldo from each day between [from] and [to] (doesn't generate days with zero change)
-async function _getDeltaDailyGroupSaldosSince(groupName: string, from: moment.Moment, to?: moment.Moment) {
+async function _getDeltaDailyGroupSaldosSince(
+  groupName: string,
+  from: moment.Moment,
+  to?: moment.Moment,
+) {
   return knex
-    .select(
-      'timestamp',
-      knex.raw('SUM(new_saldo - old_saldo) as saldo_change'),
-    )
+    .select('timestamp', knex.raw('SUM(new_saldo - old_saldo) as saldo_change'))
     .from('transactions')
-    .join('groups', { 'groups.id': 'transactions.group_id'})
+    .join('groups', { 'groups.id': 'transactions.group_id' })
     .where('groups.name', '=', groupName)
     .andWhere('transactions.timestamp', '>=', moment(from).toISOString())
-    .andWhere('transactions.timestamp', '<=', moment(to).endOf('day').toISOString())
+    .andWhere(
+      'transactions.timestamp',
+      '<=',
+      moment(to).endOf('day').toISOString(),
+    )
     .groupBy('transactions.timestamp')
     .orderBy('transactions.timestamp', 'desc');
 }
 
-async function _getTransactions(filterObject: TransactionFilter, from?: moment.Moment, to?: moment.Moment) {
+async function _getTransactions(
+  filterObject: TransactionFilter,
+  from?: moment.Moment,
+  to?: moment.Moment,
+) {
   const query = knex
     .from('transactions')
     .select(
@@ -167,22 +209,16 @@ async function _getTransactions(filterObject: TransactionFilter, from?: moment.M
     .join('groups', { 'groups.id': 'transactions.group_id' })
     .orderBy('transactions.timestamp', 'desc')
     .where(filterObject)
-    .where(
-      'transactions.timestamp',
-      '<=',
-      moment(to).toISOString(),
-    );
+    .where('transactions.timestamp', '<=', moment(to).toISOString());
 
   if (from) {
-    query.where(
-      'transactions.timestamp',
-      '>=',
-      moment(from).toISOString(),
-    );
+    query.where('transactions.timestamp', '>=', moment(from).toISOString());
   }
 
   const results: DatabaseTransaction[] = await query;
 
   // Omit comment field if it is null
-  return _.map(results, (row) => (row.comment) ? row : _.omit(row, ['comment']));
+  return _.map(results, (row) =>
+    row.comment ? row : _.omit(row, ['comment']),
+  );
 }

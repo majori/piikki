@@ -2,7 +2,7 @@ import * as process from 'process';
 import * as _ from 'lodash';
 import { createServer } from './server';
 import { Logger } from './logger';
-import config from './config';
+import * as config from './config';
 import { IConfig } from './types/config';
 
 const logger = new Logger(__filename);
@@ -12,7 +12,10 @@ async function startServer(cfg: IConfig) {
 
   // Start server
   const instance = server.listen(cfg.port, cfg.hostname, () => {
-    logger.info('Server start', { host: cfg.hostname, port: _.toString(cfg.port) });
+    logger.info('Server start', {
+      host: cfg.hostname,
+      port: _.toString(cfg.port),
+    });
   });
 
   process.on('SIGINT', () => {

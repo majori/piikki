@@ -1,4 +1,6 @@
 import * as _knex from 'knex';
-import cfg from './config';
+import * as cfg from './config';
 
-export const knex = _knex(cfg.db);
+export const knex = _knex(
+  cfg.isProduction ? cfg.db.production : cfg.db.development,
+);
