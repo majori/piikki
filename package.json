@@ -61,7 +61,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "bcrypt": "^3.0.8",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "boom": "^7.3.0",
     "cors": "^2.8.5",
