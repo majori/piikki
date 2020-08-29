@@ -1,9 +1,6 @@
-/* tslint:disable:no-unused-expression */
-import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as BBPromise from 'bluebird';
 
 import * as cfg from '../../src/config';
 import * as seed from '../../seeds/data/test';
