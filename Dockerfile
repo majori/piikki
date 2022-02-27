@@ -1,28 +1,20 @@
-FROM node:12-alpine
+FROM node:12 AS build
 
-ENV NODE_ENV production
-ENV NPM_CONFIG_PRODUCTION false
+COPY . /app
+WORKDIR /app
 
-RUN mkdir -p /home/node/app/node_modules \
-  && chown -R node:node /home/node/app
-
-WORKDIR /home/node/app
-
-RUN apk --no-cache add --virtual native-deps \
-  git g++ gcc libgcc libstdc++ linux-headers make python
-
-COPY package*.json ./
-
-USER node
-
-RUN npm install
-
-COPY --chown=node:node . .
-
+RUN npm ci
 RUN npm run build
 
 RUN npm prune --production
 RUN npm cache clean --force
 
+FROM gcr.io/distroless/nodejs:12
+
+ENV NODE_ENV production
+
+COPY --from=build /app /app
+WORKDIR /app
+
 EXPOSE 4000
-CMD [ "npm", "start" ]
+CMD [ "build/index.js" ]
