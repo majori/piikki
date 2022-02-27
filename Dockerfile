@@ -1,4 +1,4 @@
-FROM node:12 AS build
+FROM node:16 AS build
 
 COPY . /app
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN npm run build
 RUN npm prune --production
 RUN npm cache clean --force
 
-FROM gcr.io/distroless/nodejs:12
+FROM gcr.io/distroless/nodejs:16
 
 ENV NODE_ENV production
 
