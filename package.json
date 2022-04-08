@@ -71,7 +71,7 @@
     "knex": "^0.21.2",
     "lodash": "^4.17.21",
     "method-override": "^2.3.10",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "pg": "^7.18.2",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^3.0.10",
