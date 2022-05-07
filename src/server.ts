@@ -1,11 +1,9 @@
-import * as bodyParser from 'body-parser';
+import { urlencoded, json } from 'body-parser';
 import * as express from 'express';
 import * as methodOverride from 'method-override';
 import * as cors from 'cors';
 import { isBoom } from 'boom';
 import { knex } from './database';
-import swaggerJSDoc = require('swagger-jsdoc');
-import swaggerUi = require('swagger-ui-express');
 
 import { handleTokens, initTokens } from './tokenHandler';
 import { initApiRoutes } from './router';
@@ -18,11 +16,10 @@ export async function createServer(cfg: IConfig) {
   const app = express();
 
   // 3rd party middleware
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(bodyParser.json());
+  app.use(urlencoded({ extended: true }));
+  app.use(json());
   app.use(methodOverride());
   app.use(cors(cfg.cors));
-  app.options('*', cors(cfg.cors));
 
   // Set request start time
   app.use((req, res, next) => {
@@ -30,11 +27,6 @@ export async function createServer(cfg: IConfig) {
     req.insights = { startTime: Date.now() };
     next();
   });
-
-  // Setup API definitions (swagger)
-  const spec = swaggerJSDoc(cfg.swagger);
-  app.get('/api-doc.json', (req, res) => res.json(spec));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
 
   // Health endpoint
   app.get('/health', async (req, res) => {

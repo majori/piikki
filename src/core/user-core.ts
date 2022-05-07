@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { QueryBuilder } from 'knex';
+import type { Knex } from 'knex';
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import { badRequest, notFound, conflict, badData } from 'boom';
@@ -135,7 +135,7 @@ export async function authenticateUser(user: UserDto) {
   try {
     const row = await userExists(user.username);
     return await bcrypt.compare(user.password, row.password);
-  } catch (err) {
+  } catch (err: any) {
     // If user was not found, just response with failed authentication
     if (err.isBoom && err.typeof(notFound)) {
       return false;
@@ -168,7 +168,7 @@ export async function userNotExists(username: string) {
   try {
     await userExists(username);
     throw conflict(`User ${username} already exists`);
-  } catch (err) {
+  } catch (err: any) {
     if (err.isBoom && err.typeof(notFound)) {
       return true;
     } else {
@@ -251,7 +251,7 @@ export async function getAlternativeLogin(
 
 export async function getAlternativeLoginsForUser(
   login: AlternativeLoginForUserDto,
-): Promise<QueryBuilder> {
+): Promise<Knex.QueryBuilder> {
   const query = knex('alternative_login as login')
     .join('users', { 'users.id': 'login.user_id' })
     .join('groups', { 'groups.id': 'login.group_id' })
@@ -297,7 +297,7 @@ export async function resetDefaultGroup(username: string) {
 }
 
 // Get all users in group
-function _getUsersWithSaldos(): QueryBuilder {
+function _getUsersWithSaldos(): Knex.QueryBuilder {
   return knex
     .with('usr', (qb) => {
       qb.select('users.id', 'users.username', 'groups.name AS defaultGroup')

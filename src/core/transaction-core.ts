@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { QueryBuilder, JoinClause } from 'knex';
+import type { Knex } from 'knex';
 import { notFound } from 'boom';
 
 import { knex } from '../database';
@@ -23,7 +23,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
     return getUserFromGroup(newTrx.groupName, newTrx.username);
   }
 
-  const saldo = await knex.transaction(async (trx) => {
+  const saldo = await knex.transaction(async (trx: any) => {
     try {
       const result = await trx.raw(
         `
@@ -62,7 +62,7 @@ export async function makeTransaction(newTrx: TransactionDto) {
       logger.debug('New transaction', transaction);
       return trx.commit(newSaldo.saldo);
     } catch (err) {
-      logger.error(err);
+      logger.error(err as any);
       await trx.rollback();
       throw err;
     }
@@ -107,7 +107,7 @@ export async function getUserTransactionsFromGroup(
 // Returns group's absolute saldo in given date
 export async function getGroupSaldo(groupName: string, from: moment.Moment) {
   return knex
-    .with('T1', (qb: QueryBuilder) => {
+    .with('T1', (qb: Knex.QueryBuilder) => {
       qb.select('user_id')
         .max('timestamp as latest_transaction')
         .from('transactions')
@@ -118,7 +118,7 @@ export async function getGroupSaldo(groupName: string, from: moment.Moment) {
     })
     .sum('new_saldo as saldo')
     .from('T1')
-    .join('transactions', (qb: JoinClause) => {
+    .join('transactions', (qb: Knex.JoinClause) => {
       qb.on('T1.user_id', '=', 'transactions.user_id').andOn(
         'T1.latest_transaction',
         '=',

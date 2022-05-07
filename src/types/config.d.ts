@@ -1,5 +1,5 @@
 import type { CLILoggingLevel } from 'winston';
-import type * as Knex from 'knex';
+import type { Knex } from 'knex';
 
 export interface IConfig {
   dir: {
@@ -22,25 +22,7 @@ export interface IConfig {
   db: {
     production: Knex.Config;
     development: Knex.Config;
-    test: Knex.Config;
   };
 
   logLevel: CLILoggingLevel;
-
-  swagger: {
-    swaggerDefinition: {
-      info: {
-        title: string;
-        version: string;
-        description: string;
-      };
-      basePath: string;
-      schemes: string[];
-      consumes: string[];
-      produces: string[];
-      security: any[];
-      securityDefinitions: any;
-    };
-    apis: string[];
-  };
 }

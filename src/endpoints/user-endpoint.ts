@@ -93,9 +93,8 @@ const endpoint: Endpoint = {
               : req.piikki.groupAccess.group.name,
           );
 
-    const rows: DatabaseAlternativeLogin[] = await userCore.getAlternativeLoginsForUser(
-      { groupName, username, type },
-    );
+    const rows: DatabaseAlternativeLogin[] =
+      await userCore.getAlternativeLoginsForUser({ groupName, username, type });
 
     return {
       count: _.size(rows),

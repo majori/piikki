@@ -1,4 +1,4 @@
-import { QueryBuilder } from 'knex';
+import type { Knex } from 'knex';
 import * as _ from 'lodash';
 
 import { badRequest, notFound, conflict } from 'boom';
@@ -32,7 +32,7 @@ export async function createGroup(groupName: string, isPrivate: boolean) {
   logger.info('Group created', { group_name: groupName });
 
   return {
-    id: _.first(ids),
+    id: _.first(ids).id,
     groupName,
     token,
     password: isPrivate ? password : undefined,
@@ -78,7 +78,7 @@ export async function userIsInGroup(username: string, groupName: string) {
   }
 }
 
-export function getUsersFromGroup(groupName: string): QueryBuilder {
+export function getUsersFromGroup(groupName: string): Knex.QueryBuilder {
   return knex
     .select('users.username', 'user_saldos.saldo')
     .from('users')
@@ -101,7 +101,7 @@ export async function getUserFromGroup(groupName: string, username: string) {
   }
 }
 
-export function getGroups(all: boolean): QueryBuilder {
+export function getGroups(all: boolean): Knex.QueryBuilder {
   const query = knex.from('groups').select('id', 'name');
 
   all ? query.select('private') : query.where({ private: false });

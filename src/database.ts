@@ -1,4 +1,4 @@
-import * as _knex from 'knex';
+import { knex as _knex } from 'knex';
 import * as cfg from './config';
 
 export const knex = _knex(

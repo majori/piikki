@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import type * as Knex from 'knex';
+import type { Knex } from 'knex';
 import * as path from 'path';
 import { CLILoggingLevel } from 'winston';
 
@@ -58,7 +58,7 @@ export const db = {
     ...defaultDbConfig,
     connection: process.env.PG_CONNECTION_STRING || {
       host: 'localhost',
-      port: 6001,
+      port: 4001,
       database: 'postgres',
       user: 'postgres',
       password: 'password12!',
@@ -67,37 +67,8 @@ export const db = {
       directory: './seeds/development',
     },
   },
-
-  test: {
-    ...defaultDbConfig,
-  },
 };
 
 // ### Logger options
 //
 export const logLevel = (process.env.LOG_LEVEL as CLILoggingLevel) || 'info';
-
-// ### Swagger documentation
-//
-export const swagger = {
-  swaggerDefinition: {
-    info: {
-      title: 'Piikki',
-      version: require('../package.json').version,
-      description: 'API definition for Piikki API',
-    },
-    basePath: '/api/v1/',
-    schemes: ['https', 'http'],
-    consumes: ['application/json'],
-    produces: ['application/json'],
-    security: [{ token: [] }],
-    securityDefinitions: {
-      token: {
-        type: 'apiKey',
-        in: 'header',
-        name: 'Authorization',
-      },
-    },
-  },
-  apis: ['./src/router.ts'],
-};

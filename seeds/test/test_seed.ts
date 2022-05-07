@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import type { Knex } from 'knex';
 import runSeed from '../runSeed';
 import { data } from '../data/test';
 

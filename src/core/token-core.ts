@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { QueryBuilder } from 'knex';
+import type { Knex } from 'knex';
 
 import { knex } from '../database';
 import { groupExists, getGroups } from './group-core';
@@ -16,14 +16,14 @@ export async function createRestrictedToken(
   const group = await groupExists(groupName);
   const token = await _generateToken();
 
-  const id = await knex
+  const ids = await knex
     .from('tokens')
     .insert({ token, role: 'restricted', comment })
     .returning('id');
 
   await knex
     .from('token_group_access')
-    .insert({ token_id: id[0], group_id: group.id });
+    .insert({ token_id: ids[0].id, group_id: group.id });
 
   updateTokens(); // Inform token handler about new token
   logger.info('Restricted token created', { groupName, comment });
@@ -75,7 +75,7 @@ export async function deleteToken(token: string) {
   return result;
 }
 
-function _getTokens(): QueryBuilder {
+function _getTokens(): Knex.QueryBuilder {
   return knex
     .select(
       'tokens.id',
